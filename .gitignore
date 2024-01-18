@@ -454,4 +454,4 @@ $RECYCLE.BIN/
 !.vscode/extensions.json
 
 # My changes
-/OxfordDictionaryParserTests/
+**/*Tests*/
