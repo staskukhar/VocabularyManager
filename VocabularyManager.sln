@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OxfordDictionaryParser", "OxfordDictionaryParser\OxfordDictionaryParser.csproj", "{CBA30ABE-1423-4F31-A4AD-F946C9589A78}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DictionaryParserLib", "DictionaryParser\DictionaryParserLib.csproj", "{CBA30ABE-1423-4F31-A4AD-F946C9589A78}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OxfordDictionaryParserTests", "OxfordDictionaryParserTests\OxfordDictionaryParserTests.csproj", "{0F27432F-ABFC-43D4-AC00-360FACDD3E89}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DictionaryParserLibTests", "DictionaryParserTests\DictionaryParserLibTests.csproj", "{0F27432F-ABFC-43D4-AC00-360FACDD3E89}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
