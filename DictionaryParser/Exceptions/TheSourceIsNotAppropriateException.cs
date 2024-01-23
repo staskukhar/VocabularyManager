@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OxfordDictionaryParser.Exceptions
+namespace DictionaryParser.Exceptions
 {
     public class TheSourceIsNotAppropriateException : Exception
     {

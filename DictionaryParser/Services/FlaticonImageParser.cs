@@ -6,13 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AngleSharp.Html.Dom;
-using OxfordDictionaryParser.Exceptions;
+using DictionaryParser.Exceptions;
 
 namespace DictionaryParserLib.Services
 {
     public class FlaticonImageParser : IImageParser<IEnumerable<string?>>
     {
-        public async Task<IEnumerable<string?>> GetImageLinksByWord(string url, string word, bool colorfulFilter = true)
+        public async Task<IEnumerable<string?>> GetImageLinksByWordAsync(string url, string word, bool colorfulFilter = true)
         {
             if (String.IsNullOrEmpty(url))
             {

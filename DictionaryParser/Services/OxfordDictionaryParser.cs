@@ -1,8 +1,8 @@
 ﻿using AngleSharp;
 using AngleSharp.Dom;
-using OxfordDictionaryParser.Exceptions;
+using DictionaryParser.Exceptions;
 
-namespace OxfordDictionaryParser.Services
+namespace DictionaryParser.Services
 {
     public class OxfordDictionaryParser : IWordParser<ParsingWordDTO>
     {

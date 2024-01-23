@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OxfordDictionaryParser.Services
+namespace DictionaryParser.Services
 {
     public interface IWordParser<T>
     {
