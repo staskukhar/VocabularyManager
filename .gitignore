@@ -455,3 +455,4 @@ $RECYCLE.BIN/
 
 # My changes
 **/*Tests*/
+/DictionaryManagerApp/wwwroot/appsettings.json
