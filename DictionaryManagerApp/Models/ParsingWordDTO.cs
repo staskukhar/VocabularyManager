@@ -1,0 +1,1 @@
+public record class ParsingWordDTO(string OriginWord, string LexemaType, string LevelAttribute, string[] AudioLinks) {}
