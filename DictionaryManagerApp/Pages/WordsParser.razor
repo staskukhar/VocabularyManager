@@ -1,0 +1,59 @@
+﻿@page "/wordsp"
+
+@using System.IO
+@using System.Text
+@using System.Text.Json
+
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+<h3>Word list parser</h3>
+<button @onclick="DownloadFileFromStream">Generate and download file</button>
+
+@code {
+    private void GetWordListByHttp()
+    {
+        using StringContent jsonContent = new(
+        JsonSerializer.Serialize(
+            new String("https://www.oxfordlearnersdictionaries.com/wordlists/oxford3000-5000")
+        ),
+        Encoding.UTF8,
+        "application/json");
+
+        using var response = Http.PostAsync(
+            String.Concat(Http.BaseAddress, "api/WordList/getwordlist"),
+            jsonContent
+        );
+        if(response.IsCompletedSuccessfully)
+        {
+            Console.WriteLine(response.Result);
+        }
+    }
+    private Stream GetFileStream()
+    {
+        var BinaryData = GetFileAsStream(Enumerable.Empty<ParsingWordDTO>());
+        var fileStream = new MemoryStream(BinaryData);
+
+        return fileStream;
+    }
+
+    private Byte[] GetFileAsStream(IEnumerable<ParsingWordDTO> wordList)
+    {
+        StringBuilder lines = new StringBuilder();
+        foreach(var word in wordList)
+        {
+            lines.AppendLine(word.OriginWord);
+        }
+        return Encoding.UTF8.GetBytes(lines.ToString());
+    }
+
+    private async Task DownloadFileFromStream()
+    {
+        var fileStream = GetFileStream();
+        var fileName = "wordList.txt";
+
+        using var streamRef = new DotNetStreamReference(stream: fileStream);
+
+        await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+    }
+}
