@@ -57,6 +57,9 @@
 
             var fileStream = GetFileAsStream(wordList);
             await DownloadFile("wordList.txt", fileStream);
+
+            var jsonFileStream = GetJsonAsStream(wordList);
+            await DownloadFile("wordListJson.json", jsonFileStream);
         }
     }
 
@@ -96,5 +99,15 @@
             lines.AppendLine(word.OriginWord);
         }
         return new MemoryStream(Encoding.UTF8.GetBytes(lines.ToString()));
+    }
+    private Stream GetJsonAsStream(IEnumerable<ParsingWordDTO> wordList)
+    {
+        return new MemoryStream(
+            Encoding.UTF8.GetBytes(
+                JsonSerializer.Serialize(
+                    wordList
+                )
+            )
+        );
     }
 }
