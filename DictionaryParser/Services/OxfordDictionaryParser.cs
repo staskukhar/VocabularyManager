@@ -49,7 +49,7 @@ namespace DictionaryParser.Services
             return new ParsingWordDTO(
                 originWord: element.QuerySelector("a")?.TextContent, // tag a contain word text
                 lexemaType: element.QuerySelector(".pos")?.TextContent, // span with class .pos contain lexema info
-                levelAttribute: nestedDiv?.QuerySelector("div")?.TextContent, //tag div contain level info
+                levelAttribute: nestedDiv?.QuerySelector("span.belong-to")?.TextContent, //tag div contain level info
                 audioLinks: audioContentDivs?.Select( audio => 
                     audio.GetAttribute("data-src-mp3") ).ToArray()
                 );
