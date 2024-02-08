@@ -93,12 +93,11 @@
 
     private Stream GetFileAsStream(IEnumerable<ParsingWordDTO> wordList)
     {
-        StringBuilder lines = new StringBuilder();
-        foreach(var word in wordList)
-        {
-            lines.AppendLine(word.OriginWord);
-        }
-        return new MemoryStream(Encoding.UTF8.GetBytes(lines.ToString()));
+        string text = String
+            .Join(',', wordList.
+                Select(w => w.OriginWord)
+            );
+        return new MemoryStream(Encoding.UTF8.GetBytes(text));
     }
     private Stream GetJsonAsStream(IEnumerable<ParsingWordDTO> wordList)
     {
