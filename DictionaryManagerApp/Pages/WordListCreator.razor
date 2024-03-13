@@ -1,0 +1,160 @@
+﻿@page "/wordlistc"
+
+@using System.Text.Json
+@using DictionaryManagerApp.Pages.Modals
+@using DictionaryManager.Shared.Models.DTOs
+
+@inject HttpClient HttpClient
+
+<div class="container bg-light rounded-1 border-2">
+    <h3>Vocabulary craft</h3>
+    <div class="row">
+        <div class="col">
+            <label>Enter a parsing url</label>
+            <div class="input-group mb-3">
+                <input class="form-control" @bind="Url" @bind:event="oninput" @onkeyup="ValidateUrl"></input>
+                <a 
+                    class="btn btn-outline-dark @(IsUrlValid && !areWordsLoading ? "": "disabled")" 
+                    @onclick="LoadWordList">
+                    Load
+                </a>
+            </div>
+            @if(!IsUrlValid)
+            {
+                <span class="text-danger">"It seems like passed url isn't valid."</span>
+            }
+        </div>
+        @if (!areWordsLoading && WordList.Count > 0)
+        {
+            <div class="m-1">
+                <hr />
+            </div>
+            <div class="flex-row">
+                <div class="input-group mb-3">
+                    <input class="form-control" @bind="WordListName" placeholder="Word list's name">
+                    <button class="btn btn-outline-secondary" @onclick="SaveWordList">Save list</button>
+                </div>
+            </div>
+            <div class="flex-row">
+                @for (int i = StartOfPage(CurrentPage); i < EndOfPage(CurrentPage); i++)
+                {
+                    <div class="card mb-1 p-0 border-1 bg-transparent">
+                        <div class="d-flex justify-content-between bg-gradient">
+                            <div class="col m-auto ms-lg-2">
+                                <div>@PositionLabelText(i + 1): @WordList[i].OriginWord</div>
+                                <div>Lexeme: @WordList[i].LexemeType</div>
+                                <div>Level: @WordList[i].LevelAttribute</div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <Pagination ActivePageNumber="@CurrentPage"
+                        TotalPages="@((int)Math.Ceiling(WordList.Count * 1m / AmountWordsOnPage))"
+                        PageChanged="OnPageChangedAsync" />
+        }
+        else if(areWordsLoading)
+        {
+            <div class="text-primary text-center align-content-center">
+                Loading...
+            </div>
+        }
+    </div>
+</div>
+
+<Modal @ref="modalResult" />
+
+@code {
+    private List<ParsingWordDTO> WordList = new List<ParsingWordDTO>();
+
+    private int CurrentPage { get; set; } = 1;
+    private const int AmountWordsOnPage = 50;
+
+    private bool isFileValid = true;
+    private bool isJsonFileValid = true;
+    private bool areWordsLoading = false;
+
+    private string Url { get; set; } = String.Empty;
+    private bool IsUrlValid { get; set; } = true;
+    private string WordListName { get; set; } = String.Empty;
+    private bool IsWordListNameValid { get; set; } = true;
+
+    private Modal modalResult = default!;
+
+    private void ValidateUrl()
+    {
+        IsUrlValid = Uri.IsWellFormedUriString(Url, UriKind.Absolute);
+    }
+    private void ValidateWordlListName()
+    {
+        IsWordListNameValid = !String.IsNullOrEmpty(WordListName);
+    }
+
+    private async Task<IEnumerable<ParsingWordDTO>> GetWordListByHttp(string url)
+    {
+        var response = await HttpClient.PostAsJsonAsync(
+            String.Concat(HttpClient.BaseAddress, "api/WordList/getwordlist"),
+            url
+        );
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<IEnumerable<ParsingWordDTO>>() ?? 
+                Enumerable.Empty<ParsingWordDTO>();
+        }
+
+        await ShowModalMessage(title: "Opps!", message: "Some problem is occured!");
+        return Enumerable.Empty<ParsingWordDTO>();
+    }
+
+    private string PositionLabelText(int index)
+    {
+        if (index == 1) return String.Concat(index, "st");
+        else if (index == 2) return String.Concat(index, "nd");
+        else if (index == 3) return String.Concat(index, "rd");
+        else return String.Concat(index, "th");
+    }
+    private async Task OnPageChangedAsync(int newPageNumber)
+    {
+        await Task.Run(() => { CurrentPage = newPageNumber; });
+    }
+
+    private int StartOfPage(int currentPage) => (currentPage - 1) * AmountWordsOnPage;
+    private int EndOfPage(int currentPage)
+    {
+        // the code help prevent exception index out of... when we try get last page
+        int end = currentPage * AmountWordsOnPage;
+        return end > WordList.Count ? WordList.Count : end;
+    }
+
+    private async Task LoadWordList()
+    {
+        areWordsLoading = true;
+
+        WordList.Clear();
+        ValidateUrl();
+        WordList.AddRange(
+            await GetWordListByHttp(Url)
+        );
+
+        areWordsLoading = false;
+    }
+    private async Task SaveWordList()
+    {
+        ValidateWordlListName();
+        if(String.IsNullOrEmpty(WordListName))
+        {
+            await ShowModalMessage("Warning", "Please set the word list's name");
+        }
+        else
+        {
+            //TODO: implement saving logic
+            await ShowModalMessage("Good job!", $"The list: {WordListName} is saved");
+        }
+    }
+    private async Task ShowModalMessage(string title, string message)
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("Message", message);
+        await modalResult.ShowAsync<ModalResult>(title: title, parameters: parameters);
+    }
+}
