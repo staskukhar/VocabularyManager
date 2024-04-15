@@ -1,0 +1,97 @@
+﻿@using DictionaryManager.Shared.Models.DTOs
+@using DictionaryManagerApp.Services
+
+@implements IDisposable
+
+@inject IDictionaryRepository<WordListDTO, WordDTO> DictionaryRepository
+
+<Modal @ref="modalResult" />
+<EditForm EditContext="wordEditContext">
+    <div class="input-group mb-2">
+        <span class="input-group-text">Word</span>
+        <InputText class="form-control" @bind-Value="wordData.WordContent"></InputText>
+    </div>
+    <ValidationMessage For="() => wordData.WordContent" />
+    <div class="input-group mb-2">
+        <span class="input-group-text">Lexeme</span>
+        <InputText class="form-control" @bind-Value="wordData.Lexeme"></InputText>
+    </div>
+    <ValidationMessage For="() => wordData.Lexeme" />
+    <div class="input-group mb-2">
+        <span class="input-group-text">Level</span>
+        <InputText class="form-control" @bind-Value="wordData.LevelAttribute"></InputText>
+    </div>
+    <ValidationMessage For="() => wordData.LevelAttribute" />
+</EditForm>
+<Button Type="ButtonType.Submit" Color="ButtonColor.Success" @onclick="UpdateWord">Update</Button>
+<Button Type="ButtonType.Reset" Color="ButtonColor.Danger" @onclick="OnCloseFunc">Cancel</Button>
+
+@code {
+    [Inject]
+    protected ToastService ToastService { get; set; } = default!;
+    [Parameter]
+    public int WordIndex { get; set; }
+    [Parameter]
+    public Func<Task> OnCloseFunc { get; init; }
+    private WordDTO? wordData;
+    private Modal modalResult = default!;
+
+    private EditContext? wordEditContext;
+    private ValidationMessageStore? validationMessages;
+
+    protected override void OnInitialized()
+    {
+        WordDTO wordTemp = DictionaryRepository.Dictionary.Words[WordIndex];
+        wordData = WordCloner.CloneWord(wordTemp);
+
+        wordEditContext = new EditContext(wordData);
+        wordEditContext.OnValidationRequested += OnCustomValidation;
+
+        validationMessages = new ValidationMessageStore(wordEditContext);
+    }
+    private void OnCustomValidation(
+        object? sender,
+        ValidationRequestedEventArgs args
+    )
+    {
+        validationMessages?.Clear();
+
+        if (String.IsNullOrWhiteSpace(wordData.WordContent))
+        {
+            validationMessages?.Add(() => wordData.WordContent, "The content shouldn't be empty.");
+        }
+        if (String.IsNullOrWhiteSpace(wordData.LevelAttribute))
+        {
+            validationMessages?.Add(() => wordData.LevelAttribute, "The content shouldn't be empty.");
+        }
+        if (String.IsNullOrWhiteSpace(wordData.Lexeme))
+        {
+            validationMessages?.Add(() => wordData.Lexeme, "The content shouldn't be empty.");
+        }
+    }
+    private async Task UpdateWord()
+    {
+        try
+        {
+            if (wordEditContext!.Validate())
+            {
+                DictionaryRepository.UpdateWordAtIndex(wordData, WordIndex);
+                await OnCloseFunc();
+            }
+        }
+        catch (IndexOutOfRangeException)
+        {
+            ToastService.Notify(new(ToastType.Danger, "The update operation failed."));
+        }
+    }
+    private async Task ShowModalMessage(string title, string message)
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("Message", message);
+        await modalResult.ShowAsync<ModalResult>(title: title, parameters: parameters);
+    }
+    public void Dispose()
+    {
+        wordEditContext.OnValidationRequested -= OnCustomValidation;
+    }
+}
