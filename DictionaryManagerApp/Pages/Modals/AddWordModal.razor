@@ -1,0 +1,111 @@
+﻿@using DictionaryManager.Shared.Models.DTOs
+@using DictionaryManagerApp.Services
+
+@implements IDisposable
+
+@inject HttpClient HttpClient
+@inject IDictionaryRepository<WordListDTO, WordDTO> DictionaryRepository
+
+<Modal @ref="modalResult" />
+<EditForm EditContext="wordEditContext">
+    <div class="input-group mb-2">
+        <span class="input-group-text">Word</span>
+        <InputText class="form-control" @bind-Value="word.WordContent"></InputText>
+    </div>
+    <ValidationMessage For="() => word.WordContent" />
+    <div class="input-group mb-2">
+        <span class="input-group-text">Lexeme</span>
+        <InputText class="form-control" @bind-Value="word.Lexeme"></InputText>
+    </div>
+    <ValidationMessage For="() => word.Lexeme" />
+    <div class="input-group mb-2">
+        <span class="input-group-text">Level</span>
+        <InputText class="form-control" @bind-Value="word.LevelAttribute"></InputText>
+    </div>
+    <ValidationMessage For="() => word.LevelAttribute" />
+</EditForm>
+<Button Type="ButtonType.Submit" Color="ButtonColor.Success" @onclick="CreateWord">Create</Button>
+<Button Type="ButtonType.Reset" Color="ButtonColor.Danger" @onclick="OnCloseFunc">Cancel</Button>
+
+@code {
+    [Inject]
+    protected ToastService ToastService { get; set; } = default!;
+    [Parameter]
+    public Func<Task> OnCloseFunc { get; init; }
+    private WordDTO? word;
+    private Modal modalResult = default!;
+
+    private EditContext? wordEditContext;
+    private ValidationMessageStore? validationMessages;
+
+    protected override void OnInitialized()
+    {
+        word = new WordDTO("word", "level", "lexeme", null)
+        {
+            WordListId = DictionaryRepository.Dictionary.Id ?? default
+        };
+
+        wordEditContext = new EditContext(word);
+        wordEditContext.OnValidationRequested += OnWordValidation;
+
+        validationMessages = new ValidationMessageStore(wordEditContext);
+    }
+
+    private void OnWordValidation(
+        object? sender,
+        ValidationRequestedEventArgs args
+    )
+    {
+        validationMessages?.Clear();
+
+        if (String.IsNullOrWhiteSpace(word.WordContent))
+        {
+            validationMessages?.Add(() => word.WordContent, "The content shouldn't be empty.");
+        }
+        if (String.IsNullOrWhiteSpace(word.LevelAttribute))
+        {
+            validationMessages?.Add(() => word.LevelAttribute, "The content shouldn't be empty.");
+        }
+        if (String.IsNullOrWhiteSpace(word.Lexeme))
+        {
+            validationMessages?.Add(() => word.Lexeme, "The content shouldn't be empty.");
+        }
+    }
+
+    private async Task CreateWord()
+    {
+        if (wordEditContext!.Validate())
+        {
+            HttpResponseMessage wordCreationResponse = await HttpClient.PostAsJsonAsync(
+                String.Concat(HttpClient.BaseAddress, $"api/Words/addword?wordListId={word.WordListId}"),
+                word
+            );
+            if(wordCreationResponse.IsSuccessStatusCode)
+            {
+                DictionaryRepository.AddWord(await wordCreationResponse.Content.ReadFromJsonAsync<WordDTO>());
+                ToastService.Notify(new(ToastType.Info, "Word added."));
+                await OnCloseFunc();
+            }
+            else
+            {
+                ToastService.Notify(new(ToastType.Danger, "Sorry, the operation failed."));
+            }
+        }
+        else
+        {
+            ToastService.Notify(new(ToastType.Danger, "Word data is not valid."));
+        }
+    }
+
+    private async Task ShowModalMessage(string title, string message)
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("Message", message);
+        await modalResult.ShowAsync<ModalResult>(title: title, parameters: parameters);
+    }
+
+    public void Dispose()
+    {
+        wordEditContext.OnValidationRequested -= OnWordValidation;
+    }
+}
