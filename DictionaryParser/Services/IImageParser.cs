@@ -8,6 +8,6 @@ namespace DictionaryParserLib.Services
 {
     public interface IImageParser<T>
     {
-        public Task<T> GetImageLinksByWordAsync(string url, string word, bool colorfulFilter = true);
+        public Task<T> GetImageLinksByWordAsync(string url, string word, int number, bool colorfulFilter = true);
     }
 }
