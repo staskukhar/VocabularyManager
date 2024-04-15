@@ -9,7 +9,7 @@ namespace DictionaryParser.Services
 {
     public interface IWordParser<T>
     {
-        public Task<IEnumerable<T>> GetWordListByLinkAsync(string link);
+        public Task<IEnumerable<T>> GetWordListByLinkAsync(string link, Func<T, bool> isValid);
         public T GetDataAsObject(IElement element);
     }
 }

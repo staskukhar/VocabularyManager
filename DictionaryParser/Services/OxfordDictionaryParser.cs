@@ -1,12 +1,16 @@
 ﻿using AngleSharp;
 using AngleSharp.Dom;
 using DictionaryParser.Exceptions;
+using DictionaryManager.Shared.Models.DTOs;
 
 namespace DictionaryParser.Services
 {
-    public class OxfordDictionaryParser : IWordParser<ParsingWordDTO>
+    public class OxfordDictionaryParser : IWordParser<WordDTO>
     {
-        public async Task<IEnumerable<ParsingWordDTO>> GetWordListByLinkAsync(string url)
+        public async Task<IEnumerable<WordDTO>> GetWordListByLinkAsync(
+            string url, 
+            Func<WordDTO, bool> isWordValid
+        )
         {
             if (String.IsNullOrEmpty(url)) 
             {
@@ -39,20 +43,19 @@ namespace DictionaryParser.Services
                 throw new TheSourceIsNotAppropriateException("The source isn't appropriate for target purpose.");
             }
 
-            return wordsAsLiElements.Select(li => GetDataAsObject(li));
+            return wordsAsLiElements.Select(li => GetDataAsObject(li)).Where(w => isWordValid(w));
         }
-        public ParsingWordDTO GetDataAsObject(IElement element)
+        public WordDTO GetDataAsObject(IElement element)
         {
             var nestedDiv = element.QuerySelector("div"); // should contain level attribute and audio content
             var audioContentDivs = nestedDiv?.QuerySelectorAll("div"); // audio content with attribute "data-src-mp3" containt only partisional link
 
-            return new ParsingWordDTO(
-                originWord: element.QuerySelector("a")?.TextContent, // tag a contain word text
-                lexemaType: element.QuerySelector(".pos")?.TextContent, // span with class .pos contain lexema info
+            return new WordDTO(
+                wordContent: element.QuerySelector("a").TextContent, // tag a contain word text
+                lexeme: element.QuerySelector(".pos")?.TextContent, // span with class .pos contain lexema info
                 levelAttribute: nestedDiv?.QuerySelector("span.belong-to")?.TextContent, //tag div contain level info
-                audioLinks: audioContentDivs?.Select( audio => 
-                    audio.GetAttribute("data-src-mp3") ).ToArray()
-                );
+                defenition: null
+            );
         }
     }
 }
