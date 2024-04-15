@@ -1,3 +1,7 @@
+using DictionaryManagerAPI.Services.Data;
+using DictionaryManagerAPI.Services.Repositories;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -18,6 +22,11 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod();
         });
 });
+
+builder.Services.AddDbContext<VocabularyContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("VocabularyDbConnection")));
+builder.Services.AddScoped<IWordListRepository, WordListDbRepository>();
+builder.Services.AddScoped<IWordRepository, WordDbRepository>();
 
 var app = builder.Build();
 
