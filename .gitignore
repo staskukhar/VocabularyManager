@@ -458,3 +458,4 @@ $RECYCLE.BIN/
 /DictionaryManagerApp/wwwroot/appsettings.json
 /DictionaryManagerAPI/appsettings.json
 /DictionaryManagerApp/wwwroot/appsettings.json
+**/Migrations/
