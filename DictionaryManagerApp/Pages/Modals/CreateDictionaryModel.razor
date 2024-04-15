@@ -61,7 +61,6 @@
                 ToastService.Notify(new(ToastType.Success, $"Dictionary saved successfully."));
                 //the ok response of word list's creation return its id
                 int wordListId = int.Parse(await wordListCreationResponse.Content.ReadAsByteArrayAsync());
-                Console.WriteLine(wordListId);
                 await OnCloseFunc();
             }
             else

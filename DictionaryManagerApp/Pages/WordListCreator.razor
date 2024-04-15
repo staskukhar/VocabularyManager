@@ -165,8 +165,7 @@
                 return;
             }
             //the ok response of word list's creation return its id
-            int wordListId = int.Parse(await wordListCreationResponse.Content.ReadAsByteArrayAsync());
-            Console.WriteLine(wordListId);
+            int wordListId = int.Parse(await wordListCreationResponse.Content.ReadAsByteArrayAsync());;
 
             HttpResponseMessage wordsSavingResponse = await HttpClient.PostAsJsonAsync(
                 String.Concat(HttpClient.BaseAddress, $"api/Words/addwords?wordListId={wordListId}"),
