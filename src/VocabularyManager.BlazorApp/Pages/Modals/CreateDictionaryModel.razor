@@ -1,0 +1,67 @@
+﻿@using FluentValidation.Results
+@using VocabularyManager.BlazorApp.Services
+@using VocabularyManager.Core.Entities
+@using VocabularyManager.UseCases.DTOs
+@using VocabularyManager.UseCases.Validators
+
+@inject HttpService HttpService
+@inject HttpPathBuilder HttpPathBuilder
+
+<WordListForm WordList="wordList"></WordListForm>
+<div class="m-1">
+    @if (validationErrors.Count > 0)
+    {
+        foreach (var error in validationErrors)
+        {
+            <ValidationError Error="error"></ValidationError>
+        }
+    }
+</div>
+<Button Type="ButtonType.Submit" Color="ButtonColor.Success" @onclick="CreateDictionary">Create</Button>
+<Button Type="ButtonType.Reset" Color="ButtonColor.Danger" @onclick="OnCloseFunc">Cancel</Button>
+
+@code {
+    [Inject]
+    protected ToastService ToastService { get; set; } = default!;
+    [Parameter]
+    public Func<Task> OnCloseFunc { get; set; }
+    private WordListDTO wordList;
+    private WordListDTOValidator wordListValidator;
+    private List<ValidationFailure> validationErrors = [];
+
+    protected override void OnInitialized()
+    {
+        wordListValidator = new WordListDTOValidator();
+    }
+    protected override void OnParametersSet()
+    {
+        wordList = new WordListDTO();
+    }
+
+    private async Task CreateDictionary()
+    {
+        validationErrors.Clear();
+        ValidationResult result = wordListValidator.Validate(wordList);
+        if(result.IsValid)
+        {
+            HttpResponseMessage wordListCreationResponse = await HttpService.PostWithJson<WordListDTO>(
+                HttpPathBuilder.CreateWordListEndpoint(),
+                wordList
+            );
+            if (wordListCreationResponse.IsSuccessStatusCode)
+            {
+                ToastService.Notify(new(ToastType.Success, $"Dictionary saved successfully."));
+                await OnCloseFunc();
+            }
+            else
+            {
+                ToastService.Notify(new(ToastType.Danger, $"Dictionary creation failed."));
+            }
+        }
+        else
+        {
+            Console.WriteLine(result.Errors.Count);
+            validationErrors.AddRange(result.Errors);
+        }
+    }
+}

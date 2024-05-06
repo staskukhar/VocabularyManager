@@ -454,7 +454,6 @@ $RECYCLE.BIN/
 !.vscode/extensions.json
 
 # My changes
-**/*Tests*/
 /DictionaryManagerApp/wwwroot/appsettings.json
 /DictionaryManagerAPI/appsettings.json
 /DictionaryManagerApp/wwwroot/appsettings.json

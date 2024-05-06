@@ -1,0 +1,85 @@
+﻿@using VocabularyManager.BlazorApp.Pages.Modals
+@using VocabularyManager.BlazorApp.Services
+@using VocabularyManager.Core.Entities
+@using VocabularyManager.Core.Interfaces
+@using VocabularyManager.UseCases.DTOs
+
+@inject HttpService HttpService
+@inject HttpPathBuilder HttpPathBuilder
+@inject IWordListStateManager<WordListDTO> WordListStateManager
+
+<Modal @ref="editWordModal"></Modal>
+<ConfirmDialog @ref="deleteConfirmationDialog"></ConfirmDialog>
+@if(Word is not null)
+{
+    <div class="d-flex border border-1 rounded m-1 justify-content-between">
+        <span class="text-secondary m-lg-2">
+            @Word?.WordContent - @Word?.Lexeme - @Word?.LevelAttribute
+        </span>
+        <div class="d-flex">
+            <Button Class="m-lg-1" @onclick="ShowEditFormModal" Type="ButtonType.Link" Color="ButtonColor.Secondary">Edit</Button>
+            <Button Class="m-lg-1" @onclick=DeleteWord Type="ButtonType.Link" Color="ButtonColor.Danger">Delete</Button>
+        </div>
+    </div>
+}
+else
+{
+    <span class="text-info">None</span>
+}
+
+@code {
+    [Inject]
+    protected ToastService ToastService { get; set; } = default!;
+    [Parameter]
+    public WordDTO Word { get; set; }
+    private Modal editWordModal = default!;
+    private ConfirmDialog deleteConfirmationDialog = default!;
+
+    private async Task ShowEditFormModal()
+    {
+        Console.WriteLine(Word.WordContent);
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("Word", Word);
+        parameters.Add("OnCloseFunc", OnCloseModal);
+        await editWordModal.ShowAsync<EditWordModal>(title: "EditWord", parameters: parameters);
+    }
+
+    private async Task OnCloseModal()
+    {
+        await editWordModal.HideAsync();
+    }
+
+    private async Task DeleteWord()
+    {
+        ConfirmDialogOptions dialogOptions = new ConfirmDialogOptions()
+        {
+            YesButtonText = "Yes, delete",
+            YesButtonColor = ButtonColor.Danger,
+            NoButtonText = "No, cancel",
+            NoButtonColor = ButtonColor.Secondary
+        };
+        bool deleteForSure = await deleteConfirmationDialog.ShowAsync
+        (
+            "Delet word",
+            $"Do you want to delete the word: \"{Word.WordContent}\"",
+            dialogOptions
+        );
+        if(deleteForSure)
+        {
+            HttpResponseMessage deleteResponse = await HttpService.Delete(
+                HttpPathBuilder.DeleteWordEndpoint(Word.Id ?? -1)
+            );
+            if (deleteResponse.IsSuccessStatusCode)
+            {
+
+                ToastService.Notify(new(ToastType.Info, "Word was deleted."));
+                await WordListStateManager.UpdateWordList();
+
+            }
+            else
+            {
+                ToastService.Notify(new(ToastType.Danger, "Delete operation couldn't be done."));
+            }
+        }
+    }
+}

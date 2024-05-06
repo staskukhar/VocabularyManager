@@ -1,0 +1,73 @@
+﻿@using FluentValidation.Results
+@using VocabularyManager.BlazorApp.Services
+@using VocabularyManager.Core.Entities
+@using VocabularyManager.Core.Interfaces
+@using VocabularyManager.UseCases.DTOs
+@using VocabularyManager.UseCases.Services
+@using VocabularyManager.UseCases.Validators
+
+@inject HttpService HttpService
+@inject HttpPathBuilder HttpPathBuilder
+@inject IWordListStateManager<WordListDTO> WordListStateManager
+
+<WordForm Word="wordData"></WordForm>
+<div class="m-1">
+    @if (validationErrors.Count > 0)
+    {
+        foreach (var error in validationErrors)
+        {
+            <ValidationError Error="error"></ValidationError>
+        }
+    }
+</div>
+<Button Type="ButtonType.Submit" Color="ButtonColor.Success" @onclick="UpdateWord">Update</Button>
+<Button Type="ButtonType.Reset" Color="ButtonColor.Danger" @onclick="OnCloseFunc">Cancel</Button>
+
+@code {
+    [Inject]
+    protected ToastService ToastService { get; set; } = default!;
+    [Parameter]
+    public WordDTO Word { get; set; }
+    [Parameter]
+    public Func<Task> OnCloseFunc { get; init; }
+    private WordDTO wordData;
+    private WordDTOValidator wordValidator;
+    private List<ValidationFailure> validationErrors = [];
+
+    protected override void OnInitialized()
+    {
+        wordValidator = new WordDTOValidator();
+    }
+
+    protected override void OnParametersSet()
+    {
+        wordData = WordCloner.CloneWord(Word);
+    }
+
+    private async Task UpdateWord()
+    {
+        validationErrors.Clear();
+        ValidationResult result = wordValidator.Validate(wordData);
+        if (result.IsValid)
+        {
+            HttpResponseMessage updateReposne = await HttpService.Put<WordDTO>(
+                HttpPathBuilder.UpdateWordEndpoint(),
+                wordData
+            );
+            if (updateReposne.IsSuccessStatusCode)
+            {
+                ToastService.Notify(new(ToastType.Info, "Word was updated."));
+                await WordListStateManager.UpdateWordList();
+                await OnCloseFunc();
+            }
+            else
+            {
+                ToastService.Notify(new(ToastType.Info, "Sorry, update operation failed."));
+            }
+        }
+        else
+        {
+            validationErrors.AddRange(result.Errors);
+        }
+    }
+}

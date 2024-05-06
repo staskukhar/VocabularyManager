@@ -1,0 +1,72 @@
+﻿@using FluentValidation.Results
+@using VocabularyManager.BlazorApp.Services
+@using VocabularyManager.Core.Entities
+@using VocabularyManager.Core.Interfaces
+@using VocabularyManager.UseCases.DTOs
+@using VocabularyManager.UseCases.Validators
+
+@inject HttpService HttpService
+@inject HttpPathBuilder HttpPathBuilder
+@inject IWordListStateManager<WordListDTO> WordListStateManager
+
+<WordForm Word="word"></WordForm>
+<div class="m-1">
+    @if (validationErrors.Count > 0)
+    {
+        foreach (var error in validationErrors)
+        {
+            <ValidationError Error="error"></ValidationError>
+        }
+    }
+</div>
+
+<Button Type="ButtonType.Submit" Color="ButtonColor.Success" @onclick="CreateWord">Create</Button>
+<Button Type="ButtonType.Reset" Color="ButtonColor.Danger" @onclick="OnCloseFunc">Cancel</Button>
+
+@code {
+    [Inject]
+    protected ToastService ToastService { get; set; } = default!;
+    [Parameter]
+    public Func<Task> OnCloseFunc { get; init; }
+    private WordDTO? word;
+    private WordDTOValidator wordValidator;
+    private List<ValidationFailure> validationErrors = [];
+
+    protected override void OnInitialized()
+    {
+        wordValidator = new WordDTOValidator();
+    }
+
+    protected override void OnParametersSet()
+    {
+        word = new WordDTO("word", "level", "lexeme", null);
+    }
+
+    private async Task CreateWord()
+    {
+        validationErrors.Clear();
+        ValidationResult result = wordValidator.Validate(word);
+        if(result.IsValid)
+        {
+            HttpResponseMessage wordCreationResponse = await HttpService.PostWithJson<WordDTO>(
+                HttpPathBuilder.AddWordEndpoint(WordListStateManager?.WordList?.Id ?? -1),
+                word
+            );
+
+            if (wordCreationResponse.IsSuccessStatusCode)
+            {
+                ToastService.Notify(new(ToastType.Info, "Word was successfuly created."));
+                await WordListStateManager.UpdateWordList();
+                await OnCloseFunc();
+            }
+            else
+            {
+                ToastService.Notify(new(ToastType.Danger, "Sorry, creation failed."));
+            }
+        }
+        else
+        {
+            validationErrors.AddRange(result.Errors);
+        }
+    }
+}
