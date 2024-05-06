@@ -1,0 +1,19 @@
+﻿@using VocabularyManager.UseCases.DTOs
+
+<div class="input-group mb-2">
+    <span class="input-group-text">Word</span>
+    <InputText class="form-control" @bind-Value="Word.WordContent"></InputText>
+</div>
+<div class="input-group mb-2">
+    <span class="input-group-text">Lexeme</span>
+    <InputText class="form-control" @bind-Value="Word.Lexeme"></InputText>
+</div>
+<div class="input-group mb-2">
+    <span class="input-group-text">Level</span>
+    <InputText class="form-control" @bind-Value="Word.LevelAttribute"></InputText>
+</div>
+
+@code {
+    [Parameter]
+    public WordDTO Word { get; set; }
+}

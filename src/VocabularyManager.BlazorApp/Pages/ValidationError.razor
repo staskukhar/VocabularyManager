@@ -1,0 +1,8 @@
+﻿@using FluentValidation.Results
+
+<div class="text-danger m-1">@Error.ErrorMessage</div>
+
+@code {
+    [Parameter]
+    public ValidationFailure Error { get; set; }
+}
