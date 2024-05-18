@@ -6,7 +6,7 @@ using VocabularyManager.Core.Services;
 
 namespace VocabularyManager.UnitTests.Services
 {
-    public class WordServiceTests
+    public class WordStoreMangerTests
     {
         [Fact]
         public async Task Delete_Word_By_Id_Test1()
@@ -29,10 +29,10 @@ namespace VocabularyManager.UnitTests.Services
                         () => word
                     )
                 );
-            IWordService wordService = new WordService(repository);
+            IWordStoreManager wordStoreService = new WordStoreManager(repository);
 
             //Act
-            int? deletedWordId = await wordService.DeleteWordById(wordId);
+            int? deletedWordId = await wordStoreService.DeleteWordById(wordId);
 
             //Assert
             Assert.NotNull(deletedWordId);
@@ -49,10 +49,10 @@ namespace VocabularyManager.UnitTests.Services
             repository
                 .UpdateAsync(Arg.Any<Word>())
                 .Returns(Task.Run(() => word));
-            WordService wordService = new WordService(repository);
+            WordStoreManager wordStoreService = new WordStoreManager(repository);
 
             //Act && Assert
-            await wordService.UpdateWord(word);
+            await wordStoreService.UpdateWord(word);
         }
     }
 }

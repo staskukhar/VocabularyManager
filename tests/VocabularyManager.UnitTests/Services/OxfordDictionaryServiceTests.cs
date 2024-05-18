@@ -1,7 +1,7 @@
-using DictionaryParser.Services;
-using VocabularyManager.Core.Entities;
-using VocabularyManager.Infrastructure.Exceptions;
-using VocabularyManager.Infrastructure.Validators;
+using VocabularyManager.UseCases.DTOs;
+using VocabularyManager.UseCases.Exceptions;
+using VocabularyManager.UseCases.Services;
+using VocabularyManager.UseCases.Validators;
 
 namespace VocabularyManager.UnitTests.Services
 {
@@ -14,15 +14,15 @@ namespace VocabularyManager.UnitTests.Services
             var parsingService = new OxfordDictionaryParser();
 
             //Act
-            var wordList = await parsingService
+            var wordList = parsingService
                 .GetWordListByLinkAsync(
                 "https://www.oxfordlearnersdictionaries.com/wordlists/oxford3000-5000",
-                OxfordDictionaryValidator.IsWordObjectDataValid
+                new OxfordParsingWordDTOValidator()
             ); //well-fitable url
 
             //Assert
             Assert.NotNull(wordList);
-            Assert.IsAssignableFrom<IEnumerable<Word>>(wordList);
+            Assert.IsAssignableFrom<IAsyncEnumerable<WordDTO>>(wordList);
         }
 
         [Fact]
@@ -34,25 +34,25 @@ namespace VocabularyManager.UnitTests.Services
             // Act & Assert
             Assert.ThrowsAsync<ArgumentNullException>(async () =>
             {
-                await parsingService.GetWordListByLinkAsync(
+                parsingService.GetWordListByLinkAsync(
                     null,
-                    OxfordDictionaryValidator.IsWordObjectDataValid
+                    new OxfordParsingWordDTOValidator()
                 ); // passed url is null value
             });
 
             Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
-                await parsingService.GetWordListByLinkAsync(
+                parsingService.GetWordListByLinkAsync(
                     "invalid-url",
-                    OxfordDictionaryValidator.IsWordObjectDataValid
+                    new OxfordParsingWordDTOValidator()
                 ); // fully invalid url, in case when we can't get response as document
             });
 
             Assert.ThrowsAsync<TheSourceIsNotAppropriateException>(async () =>
             {
-                await parsingService.GetWordListByLinkAsync(
+                parsingService.GetWordListByLinkAsync(
                     "https://www.oxfordlearnersdictionaries.com/invalid-path",
-                    OxfordDictionaryValidator.IsWordObjectDataValid
+                    new OxfordParsingWordDTOValidator()
                 ); // not appropriate url
             });
         }

@@ -1,9 +1,10 @@
-﻿using VocabularyManager.UseCases.DTOs;
+﻿using VocabularyManager.Core.Entities;
+using VocabularyManager.UseCases.DTOs;
 using VocabularyManager.UseCases.Validators;
 
 namespace VocabularyManager.UnitTests.Validators
 {
-    public class WordDTOValidatorTests
+    public class WordValidatorTests
     {
         [Fact]
         public void Validate_Word_Test1()
@@ -11,8 +12,8 @@ namespace VocabularyManager.UnitTests.Validators
             //Arrange
             var expectedResult = true;
             int errorsNumber = 0;
-            var validator = new WordDTOValidator();
-            var word = new WordDTO("to run", "a1", "verb", "the action of moving fast by using legs");
+            var validator = new WordValidator();
+            var word = new Word("to run", "a1", "verb", "the action of moving fast by using legs");
 
             //Act
             var result = validator.Validate(word);
@@ -27,8 +28,8 @@ namespace VocabularyManager.UnitTests.Validators
             //Arrange
             var expectedResult = true;
             int errorsNumber = 0;
-            var validator = new WordDTOValidator();
-            var word = new WordDTO("to run", "a1", "verb", null);
+            var validator = new WordValidator();
+            var word = new Word("to run", "a1", "verb", null);
 
             //Act
             var result = validator.Validate(word);
@@ -43,8 +44,8 @@ namespace VocabularyManager.UnitTests.Validators
             //Arrange
             var expectedResult = true;
             int errorsNumber = 0;
-            var validator = new WordDTOValidator();
-            var word = new WordDTO("to run", "a1", null, null);
+            var validator = new WordValidator();
+            var word = new Word("to run", "a1", null, null);
 
             //Act
             var result = validator.Validate(word);
@@ -59,8 +60,8 @@ namespace VocabularyManager.UnitTests.Validators
             //Arrange
             var expectedResult = true;
             int errorsNumber = 0;
-            var validator = new WordDTOValidator();
-            var word = new WordDTO("to run", null, null, null);
+            var validator = new WordValidator();
+            var word = new Word("to run", null, null, null);
 
             //Act
             var result = validator.Validate(word);
@@ -75,8 +76,8 @@ namespace VocabularyManager.UnitTests.Validators
             //Arrange
             var expectedResult = false;
             int errorsNumber = 1;
-            var validator = new WordDTOValidator();
-            var word = new WordDTO(String.Empty, null, null, null);
+            var validator = new WordValidator();
+            var word = new Word(String.Empty, null, null, null);
 
             //Act
             var result = validator.Validate(word);
@@ -91,8 +92,8 @@ namespace VocabularyManager.UnitTests.Validators
             //Arrange
             var expectedResult = false;
             int errorsNumber = 1;
-            var validator = new WordDTOValidator();
-            var word = new WordDTO(null, null, null, null);
+            var validator = new WordValidator();
+            var word = new Word(null, null, null, null);
 
             //Act
             var result = validator.Validate(word);
