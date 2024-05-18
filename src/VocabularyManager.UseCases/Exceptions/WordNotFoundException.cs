@@ -1,4 +1,4 @@
-﻿namespace VocabularyManager.Core.Exceptions
+﻿namespace VocabularyManager.UseCases.Exceptions
 {
     public class WordNotFoundException : Exception
     {

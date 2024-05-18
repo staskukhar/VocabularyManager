@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
-using VocabularyManager.UseCases.DTOs;
+using VocabularyManager.Core.Entities;
 
 namespace VocabularyManager.UseCases.Validators
 {
-    public class WordDTOValidator : AbstractValidator<WordDTO>
+    public class WordValidator : AbstractValidator<Word>
     {
-        public WordDTOValidator()
+        public WordValidator()
         {
             RuleFor(word => word.WordContent)
                 .Cascade(CascadeMode.Stop)

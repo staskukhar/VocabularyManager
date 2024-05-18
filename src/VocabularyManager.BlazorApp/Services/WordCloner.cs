@@ -1,19 +1,19 @@
-﻿using VocabularyManager.UseCases.DTOs;
+﻿using VocabularyManager.BlazorApp.Models.Views;
 
-namespace VocabularyManager.UseCases.Services
+namespace VocabularyManager.BlazorApp.Services
 {
     public class WordCloner
     {
-        public static WordDTO CloneWord(WordDTO word)
+        public static WordView CloneWord(WordView word)
         {
-            WordDTO clone = new WordDTO()
+            WordView clone = new WordView()
             {
                 Id = word.Id,
                 WordContent = word.WordContent,
                 Lexeme = word.Lexeme,
                 LevelAttribute = word.LevelAttribute,
                 Defenition = word.Defenition,
-                WordListId = word.WordListId,
+                VocabularyId = word.VocabularyId,
             };
             return clone;
         }

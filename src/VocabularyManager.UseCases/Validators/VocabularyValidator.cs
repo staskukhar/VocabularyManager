@@ -1,13 +1,13 @@
 ﻿using FluentValidation;
-using VocabularyManager.UseCases.DTOs;
+using VocabularyManager.Core.Entities;
 
 namespace VocabularyManager.UseCases.Validators
 {
-    public class WordListDTOValidator : AbstractValidator<WordListDTO>
+    public class VocabularyValidator : AbstractValidator<Vocabulary>
     {
-        public WordListDTOValidator() 
+        public VocabularyValidator()
         {
-            RuleFor(wl => wl.ListName)
+            RuleFor(wl => wl.Name)
                 .Cascade(CascadeMode.Stop)
                 .NotNull()
                 .WithMessage("List's name is required.")

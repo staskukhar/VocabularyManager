@@ -1,4 +1,4 @@
-﻿namespace VocabularyManager.Infrastructure.Exceptions
+﻿namespace VocabularyManager.UseCases.Exceptions
 {
     public class TheSourceIsNotAppropriateException : Exception
     {

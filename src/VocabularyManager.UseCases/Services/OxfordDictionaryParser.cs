@@ -1,16 +1,18 @@
 ﻿using AngleSharp;
 using AngleSharp.Dom;
-using VocabularyManager.Core.Entities;
-using VocabularyManager.Infrastructure.Exceptions;
-using VocabularyManager.Core.Interfaces;
+using FluentValidation;
+using FluentValidation.Results;
+using VocabularyManager.UseCases.Exceptions;
+using VocabularyManager.UseCases.DTOs;
+using VocabularyManager.UseCases.Interfaces;
 
-namespace DictionaryParser.Services
+namespace VocabularyManager.UseCases.Services
 {
-    public class OxfordDictionaryParser : IWordParser<Word>
+    public class OxfordDictionaryParser : IWordParser<WordDTO>
     {
-        public async Task<IEnumerable<Word>> GetWordListByLinkAsync(
+        public async IAsyncEnumerable<WordDTO> GetWordListByLinkAsync(
             string url, 
-            Func<Word, bool> isWordValid
+            IValidator<WordDTO> validationFilter
         )
         {
             if (String.IsNullOrEmpty(url)) 
@@ -44,15 +46,22 @@ namespace DictionaryParser.Services
                 throw new TheSourceIsNotAppropriateException("The source isn't appropriate for target purpose.");
             }
 
-            return wordsAsLiElements.Select(li => GetDataAsObject(li)).Where(w => isWordValid(w));
+            IEnumerable<WordDTO> words = wordsAsLiElements.Select(li => GetDataAsObject(li));
+            foreach(WordDTO word in words)
+            {
+                ValidationResult result = validationFilter.Validate(word);
+                if (result.IsValid)
+                {
+                    yield return word;
+                }
+            }
         }
-        public Word GetDataAsObject(IElement element)
+        public WordDTO GetDataAsObject(IElement element)
         {
             var nestedDiv = element.QuerySelector("div"); // should contain level attribute and audio content
-            var audioContentDivs = nestedDiv?.QuerySelectorAll("div"); // audio content with attribute "data-src-mp3" containt only partisional link
 
-            return new Word(
-                wordContent: element.QuerySelector("a").TextContent, // tag a contain word text
+            return new WordDTO(
+                wordContent: element.QuerySelector("a")?.TextContent, // tag a contain word text
                 lexeme: element.QuerySelector(".pos")?.TextContent, // span with class .pos contain lexema info
                 levelAttribute: nestedDiv?.QuerySelector("span.belong-to")?.TextContent, //tag div contain level info
                 defenition: null

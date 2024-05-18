@@ -1,4 +1,4 @@
-﻿namespace VocabularyManager.Core.Interfaces
+﻿namespace VocabularyManager.BlazorApp.Interfaces
 {
     public interface IStateManager
     {
