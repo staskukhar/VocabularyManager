@@ -1,0 +1,15 @@
+﻿@using VocabularyManager.BlazorApp.Models.Views
+
+<div class="input-group mb-2">
+    <span class="input-group-text">Vocabulary's name</span>
+    <InputText class="form-control" @bind-Value="Vocabulary.Name"></InputText>
+</div>
+<div class="input-group mb-2">
+    <span class="input-group-text">Source url</span>
+    <InputText class="form-control" @bind-Value="Vocabulary.SourceUrl"></InputText>
+</div>
+
+@code {
+    [Parameter]
+    public VocabularyView Vocabulary { get; set; }
+}

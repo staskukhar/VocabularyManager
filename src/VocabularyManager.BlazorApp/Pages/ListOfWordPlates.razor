@@ -1,10 +1,10 @@
 ﻿@page "/wlplate"
 
-@using VocabularyManager.Core.Interfaces
-@using VocabularyManager.UseCases.DTOs
+@using VocabularyManager.BlazorApp.Interfaces
+@using VocabularyManager.BlazorApp.Models.Views
 @using VocabularyManager.BlazorApp.Pages.Modals
 
-@inject IWordListStateManager<WordListDTO> WordListStateManager
+@inject IVocabularyStateManager<VocabularyView> VocabularyStateManager
 
 @implements IDisposable
 
@@ -14,14 +14,14 @@
         Add new
     </Button>
 </div>
-@if(WordList is not null)
+@if(Vocabulary is not null)
 {
     @for (int i = StartOfPage(CurrentPage); i < EndOfPage(CurrentPage); i++)
     {
-        <WordPlate Word="@WordList.Words[i]"></WordPlate>
+        <WordPlate Word="@Vocabulary.Words[i]"></WordPlate>
     }
     <Pagination ActivePageNumber="@CurrentPage"
-                TotalPages="@((int)Math.Ceiling(WordList.Words.Count * 1m / AmountWordsOnPage))"
+                TotalPages="@((int)Math.Ceiling(Vocabulary.Words.Count * 1m / AmountWordsOnPage))"
                 PageChanged="OnPageChangedAsync" />
 }
 else
@@ -31,14 +31,14 @@ else
 
 @code {
     [Parameter]
-    public WordListDTO WordList { get; set; }
+    public VocabularyView Vocabulary { get; set; }
     private int CurrentPage { get; set; } = 1;
     private const int AmountWordsOnPage = 50;
     private Modal addWordModal = default!;
 
     protected override void OnInitialized()
     {
-        WordListStateManager.SubscribeOnChangeAction(StateHasChanged);
+        VocabularyStateManager.SubscribeOnChangeAction(StateHasChanged);
     }
 
     private async Task OnPageChangedAsync(int newPageNumber)
@@ -63,11 +63,11 @@ else
     {
         // the code help to prevent exception index out of... when we try get last page
         int end = currentPage * AmountWordsOnPage;
-        return end > WordList.Words.Count ? WordList.Words.Count : end;
+        return end > Vocabulary.Words.Count ? Vocabulary.Words.Count : end;
     }
 
     public void Dispose()
     {
-        WordListStateManager.UnsubscribeOnChangeAction(StateHasChanged);
+        VocabularyStateManager.UnsubscribeOnChangeAction(StateHasChanged);
     }
 }

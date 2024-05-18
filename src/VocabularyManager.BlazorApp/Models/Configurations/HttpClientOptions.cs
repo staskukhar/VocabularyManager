@@ -5,7 +5,7 @@
         public const string SectionKey = "HttpClient";
         public string ApiBaseURL { get; set; } = String.Empty;
         public WordPathes WordTree { get; set; }
-        public WordListPathes WordListTree { get; set; }
+        public VocabularyPathes VocabularyTree { get; set; }
         public HttpClientOptions()
         {
 
@@ -25,16 +25,16 @@
             
         }
     }
-    public class WordListPathes
+    public class VocabularyPathes
     {
-        public const string SectionKey = "WordList";
+        public const string SectionKey = "Vocabulary";
         public string PathPrefix { get; set; } = String.Empty;
-        public string GetWordList { get; set; } = String.Empty;
+        public string GetVocabulary { get; set; } = String.Empty;
         public string Create { get; set; } = String.Empty;
-        public string GetWordLists { get; set; } = String.Empty;
+        public string GetVocabularies { get; set; } = String.Empty;
         public string GetById { get; set; } = String.Empty;
         public string Update { get; set; } = String.Empty;
-        public WordListPathes()
+        public VocabularyPathes()
         {
             
         }

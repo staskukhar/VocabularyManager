@@ -1,12 +1,11 @@
-﻿@using VocabularyManager.BlazorApp.Pages.Modals
+﻿@using VocabularyManager.BlazorApp.Models.Views
+@using VocabularyManager.BlazorApp.Pages.Modals
 @using VocabularyManager.BlazorApp.Services
-@using VocabularyManager.Core.Entities
-@using VocabularyManager.Core.Interfaces
-@using VocabularyManager.UseCases.DTOs
+@using VocabularyManager.BlazorApp.Interfaces
 
 @inject HttpService HttpService
 @inject HttpPathBuilder HttpPathBuilder
-@inject IWordListStateManager<WordListDTO> WordListStateManager
+@inject IVocabularyStateManager<VocabularyView> VocabularyStateManager
 
 <Modal @ref="editWordModal"></Modal>
 <ConfirmDialog @ref="deleteConfirmationDialog"></ConfirmDialog>
@@ -31,7 +30,7 @@ else
     [Inject]
     protected ToastService ToastService { get; set; } = default!;
     [Parameter]
-    public WordDTO Word { get; set; }
+    public WordView Word { get; set; }
     private Modal editWordModal = default!;
     private ConfirmDialog deleteConfirmationDialog = default!;
 
@@ -67,13 +66,13 @@ else
         if(deleteForSure)
         {
             HttpResponseMessage deleteResponse = await HttpService.Delete(
-                HttpPathBuilder.DeleteWordEndpoint(Word.Id ?? -1)
+                HttpPathBuilder.DeleteWordEndpoint(Word.Id)
             );
             if (deleteResponse.IsSuccessStatusCode)
             {
 
                 ToastService.Notify(new(ToastType.Info, "Word was deleted."));
-                await WordListStateManager.UpdateWordList();
+                await VocabularyStateManager.Update();
 
             }
             else

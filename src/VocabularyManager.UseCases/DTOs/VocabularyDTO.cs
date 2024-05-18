@@ -1,16 +1,16 @@
 ﻿namespace VocabularyManager.UseCases.DTOs
 {
-    public class WordListDTO
+    public class VocabularyDTO
     {
         public int? Id { get; init; } = 0;
-        public string ListName { get; set; }
+        public string Name { get; set; }
         public string? SourceUrl { get; set; }
         public List<WordDTO>? Words { get; set; } = new List<WordDTO>();
-        public WordListDTO(string listName, string? sourceUrl) 
+        public VocabularyDTO(string name, string? sourceUrl) 
         {
-            ListName = listName;
+            Name = name;
             SourceUrl = sourceUrl;
         }
-        public WordListDTO() { }
+        public VocabularyDTO() { }
     }
 }

@@ -2,14 +2,13 @@
 @using FluentValidation.Results
 @using VocabularyManager.BlazorApp.Models.Views
 @using VocabularyManager.BlazorApp.Services
-@using VocabularyManager.BlazorApp.Interfaces
+@using VocabularyManager.Core.Entities
 
 @inject HttpService HttpService
 @inject HttpPathBuilder HttpPathBuilder
-@inject IVocabularyStateManager<VocabularyView> VocabularyStateManager
-@inject IValidator<WordView> WordValidator
+@inject IValidator<VocabularyView> VocabularyValidator
 
-<WordForm Word="word"></WordForm>
+<VocabularyForm Vocabulary="vocabulary"></VocabularyForm>
 <div class="m-1">
     @if (validationErrors.Count > 0)
     {
@@ -19,43 +18,40 @@
         }
     }
 </div>
-
-<Button Type="ButtonType.Submit" Color="ButtonColor.Success" @onclick="CreateWord">Create</Button>
+<Button Type="ButtonType.Submit" Color="ButtonColor.Success" @onclick="CreateVocabulary">Create</Button>
 <Button Type="ButtonType.Reset" Color="ButtonColor.Danger" @onclick="OnCloseFunc">Cancel</Button>
 
 @code {
     [Inject]
     protected ToastService ToastService { get; set; } = default!;
     [Parameter]
-    public Func<Task> OnCloseFunc { get; init; }
-    private WordView? word;
+    public Func<Task> OnCloseFunc { get; set; }
+    private VocabularyView vocabulary;
     private List<ValidationFailure> validationErrors = [];
 
     protected override void OnParametersSet()
     {
-        word = new WordView("word", "level", "lexeme", null);
+        vocabulary = new VocabularyView();
     }
 
-    private async Task CreateWord()
+    private async Task CreateVocabulary()
     {
         validationErrors.Clear();
-        ValidationResult result = WordValidator.Validate(word);
+        ValidationResult result = VocabularyValidator.Validate(vocabulary);
         if(result.IsValid)
         {
-            HttpResponseMessage wordCreationResponse = await HttpService.PostWithJson<WordView>(
-                HttpPathBuilder.AddWordEndpoint(VocabularyStateManager?.Vocabulary?.Id ?? -1),
-                word
+            HttpResponseMessage vocabularyCreationResponse = await HttpService.PostWithJson<VocabularyView>(
+                HttpPathBuilder.CreateVocabularyEndpoint(),
+                vocabulary
             );
-
-            if (wordCreationResponse.IsSuccessStatusCode)
+            if (vocabularyCreationResponse.IsSuccessStatusCode)
             {
-                ToastService.Notify(new(ToastType.Info, "Word was successfuly created."));
-                await VocabularyStateManager.Update();
+                ToastService.Notify(new(ToastType.Success, $"Vocabulary saved successfully."));
                 await OnCloseFunc();
             }
             else
             {
-                ToastService.Notify(new(ToastType.Danger, "Sorry, creation failed."));
+                ToastService.Notify(new(ToastType.Danger, $"Vocabulary creation failed."));
             }
         }
         else

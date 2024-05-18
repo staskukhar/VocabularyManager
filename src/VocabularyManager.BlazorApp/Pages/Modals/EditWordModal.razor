@@ -1,14 +1,14 @@
-﻿@using FluentValidation.Results
+﻿@using FluentValidation
+@using FluentValidation.Results
+@using VocabularyManager.BlazorApp.Models.Views
 @using VocabularyManager.BlazorApp.Services
-@using VocabularyManager.Core.Entities
-@using VocabularyManager.Core.Interfaces
-@using VocabularyManager.UseCases.DTOs
-@using VocabularyManager.UseCases.Services
-@using VocabularyManager.UseCases.Validators
+@using VocabularyManager.BlazorApp.Interfaces
+@using VocabularyManager.BlazorApp.Validators
 
 @inject HttpService HttpService
 @inject HttpPathBuilder HttpPathBuilder
-@inject IWordListStateManager<WordListDTO> WordListStateManager
+@inject IVocabularyStateManager<VocabularyView> VocabularyStateManager
+@inject IValidator<WordView> WordValidator
 
 <WordForm Word="wordData"></WordForm>
 <div class="m-1">
@@ -27,17 +27,11 @@
     [Inject]
     protected ToastService ToastService { get; set; } = default!;
     [Parameter]
-    public WordDTO Word { get; set; }
+    public WordView Word { get; set; }
     [Parameter]
     public Func<Task> OnCloseFunc { get; init; }
-    private WordDTO wordData;
-    private WordDTOValidator wordValidator;
+    private WordView wordData;
     private List<ValidationFailure> validationErrors = [];
-
-    protected override void OnInitialized()
-    {
-        wordValidator = new WordDTOValidator();
-    }
 
     protected override void OnParametersSet()
     {
@@ -47,17 +41,17 @@
     private async Task UpdateWord()
     {
         validationErrors.Clear();
-        ValidationResult result = wordValidator.Validate(wordData);
+        ValidationResult result = WordValidator.Validate(wordData);
         if (result.IsValid)
         {
-            HttpResponseMessage updateReposne = await HttpService.Put<WordDTO>(
+            HttpResponseMessage updateReposne = await HttpService.Put<WordView>(
                 HttpPathBuilder.UpdateWordEndpoint(),
                 wordData
             );
             if (updateReposne.IsSuccessStatusCode)
             {
                 ToastService.Notify(new(ToastType.Info, "Word was updated."));
-                await WordListStateManager.UpdateWordList();
+                await VocabularyStateManager.Update();
                 await OnCloseFunc();
             }
             else

@@ -7,7 +7,7 @@ namespace VocabularyManager.UseCases.DTOs
         public string? LevelAttribute { get; set; }
         public string? Lexeme { get; set; }
         public string? Defenition { get; set; }
-        public int WordListId { get; set; }
+        public int VocabularyId { get; set; }
         public WordDTO(
             string wordContent,
             string? levelAttribute,

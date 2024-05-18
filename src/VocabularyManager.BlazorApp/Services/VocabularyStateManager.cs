@@ -1,26 +1,25 @@
 ﻿using System.Net.Http.Json;
-using VocabularyManager.Core.Entities;
-using VocabularyManager.Core.Interfaces;
-using VocabularyManager.UseCases.DTOs;
+using VocabularyManager.BlazorApp.Interfaces;
+using VocabularyManager.BlazorApp.Models.Views;
 
 namespace VocabularyManager.BlazorApp.Services
 {
-    public class WordListStateManager : IWordListStateManager<WordListDTO>
+    public class VocabularyStateManager : IVocabularyStateManager<VocabularyView>
     {
         private event Action? OnChange;
         private ILogger _logger;
-        private WordListDTO? _wordListDTO;
+        private VocabularyView? _vocabulary;
         private HttpService _httpService;
         private HttpPathBuilder _httpPathBuilder;
 
-        WordListDTO? IWordListStateManager<WordListDTO>.WordList
+        VocabularyView? IVocabularyStateManager<VocabularyView>.Vocabulary
         {
-            get => _wordListDTO;
-            set => _wordListDTO = value;
+            get => _vocabulary;
+            set => _vocabulary = value;
         }
 
-        public WordListStateManager(
-            ILogger<IWordListStateManager<WordList>> logger,
+        public VocabularyStateManager(
+            ILogger<IVocabularyStateManager<VocabularyView>> logger,
             HttpService httpService,
             HttpPathBuilder httpPathBuilder)
         {
@@ -41,33 +40,33 @@ namespace VocabularyManager.BlazorApp.Services
             if(OnChange != null)
             {
                 OnChange.Invoke();
-                _logger.LogInformation($"{nameof(WordListStateManager)}: on change was invoked.");
+                _logger.LogInformation($"{nameof(VocabularyStateManager)}: on change was invoked.");
             }
             else
             {
-                _logger.LogInformation($"{nameof(WordListStateManager)}: no subscribers defined.");
+                _logger.LogInformation($"{nameof(VocabularyStateManager)}: no subscribers defined.");
             }
         }
 
-        public async Task UpdateWordList()
+        public async Task Update()
         {
-            if (_wordListDTO is null)
+            if (_vocabulary is null)
             {
-                _logger.LogInformation($"{UpdateWordList}: word list was not initialized.");
+                _logger.LogInformation($"{Update}: word list was not initialized.");
             }
             else
             {
                 HttpResponseMessage response = await _httpService.Get(
-                    _httpPathBuilder.GetWordListByIdEndpoint(_wordListDTO.Id ?? -1));
+                    _httpPathBuilder.GetVocabularytByIdEndpoint(_vocabulary.Id));
 
                 if(response.IsSuccessStatusCode)
                 {
-                    _wordListDTO = await response.Content.ReadFromJsonAsync<WordListDTO>();
+                    _vocabulary = await response.Content.ReadFromJsonAsync<VocabularyView>();
                     NotifyStateHasChanged();
                 }
                 else
                 {
-                    _logger.LogInformation($"{UpdateWordList}: http operation failed.");
+                    _logger.LogInformation($"{Update}: http operation failed.");
                 }
             }
 

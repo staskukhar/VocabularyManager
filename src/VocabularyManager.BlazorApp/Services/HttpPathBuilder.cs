@@ -10,72 +10,80 @@ namespace VocabularyManager.BlazorApp.Services
             _httpOptions = httpOptions;
         }
 
-        public string AddWordEndpoint(int wordListId)
+        public string AddWordEndpoint(int vocabularyId)
         {
             return String.Concat(
                 _httpOptions.ApiBaseURL, 
                 _httpOptions.WordTree.PathPrefix,
                 _httpOptions.WordTree.Add,
-                $"?wordListId={wordListId}"
+                $"?vocabularyId={vocabularyId}"
             );
         }
-        public string AddWordsEndpoint(int wordListId)
+        public string AddWordsEndpoint(int vocabularyId)
         {
-            return String.Concat(
-                _httpOptions.ApiBaseURL,
-                _httpOptions.WordTree.PathPrefix,
-                _httpOptions.WordTree.AddWords,
-                $"?wordlistid={wordListId}"
+            return String.Format(
+                String.Concat(
+                    _httpOptions.ApiBaseURL,
+                    _httpOptions.WordTree.PathPrefix,
+                    _httpOptions.WordTree.AddWords
+                ),
+                vocabularyId
             );
         }
         public string DeleteWordEndpoint(int wordId)
         {
-            return String.Concat(
-                _httpOptions.ApiBaseURL,
-                _httpOptions.WordTree.PathPrefix,
-                _httpOptions.WordTree.Delete,
-                $"?id={wordId}"
+            return String.Format(
+                String.Concat(
+                    _httpOptions.ApiBaseURL,
+                    _httpOptions.WordTree.PathPrefix,
+                    _httpOptions.WordTree.Delete,
+                    $"?id={wordId}"
+                ),
+                wordId
             );
         }
-        public string ParseListOfWordEndpoint()
+        public string ParseListOfWordEndpoint(string url)
+        {
+            return String.Format(
+                String.Concat(
+                    _httpOptions.ApiBaseURL,
+                    _httpOptions.VocabularyTree.PathPrefix,
+                    _httpOptions.VocabularyTree.GetVocabulary
+                ),
+                url
+            );
+        }
+        public string CreateVocabularyEndpoint()
         {
             return String.Concat(
                 _httpOptions.ApiBaseURL,
-                _httpOptions.WordListTree.PathPrefix,
-                _httpOptions.WordListTree.GetWordList
+                _httpOptions.VocabularyTree.PathPrefix,
+                _httpOptions.VocabularyTree.Create
             );
         }
-        public string CreateWordListEndpoint()
+        public string GetVocabularyEndpoint()
         {
             return String.Concat(
                 _httpOptions.ApiBaseURL,
-                _httpOptions.WordListTree.PathPrefix,
-                _httpOptions.WordListTree.Create
+                _httpOptions.VocabularyTree.PathPrefix,
+                _httpOptions.VocabularyTree.GetVocabularies
             );
         }
-        public string GetWordListsEndpoint()
+        public string GetVocabularytByIdEndpoint(int vocabularyId)
         {
             return String.Concat(
                 _httpOptions.ApiBaseURL,
-                _httpOptions.WordListTree.PathPrefix,
-                _httpOptions.WordListTree.GetWordLists
+                _httpOptions.VocabularyTree.PathPrefix,
+                _httpOptions.VocabularyTree.GetById,
+                $"?vocabularyId={vocabularyId}"
             );
         }
-        public string GetWordListByIdEndpoint(int wordListId)
+        public string UpdateVocabularyEndpoint()
         {
             return String.Concat(
                 _httpOptions.ApiBaseURL,
-                _httpOptions.WordListTree.PathPrefix,
-                _httpOptions.WordListTree.GetById,
-                $"?wordlistid={wordListId}"
-            );
-        }
-        public string UpdateWordListEndpoint()
-        {
-            return String.Concat(
-                _httpOptions.ApiBaseURL,
-                _httpOptions.WordListTree.PathPrefix,
-                _httpOptions.WordListTree.Update
+                _httpOptions.VocabularyTree.PathPrefix,
+                _httpOptions.VocabularyTree.Update
             );
         }
         public string UpdateWordEndpoint()

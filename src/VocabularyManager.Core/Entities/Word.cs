@@ -12,9 +12,9 @@ namespace VocabularyManager.Core.Entities
         public string? Lexeme { get; set; }
         public string? LevelAttribute { get; set; }
         public string? Defenition { get; set; }
-        public int WordListId { get; set; }
+        public int VocabularyId { get; set; }
         [JsonIgnore]
-        public WordList? WordList { get; set; }
+        public Vocabulary? Vocabulary { get; set; }
         public Word(string wordContent, string? lexeme, string? levelAttribute, string? defenition)
         {
             WordContent = wordContent;

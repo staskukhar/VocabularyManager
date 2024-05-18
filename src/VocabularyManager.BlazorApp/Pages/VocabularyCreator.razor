@@ -1,8 +1,8 @@
-﻿@page "/wordlistc"
+﻿@page "/vocabularycraft"
 
+@using VocabularyManager.BlazorApp.Models.Views
 @using VocabularyManager.BlazorApp.Pages.Modals
 @using VocabularyManager.BlazorApp.Services
-@using VocabularyManager.Core.Entities
 @using VocabularyManager.UseCases.DTOs
 
 @inject HttpService HttpService
@@ -17,7 +17,7 @@
                 <input class="form-control" @bind="Url" @bind:event="oninput" @onkeyup="ValidateUrl"></input>
                 <a 
                     class="btn btn-outline-dark @(IsUrlValid && !areWordsLoading ? "": "disabled")" 
-                    @onclick="LoadWordList">
+                    @onclick="LoadVocabulary">
                     Load
                 </a>
             </div>
@@ -33,8 +33,8 @@
             </div>
             <div class="flex-row">
                 <div class="input-group mb-3">
-                    <input class="form-control" @bind="WordListName" placeholder="Word list's name">
-                    <button class="btn btn-outline-secondary @(isListSaving ? "disabled": "")" @onclick="SaveWordList">Save list</button>
+                    <input class="form-control" @bind="VocabularyName" placeholder="Word list's name">
+                    <button class="btn btn-outline-secondary @(isListSaving ? "disabled": "")" @onclick="SaveVocabulary">Save list</button>
                 </div>
                 @if(isListSaving)
                 {
@@ -83,8 +83,8 @@
 
     private string Url { get; set; } = String.Empty;
     private bool IsUrlValid { get; set; } = true;
-    private string WordListName { get; set; } = String.Empty;
-    private bool IsWordListNameValid { get; set; } = true;
+    private string VocabularyName { get; set; } = String.Empty;
+    private bool IsVocabularyNameValid { get; set; } = true;
 
     private Modal modalResult = default!;
 
@@ -92,25 +92,25 @@
     {
         IsUrlValid = Uri.IsWellFormedUriString(Url, UriKind.Absolute);
     }
-    private void ValidateWordlListName()
+    private void ValidateVocabularyName()
     {
-        IsWordListNameValid = !String.IsNullOrEmpty(WordListName);
+        IsVocabularyNameValid = !String.IsNullOrEmpty(VocabularyName);
     }
 
-    private async Task<IEnumerable<WordDTO>> GetWordListByHttp(string url)
+    private async Task<IEnumerable<WordDTO>> GetVocabulary(string url)
     {
         HttpResponseMessage response = await HttpService
-            .PostWithJson<string>(
-                HttpPathBuilder.ParseListOfWordEndpoint(),
-                url
+            .Get(
+                HttpPathBuilder.ParseListOfWordEndpoint(url)
             );
+        Console.WriteLine(await response.Content.ReadAsStringAsync());
         if (response.IsSuccessStatusCode)
         {
             return await response.Content.ReadFromJsonAsync<IEnumerable<WordDTO>>() ?? 
                 Enumerable.Empty<WordDTO>();
         }
 
-        await ShowModalMessage(title: "Opps!", message: "Some problem is occured!");
+        await ShowModalMessage(title: "Opps!", message: "Some problem was occured!");
         return Enumerable.Empty<WordDTO>();
     }
 
@@ -134,50 +134,50 @@
         return end > WordList.Count ? WordList.Count : end;
     }
 
-    private async Task LoadWordList()
+    private async Task LoadVocabulary()
     {
         areWordsLoading = true;
 
         WordList.Clear();
         ValidateUrl();
         WordList.AddRange(
-            await GetWordListByHttp(Url)
+            await GetVocabulary(Url)
         );
 
         areWordsLoading = false;
     }
-    private async Task SaveWordList()
+    private async Task SaveVocabulary()
     {
         isListSaving = true;
-        ValidateWordlListName();
-        if(String.IsNullOrEmpty(WordListName))
+        ValidateVocabularyName();
+        if(String.IsNullOrEmpty(VocabularyName))
         {
             isListSaving = false;
-            await ShowModalMessage("Warning", "Please set the word list's name");
+            await ShowModalMessage("Warning", "Please set the vocabulary's name");
         }
         else
         {
             //the ok response of word list's creation return its id
-            HttpResponseMessage wordListCreationResponse = await HttpService.PostWithJson<WordListDTO>(
-                HttpPathBuilder.CreateWordListEndpoint(),
-                new WordListDTO(WordListName, Url)
+            HttpResponseMessage vocabularyCreationResponse = await HttpService.PostWithJson<VocabularyView>(
+                HttpPathBuilder.CreateVocabularyEndpoint(),
+                new VocabularyView(VocabularyName, Url)
             );
-            if (!wordListCreationResponse.IsSuccessStatusCode)
+            if (!vocabularyCreationResponse.IsSuccessStatusCode)
             {
                 isListSaving = false;
-                await ShowModalMessage("Opps!", await wordListCreationResponse.Content.ReadAsStringAsync());
+                await ShowModalMessage("Opps!", await vocabularyCreationResponse.Content.ReadAsStringAsync());
                 return;
             }
 
-            int wordListId = int.Parse(await wordListCreationResponse.Content.ReadAsStringAsync());
+            int vocabularyId = int.Parse(await vocabularyCreationResponse.Content.ReadAsStringAsync());
 
             HttpResponseMessage wordsSavingResponse = await HttpService.PostWithJson<IEnumerable<WordDTO>>(
-                HttpPathBuilder.AddWordsEndpoint(wordListId),
+                HttpPathBuilder.AddWordsEndpoint(vocabularyId),
                 WordList
             );
             if(wordsSavingResponse.IsSuccessStatusCode)
             {
-                await ShowModalMessage("Good job!", $"The list: {WordListName} is saved");
+                await ShowModalMessage("Good job!", $"The vocabulary: {VocabularyName} is saved");
             }
             else
             {

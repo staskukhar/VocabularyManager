@@ -3,9 +3,9 @@ using VocabularyManager.Core.Entities;
 
 namespace VocabularyManager.Core.Specifications
 {
-    public class WordListWithWordsSpecification : Specification<WordList>
+    public class VocabularyWithWordsSpecification : Specification<Vocabulary>
     {
-        public WordListWithWordsSpecification(int wordListId) 
+        public VocabularyWithWordsSpecification(int wordListId) 
         {
             Query
                 .Where(wl => wl.Id == wordListId)

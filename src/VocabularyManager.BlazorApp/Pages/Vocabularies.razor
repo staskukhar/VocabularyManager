@@ -1,0 +1,171 @@
+﻿@page "/dic/{VocabularyId:int?}"
+
+@using VocabularyManager.BlazorApp.Models.Views
+@using VocabularyManager.BlazorApp.Pages.Modals
+@using VocabularyManager.BlazorApp.Services
+@using VocabularyManager.BlazorApp.Interfaces
+
+@inject HttpPathBuilder HttpPathBuilder
+@inject HttpService HttpService
+@inject IVocabularyStateManager<VocabularyView> VocabularyStateManager
+
+@implements IDisposable
+
+<Modal @ref="createVocabularyModal"></Modal>
+
+<h3>Vocabularies</h3>
+<div class="input-group mb-3">
+    <div class="col-md-5 col-sm-12">
+        <AutoComplete @bind-Value="vocabularyName"
+                      TItem="VocabularyView"
+                      DataProvider="VocabulariesDataProvider"
+                      PropertyName="Name"
+                      Placeholder="Search a vocabulary..."
+                      Disabled=@vocabularyLoading
+                      OnChanged="(VocabularyView? vocabulary) => OnAutoCompleteChanged(vocabulary)" />
+    </div>
+    <Button Color="ButtonColor.Primary" Disabled=@vocabularyLoading @onclick=TryToLoadVocabulary>Load</Button>
+</div>
+<div class="mb-1">
+    <Button class="m-1" 
+        Type="ButtonType.Button" 
+        Color="ButtonColor.Success" 
+        @onclick="CreateVocabularyModal">
+        Create new
+    </Button>
+</div>
+@if (vocabularyLoading)
+{
+<div class="text-info">Loading...</div>
+}
+else
+{
+    if (VocabularyStateManager.Vocabulary is not null)
+    {
+        <Tabs>
+            <Tab Title="About" IsActive="true">
+                <Content>
+                    <AboutVocabulary Vocabulary="@VocabularyStateManager.Vocabulary"></AboutVocabulary>
+                </Content>
+            </Tab>
+            <Tab Title="Edit">
+                <Content>
+                    <ListOfWordPlates Vocabulary="@VocabularyStateManager.Vocabulary"></ListOfWordPlates>
+                </Content>
+            </Tab>
+        </Tabs>
+    }
+    else
+    {
+        <div class="text-info">No list loaded</div>
+    }
+}
+
+@code {
+    [Inject]
+    protected ToastService ToastService { get; set; } = default!;
+
+    [Parameter]
+    public int? VocabularyId { get; set; }
+
+    private string? vocabularyName;
+    private IEnumerable<VocabularyView>? listOfVocabularies;
+    private bool vocabularyLoading = false;
+    private Modal createVocabularyModal = default!;
+
+    protected override void OnInitialized()
+    {
+        VocabularyStateManager.SubscribeOnChangeAction(StateHasChanged);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await TryToLoadVocabulary();
+    }
+
+    private async Task<AutoCompleteDataProviderResult<VocabularyView>> VocabulariesDataProvider(
+    AutoCompleteDataProviderRequest<VocabularyView> request)
+    {
+        if(listOfVocabularies is null)
+        {
+            listOfVocabularies = await GetVocabulariesAsync();
+        }
+
+        return await Task.FromResult(request.ApplyTo(listOfVocabularies.OrderBy(wl => wl.Name)));
+    }
+
+    private async Task<IEnumerable<VocabularyView>> GetVocabulariesAsync()
+    {
+        HttpResponseMessage response = await HttpService.Get(
+            HttpPathBuilder.GetVocabularyEndpoint()
+        );
+        if (response.IsSuccessStatusCode)
+        {
+            return listOfVocabularies = await response.Content.ReadFromJsonAsync<IEnumerable<VocabularyView>>() ??
+                Enumerable.Empty<VocabularyView>();
+        }
+        else return Enumerable.Empty<VocabularyView>();
+    }
+
+    private void OnAutoCompleteChanged(VocabularyView? vocabulary)
+    {
+        if(vocabulary is not null)
+        {
+            VocabularyId = vocabulary.Id;
+        }
+    }
+
+    private async Task<VocabularyView?> GetVocabularyWithWordsById(int? vocabularyId)
+    {
+        vocabularyLoading = true;
+        if (vocabularyId is null)
+        {
+            vocabularyLoading = false;
+            return null;
+        }
+
+        try
+        {
+            HttpResponseMessage response = await HttpService
+                .Get(HttpPathBuilder.GetVocabularytByIdEndpoint(vocabularyId ?? -1));
+            if (response.IsSuccessStatusCode)
+            {
+                vocabularyLoading = false;
+                return await response.Content.ReadFromJsonAsync<VocabularyView>();
+            }
+        }
+        finally
+        {
+            vocabularyLoading = false;
+        }
+        return null;
+    }
+    private async Task TryToLoadVocabulary()
+    {
+        if(VocabularyId is not null)
+        {
+            VocabularyStateManager.Vocabulary = await GetVocabularyWithWordsById(VocabularyId);
+        }
+    }
+
+    private async Task CreateVocabularyModal()
+    {
+        Dictionary<string, object> parameters = new Dictionary<string, object>();
+        parameters.Add("OnCloseFunc", CloseVocabularyCreationModal);
+        await createVocabularyModal.ShowAsync<CreateVocabularyModel>(
+            title: "Create vocabulary",
+            parameters: parameters
+        );
+    }
+
+    private async Task CloseVocabularyCreationModal()
+    {
+        await createVocabularyModal.HideAsync();
+        listOfVocabularies = await GetVocabulariesAsync();
+    }
+
+    public void Dispose()
+    {
+        VocabularyStateManager.UnsubscribeOnChangeAction(StateHasChanged);
+    }
+}

@@ -5,13 +5,13 @@ namespace VocabularyManager.Infrastructure.Data
 {
     public class VocabularyContext : DbContext
     {
-        public DbSet<WordList> WordLists { get; set; }
+        public DbSet<Vocabulary> Vocabularies { get; set; }
         public DbSet<Word> Words { get; set; }
         public VocabularyContext(
             DbContextOptions<VocabularyContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<WordList>()
+            modelBuilder.Entity<Vocabulary>()
                 .Property(wl => wl.Id)
                 .HasIdentityOptions(startValue: 1);
 
@@ -19,16 +19,11 @@ namespace VocabularyManager.Infrastructure.Data
                 .Property(w => w.Id)
                 .HasIdentityOptions(startValue: 1);
 
-            modelBuilder.Entity<WordList>()
+            modelBuilder.Entity<Vocabulary>()
                 .HasMany(wl => wl.Words)
-                .WithOne(w => w.WordList)
-                .HasForeignKey(w => w.WordListId)
+                .WithOne(w => w.Vocabulary)
+                .HasForeignKey(w => w.VocabularyId)
                 .HasPrincipalKey(w => w.Id);
-        }
-
-        internal IEnumerable<WordList> Where(Func<bool> condition)
-        {
-            throw new NotImplementedException();
         }
     }
 }

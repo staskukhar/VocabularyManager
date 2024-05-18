@@ -2,7 +2,7 @@
 
 namespace VocabularyManager.Core.Interfaces
 {
-    public interface IWordService
+    public interface IWordStoreManager
     {
         Task<int> DeleteWordById(int wordId);
         Task UpdateWord(Word word);
