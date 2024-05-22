@@ -1,15 +1,26 @@
 ﻿using VocabularyManager.BlazorApp.Services;
 using VocabularyManager.BlazorApp.Models.Views;
+using AutoFixture;
 
 namespace VocabularyManager.UnitTests.Services
 {
     public class WordClonerTests
     {
+        Fixture _fixture;
+        public WordClonerTests()
+        {
+            _fixture = new Fixture();
+        }
         [Fact]
         public void Word_Clone_Test1()
         {
             //Arrange
-            var word = new WordView("to run", "a1", "verb", "the action of moving fast by using legs");
+            var word = new WordView(
+                _fixture.Create<string>(),
+                _fixture.Create<string?>(),
+                _fixture.Create<string?>(),
+                _fixture.Create<string?>()
+            );
 
             //Act
             var clonedWord = WordCloner.CloneWord(word);

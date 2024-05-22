@@ -1,21 +1,32 @@
 ﻿using Ardalis.Specification;
+using AutoFixture;
 using NSubstitute;
 using VocabularyManager.Core.Entities;
-using VocabularyManager.Core.Interfaces;
-using VocabularyManager.Core.Services;
 using VocabularyManager.Core.Specifications;
+using VocabularyManager.UseCases.Interfaces;
+using VocabularyManager.UseCases.Services.StoreManagers;
 
 namespace VocabularyManager.UnitTests.Services
 {
     public class VocabularyStoreManagerTest
     {
+        Fixture _fixture;
+        public VocabularyStoreManagerTest()
+        {
+            _fixture = new Fixture();
+        }
         [Fact]
-        public async Task Add_Word_To_Word_List_Test1()
+        public async Task Add_Word_To_Vocabulary_Test1()
         {
             //Arrange
-            Vocabulary vocabulary = new Vocabulary("some word list", null);
-            Word word = new Word("word", "noun", "a1", null);
-            int vocabularyId = 0;
+            Vocabulary vocabulary = new Vocabulary(_fixture.Create<string>(), null);
+            Word word = new Word(
+                _fixture.Create<string>(), 
+                _fixture.Create<string>(), 
+                _fixture.Create<string>(), 
+                null
+            );
+            int vocabularyId = _fixture.Create<int>();
             IRepositoryBase<Vocabulary> repository = Substitute.For<IRepositoryBase<Vocabulary>>();
             repository
                 .GetByIdAsync(vocabularyId)
@@ -24,7 +35,7 @@ namespace VocabularyManager.UnitTests.Services
                         () => new Vocabulary(vocabulary.Name, vocabulary.SourceUrl)
                         { Id = vocabularyId, Words = new List<Word>() })
             ); ;
-            IVocabularyStoreManager vocabularyStoreService = new VocabularyStoreManager(repository);
+            IVocabularyStorageManager vocabularyStoreService = new VocabularyStorageManager(repository);
 
             //Act
             int? wordId = await vocabularyStoreService.AddWord(word, vocabularyId);
@@ -34,11 +45,11 @@ namespace VocabularyManager.UnitTests.Services
             Assert.NotNull(wordId);
         }
         [Fact]
-        public async Task Create_Word_List_Test1()
+        public async Task Create_Vocabulary_Test1()
         {
             // Arrange
-            Vocabulary vocabulary = new Vocabulary("some word list", null);
-            int expectedId = 0;
+            Vocabulary vocabulary = new Vocabulary(_fixture.Create<string>(), null);
+            int expectedId = _fixture.Create<int>();
             IRepositoryBase<Vocabulary> repository = Substitute.For<IRepositoryBase<Vocabulary>>();
             repository
                 .AddAsync(vocabulary)
@@ -46,7 +57,7 @@ namespace VocabularyManager.UnitTests.Services
                     Task.Run(
                         () => new Vocabulary(vocabulary.Name, vocabulary.SourceUrl) { Id = expectedId })
             );
-            IVocabularyStoreManager vocabularyStoreService = new VocabularyStoreManager(repository);
+            IVocabularyStorageManager vocabularyStoreService = new VocabularyStorageManager(repository);
 
             //Act
             int? vocabularyId = await vocabularyStoreService.CreateVocabulary(vocabulary);
@@ -56,11 +67,11 @@ namespace VocabularyManager.UnitTests.Services
             Assert.NotNull(vocabularyId);
         }
         [Fact]
-        public async Task Get_Word_Lists_Test1()
+        public async Task Get_Vocabularies_Test1()
         {
             //Arrange
             List<Vocabulary> vocabulary = new List<Vocabulary>();
-            vocabulary.Add(new Vocabulary("some word list", null));
+            vocabulary.Add(new Vocabulary(_fixture.Create<string>(), null));
             IRepositoryBase<Vocabulary> repository = Substitute.For<IRepositoryBase<Vocabulary>>();
             repository
                 .ListAsync()
@@ -68,7 +79,7 @@ namespace VocabularyManager.UnitTests.Services
                     Task.Run(
                         () => vocabulary)
             );
-            IVocabularyStoreManager vocabularyStoreService = new VocabularyStoreManager(repository);
+            IVocabularyStorageManager vocabularyStoreService = new VocabularyStorageManager(repository);
             //Act
             var result = await vocabularyStoreService.GetVocabularies();
 
@@ -77,11 +88,11 @@ namespace VocabularyManager.UnitTests.Services
             Assert.NotNull(vocabulary);
         }
         [Fact]
-        public async Task Get_Word_List_By_Id_Test1()
+        public async Task Get_Vocabulary_By_Id_Test1()
         {
             //Arrange
-            Vocabulary expectedVocabulary = new Vocabulary("some word list", null);
-            int vocabularyId = 0;
+            Vocabulary expectedVocabulary = new Vocabulary(_fixture.Create<string>(), null);
+            int vocabularyId = _fixture.Create<int>();
             ISpecification<Vocabulary> spec = new VocabularyWithWordsSpecification(vocabularyId);
             IRepositoryBase<Vocabulary> repository = Substitute.For<IRepositoryBase<Vocabulary>>();
             repository
@@ -93,7 +104,7 @@ namespace VocabularyManager.UnitTests.Services
                         () => new Vocabulary(expectedVocabulary.Name, expectedVocabulary.SourceUrl)
                         { Id = vocabularyId, Words = new List<Word>() })
             );
-            IVocabularyStoreManager vocabularyStoreService = new VocabularyStoreManager(repository);
+            IVocabularyStorageManager vocabularyStoreService = new VocabularyStorageManager(repository);
 
             //Act
             Vocabulary wordList = await vocabularyStoreService.GetVocabularyWithWordsById(vocabularyId);

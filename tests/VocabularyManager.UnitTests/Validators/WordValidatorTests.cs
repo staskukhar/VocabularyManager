@@ -1,5 +1,4 @@
 ﻿using VocabularyManager.Core.Entities;
-using VocabularyManager.UseCases.DTOs;
 using VocabularyManager.UseCases.Validators;
 
 namespace VocabularyManager.UnitTests.Validators
