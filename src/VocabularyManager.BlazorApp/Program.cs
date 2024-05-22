@@ -1,12 +1,8 @@
-using FluentValidation;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using VocabularyManager.BlazorApp;
-using VocabularyManager.BlazorApp.Interfaces;
 using VocabularyManager.BlazorApp.Models.Configurations;
-using VocabularyManager.BlazorApp.Models.Views;
-using VocabularyManager.BlazorApp.Services;
-using VocabularyManager.BlazorApp.Validators;
+using VocabularyManager.BlazorApp.DIExtensions;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.Logging.SetMinimumLevel(LogLevel.Information);
@@ -24,18 +20,13 @@ if(httpOptions == null)
 builder.Services.AddSingleton( sg =>
     httpOptions!
 );
-builder.Services.AddSingleton<HttpPathBuilder, HttpPathBuilder>();
-
-builder.Services.AddScoped( sp =>
+builder.Services.AddScoped(sp =>
     new HttpClient()
     {
         BaseAddress = new Uri(httpOptions.ApiBaseURL)
     }
 );
-builder.Services.AddScoped<HttpService, HttpService>();
-builder.Services.AddScoped<IVocabularyStateManager<VocabularyView>, VocabularyStateManager>();
-builder.Services.AddScoped<IValidator<VocabularyView>, VocabularyViewValidator>();
-builder.Services.AddScoped<IValidator<WordView>, WordViewValidator>();
+builder.Services.InjectDependencies();
 
 builder.Services.AddBlazorBootstrap();
 

@@ -1,16 +1,7 @@
 using VocabularyManager.Infrastructure.Data;
-using VocabularyManager.Core.Services;
-using VocabularyManager.Core.Entities;
 using Microsoft.EntityFrameworkCore;
-using Ardalis.Specification;
-using VocabularyManager.Core.Interfaces;
-using VocabularyManager.UseCases.Validators;
-using FluentValidation;
-using VocabularyManager.UseCases.DTOs;
-using VocabularyManager.UseCases.Interfaces;
 using VocabularyManager.Api.Middleware;
-using VocabularyManager.Api.ActionFilters;
-using VocabularyManager.UseCases.Services;
+using VocabularyManager.Api.DIExtensions;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,9 +10,7 @@ var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 // Add services to the container.
 
 builder.Services.AddControllers();
-builder.Services.AddScoped<WordValidationFilter>();
-builder.Services.AddScoped<WordsValidationFilter>();
-builder.Services.AddScoped<VocabularyValidationFilter>();
+builder.Services.AddValidationFilters();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -39,14 +28,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddDbContext<VocabularyContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("VocabularyDbConnection")));
-builder.Services.AddScoped<IRepositoryBase<Word>, EfRepository<Word>>();
-builder.Services.AddScoped<IRepositoryBase<Vocabulary>, EfRepository<Vocabulary>>();
-builder.Services.AddScoped<IWordStoreManager, WordStoreManager>();
-builder.Services.AddScoped<IVocabularyStoreManager, VocabularyStoreManager>();
-builder.Services.AddScoped<IWordParser<WordDTO>, OxfordDictionaryParser>();
-builder.Services.AddScoped<IValidator<Word>, WordValidator>();
-builder.Services.AddScoped<IValidator<Vocabulary>, VocabularyValidator>();
-builder.Services.AddScoped<IValidator<WordDTO>, OxfordParsingWordDTOValidator>();
+builder.Services.InjectDependencies();
 
 var app = builder.Build();
 
