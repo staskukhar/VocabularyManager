@@ -172,7 +172,7 @@
             int vocabularyId = int.Parse(await vocabularyCreationResponse.Content.ReadAsStringAsync());
 
             HttpResponseMessage wordsSavingResponse = await HttpService.PostWithJson<IEnumerable<WordDTO>>(
-                HttpPathBuilder.AddWordsEndpoint(vocabularyId),
+                HttpPathBuilder.AddWordEndpoint(vocabularyId),
                 WordList
             );
             if(wordsSavingResponse.IsSuccessStatusCode)

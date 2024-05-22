@@ -1,8 +1,8 @@
 ﻿using VocabularyManager.Core.Entities;
 
-namespace VocabularyManager.Core.Interfaces
+namespace VocabularyManager.UseCases.Interfaces
 {
-    public interface IWordStoreManager
+    public interface IWordStorageManager
     {
         Task<int> DeleteWordById(int wordId);
         Task UpdateWord(Word word);

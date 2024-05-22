@@ -42,9 +42,9 @@
         ValidationResult result = WordValidator.Validate(word);
         if(result.IsValid)
         {
-            HttpResponseMessage wordCreationResponse = await HttpService.PostWithJson<WordView>(
+            HttpResponseMessage wordCreationResponse = await HttpService.PostWithJson<IEnumerable<WordView>>(
                 HttpPathBuilder.AddWordEndpoint(VocabularyStateManager?.Vocabulary?.Id ?? -1),
-                word
+                [word]
             );
 
             if (wordCreationResponse.IsSuccessStatusCode)

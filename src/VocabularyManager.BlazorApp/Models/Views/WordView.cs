@@ -1,8 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
-using VocabularyManager.Core.Entities;
-
-namespace VocabularyManager.BlazorApp.Models.Views
+﻿namespace VocabularyManager.BlazorApp.Models.Views
 {
     public class WordView
     {

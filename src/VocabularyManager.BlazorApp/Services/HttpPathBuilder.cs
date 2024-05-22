@@ -12,20 +12,11 @@ namespace VocabularyManager.BlazorApp.Services
 
         public string AddWordEndpoint(int vocabularyId)
         {
-            return String.Concat(
-                _httpOptions.ApiBaseURL, 
-                _httpOptions.WordTree.PathPrefix,
-                _httpOptions.WordTree.Add,
-                $"?vocabularyId={vocabularyId}"
-            );
-        }
-        public string AddWordsEndpoint(int vocabularyId)
-        {
             return String.Format(
                 String.Concat(
                     _httpOptions.ApiBaseURL,
                     _httpOptions.WordTree.PathPrefix,
-                    _httpOptions.WordTree.AddWords
+                    _httpOptions.WordTree.Add
                 ),
                 vocabularyId
             );
@@ -36,8 +27,7 @@ namespace VocabularyManager.BlazorApp.Services
                 String.Concat(
                     _httpOptions.ApiBaseURL,
                     _httpOptions.WordTree.PathPrefix,
-                    _httpOptions.WordTree.Delete,
-                    $"?id={wordId}"
+                    _httpOptions.WordTree.Delete
                 ),
                 wordId
             );
@@ -71,11 +61,13 @@ namespace VocabularyManager.BlazorApp.Services
         }
         public string GetVocabularytByIdEndpoint(int vocabularyId)
         {
-            return String.Concat(
-                _httpOptions.ApiBaseURL,
-                _httpOptions.VocabularyTree.PathPrefix,
-                _httpOptions.VocabularyTree.GetById,
-                $"?vocabularyId={vocabularyId}"
+            return String.Format(
+                String.Concat(
+                    _httpOptions.ApiBaseURL,
+                    _httpOptions.VocabularyTree.PathPrefix,
+                    _httpOptions.VocabularyTree.GetById
+                ),
+                vocabularyId
             );
         }
         public string UpdateVocabularyEndpoint()

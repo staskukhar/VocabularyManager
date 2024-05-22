@@ -17,7 +17,6 @@
         public const string SectionKey = "Word";
         public string PathPrefix { get; set; } = String.Empty;
         public string Add { get; set; } = String.Empty;
-        public string AddWords { get; set; } = String.Empty;
         public string Delete { get; set; } = String.Empty;
         public string Update { get; set; } = String.Empty;
         public WordPathes()

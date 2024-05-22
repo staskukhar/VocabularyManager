@@ -2,7 +2,7 @@ namespace VocabularyManager.UseCases.DTOs
 {
     public class WordDTO
     {
-        public int? Id { get; init; } = 0;
+        public int Id { get; init; }
         public string WordContent { get; set; }
         public string? LevelAttribute { get; set; }
         public string? Lexeme { get; set; }

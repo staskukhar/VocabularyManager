@@ -1,20 +1,21 @@
 ﻿using Ardalis.Specification;
 using VocabularyManager.Core.Entities;
 using VocabularyManager.UseCases.Exceptions;
-using VocabularyManager.Core.Interfaces;
+using VocabularyManager.UseCases.Interfaces;
 using VocabularyManager.Core.Specifications;
+using System.Collections.Immutable;
 
-namespace VocabularyManager.Core.Services
+namespace VocabularyManager.UseCases.Services.StoreManagers
 {
-    public class VocabularyStoreManager : IVocabularyStoreManager
+    public class VocabularyStorageManager : IVocabularyStorageManager
     {
         private readonly IRepositoryBase<Vocabulary> _vocabularyRepository;
-        public VocabularyStoreManager(IRepositoryBase<Vocabulary> wordListService) 
+        public VocabularyStorageManager(IRepositoryBase<Vocabulary> vocabularyRepository)
         {
-            _vocabularyRepository = wordListService;
+            _vocabularyRepository = vocabularyRepository;
         }
 
-        public async Task AddWords(IEnumerable<Word> words, int vocabularyId)
+        public async Task<ImmutableList<int>> AddWords(IEnumerable<Word> words, int vocabularyId)
         {
             Vocabulary? vocabulary = await _vocabularyRepository.GetByIdAsync(vocabularyId);
             if (vocabulary == null)
@@ -23,6 +24,7 @@ namespace VocabularyManager.Core.Services
             }
             vocabulary.Words.AddRange(words);
             await _vocabularyRepository.SaveChangesAsync();
+            return words.Select(w => w.Id).ToImmutableList();
         }
 
         public async Task<int> AddWord(Word word, int vocabularyId)

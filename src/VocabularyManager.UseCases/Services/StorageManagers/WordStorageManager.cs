@@ -1,14 +1,14 @@
 ﻿using Ardalis.Specification;
 using VocabularyManager.Core.Entities;
 using VocabularyManager.UseCases.Exceptions;
-using VocabularyManager.Core.Interfaces;
+using VocabularyManager.UseCases.Interfaces;
 
-namespace VocabularyManager.Core.Services
+namespace VocabularyManager.UseCases.Services.StoreManagers
 {
-    public class WordStoreManager : IWordStoreManager
+    public class WordStorageManager : IWordStorageManager
     {
         private readonly IRepositoryBase<Word> _wordRepository;
-        public WordStoreManager(IRepositoryBase<Word> wordRepository) 
+        public WordStorageManager(IRepositoryBase<Word> wordRepository)
         {
             _wordRepository = wordRepository;
         }

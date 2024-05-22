@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using VocabularyManager.Core.Entities;
-
-namespace VocabularyManager.BlazorApp.Models.Views
+﻿namespace VocabularyManager.BlazorApp.Models.Views
 {
     public class VocabularyView
     {

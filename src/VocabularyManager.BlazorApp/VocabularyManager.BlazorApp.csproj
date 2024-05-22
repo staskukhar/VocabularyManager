@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\VocabularyManager.Core\VocabularyManager.Core.csproj" />
     <ProjectReference Include="..\VocabularyManager.UseCases\VocabularyManager.UseCases.csproj" />
   </ItemGroup>
 
