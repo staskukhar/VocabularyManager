@@ -25,10 +25,10 @@ namespace VocabularyManager.Api.Middleware
             }
             catch(Exception e)
             {
-                await HandleExceptinAsync(httpContext, e);
+                await HandleExceptionAsync(httpContext, e);
             }
         }
-        private async Task HandleExceptinAsync(HttpContext httpContext, Exception e)
+        private async Task HandleExceptionAsync(HttpContext httpContext, Exception e)
         {
             _logger.LogError($"{DateTime.UtcNow} - excpetion handled: {e.Message}");
             HttpStatusCode statusCode = DefineStatusCode(e);
@@ -43,7 +43,7 @@ namespace VocabularyManager.Api.Middleware
             {
                 case WordNotFoundException:
                 case VocabularyNotFoundException:
-                    return HttpStatusCode.NotFound;
+                    return HttpStatusCode.BadRequest;
                 default: 
                     return HttpStatusCode.InternalServerError;
             }
