@@ -16,6 +16,7 @@
     {
         public const string SectionKey = "Word";
         public string PathPrefix { get; set; } = String.Empty;
+        public string Get { get; set; } = String.Empty;
         public string Add { get; set; } = String.Empty;
         public string Delete { get; set; } = String.Empty;
         public string Update { get; set; } = String.Empty;
@@ -28,7 +29,6 @@
     {
         public const string SectionKey = "Vocabulary";
         public string PathPrefix { get; set; } = String.Empty;
-        public string GetVocabulary { get; set; } = String.Empty;
         public string Create { get; set; } = String.Empty;
         public string GetVocabularies { get; set; } = String.Empty;
         public string GetById { get; set; } = String.Empty;

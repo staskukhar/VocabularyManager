@@ -37,8 +37,8 @@ namespace VocabularyManager.BlazorApp.Services
             return String.Format(
                 String.Concat(
                     _httpOptions.ApiBaseURL,
-                    _httpOptions.VocabularyTree.PathPrefix,
-                    _httpOptions.VocabularyTree.GetVocabulary
+                    _httpOptions.WordTree.PathPrefix,
+                    _httpOptions.WordTree.Get
                 ),
                 url
             );

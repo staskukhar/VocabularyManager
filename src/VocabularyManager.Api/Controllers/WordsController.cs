@@ -2,7 +2,9 @@
 using System.Collections.Immutable;
 using VocabularyManager.Api.ActionFilters;
 using VocabularyManager.Core.Entities;
+using VocabularyManager.UseCases.DTOs;
 using VocabularyManager.UseCases.Interfaces;
+using VocabularyManager.UseCases.Validators;
 
 namespace VocabularyManager.Api.Controllers
 {
@@ -12,12 +14,22 @@ namespace VocabularyManager.Api.Controllers
     {
         private readonly IWordStorageManager _wordStoreManager;
         private readonly IVocabularyStorageManager _vocabularyStoreManager;
+        private readonly IWordParser<WordDTO> _oxfordDictionaryParser;
         public WordsController(
             IWordStorageManager wordStoreManager,
-            IVocabularyStorageManager vocabularyStoreManager)
+            IVocabularyStorageManager vocabularyStoreManager,
+            IWordParser<WordDTO> oxfordDictionaryParser)
         {
             _wordStoreManager = wordStoreManager;  
             _vocabularyStoreManager = vocabularyStoreManager;
+            _oxfordDictionaryParser = oxfordDictionaryParser;
+        }
+        [HttpGet]
+        public IActionResult GetListOfWordsByUrlAsync([FromQuery] string url)
+        {
+            IAsyncEnumerable<WordDTO> listOfWords = _oxfordDictionaryParser
+                    .GetWordListByLinkAsync(url, new OxfordParsingWordDTOValidator());
+            return Ok(listOfWords);
         }
         [HttpPost]
         [ServiceFilter(typeof(WordsValidationFilter))]
