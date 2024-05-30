@@ -1,5 +1,6 @@
 ﻿using Ardalis.Specification;
 using AutoFixture;
+using FluentAssertions;
 using NSubstitute;
 using VocabularyManager.Core.Entities;
 using VocabularyManager.UseCases.Interfaces;
@@ -46,9 +47,10 @@ namespace VocabularyManager.UnitTests.Services
             int? deletedWordId = await wordStoreService.DeleteWordById(wordId);
 
             //Assert
-            Assert.NotNull(deletedWordId);
-            Assert.IsType<int>(wordId);
-            Assert.Equal(wordId, deletedWordId);
+            deletedWordId
+                .Should().NotBeNull()
+                .And.Be(wordId);
+            wordId.Should().BeOfType(typeof(int));
         }
         [Fact]
         public async Task Update_Word_Test1()

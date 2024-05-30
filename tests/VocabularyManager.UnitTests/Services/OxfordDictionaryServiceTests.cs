@@ -1,3 +1,5 @@
+using FluentAssertions;
+using NSubstitute.ExceptionExtensions;
 using VocabularyManager.UseCases.DTOs;
 using VocabularyManager.UseCases.Exceptions;
 using VocabularyManager.UseCases.Services.Parsers;
@@ -8,7 +10,7 @@ namespace VocabularyManager.UnitTests.Services
     public class OxfordDictionaryServiceTests
     {
         [Fact]
-        public async Task Get_List_Of_Words_By_Link_Async_Test_1()
+        public void Get_List_Of_Words_By_Link_Async_Test_1()
         {
             //Arrange
             var parsingService = new OxfordDictionaryParser();
@@ -21,53 +23,53 @@ namespace VocabularyManager.UnitTests.Services
             ); //well-fitable url
 
             //Assert
-            Assert.NotNull(wordList);
-            Assert.IsAssignableFrom<IAsyncEnumerable<WordDTO>>(wordList);
+            wordList
+                .Should().NotBeNull()
+                .And.BeAssignableTo<IAsyncEnumerable<WordDTO>>();
         }
         [Fact]
-        public async Task Get_List_Of_Words_By_Link_Async_Exceptions_Test1()
+        public void Get_List_Of_Words_By_Link_Async_Exceptions_Test1()
         {
             // Arrange
             var parsingService = new OxfordDictionaryParser();
 
             // Act & Assert
-            Assert.ThrowsAsync<ArgumentNullException>(async () =>
-            {
+            FluentActions.Invoking(async () =>
                 parsingService.GetWordListByLinkAsync(
                     null,
                     new OxfordParsingWordDTOValidator()
-                );
-            });
+                )
+            ).Should().ThrowAsync<ArgumentNullException>();
         }
         [Fact]
-        public async Task Get_List_Of_Words_By_Link_Async_Exceptions_Test2()
+        public void Get_List_Of_Words_By_Link_Async_Exceptions_Test2()
         {
             // Arrange
             var parsingService = new OxfordDictionaryParser();
 
             // Act & Assert
-            Assert.ThrowsAsync<NullReferenceException>(async () =>
-            {
+            FluentActions.Invoking(async () =>
                 parsingService.GetWordListByLinkAsync(
-                    "invalid_url",
+                    String.Empty,
                     new OxfordParsingWordDTOValidator()
-                );
-            }); //fully invalid url, in case when we can't get response as document
+                )
+            ).Should().ThrowAsync<NullReferenceException>();
+            //fully invalid url, in case when we can't get response as document
         }
         [Fact]
-        public async Task Get_List_Of_Words_By_Link_Async_Exceptions_Test3()
+        public void Get_List_Of_Words_By_Link_Async_Exceptions_Test3()
         {
             // Arrange
             var parsingService = new OxfordDictionaryParser();
 
             // Act & Assert
-            Assert.ThrowsAsync<TheSourceIsNotAppropriateException>(async () =>
-            {
+            FluentActions.Invoking(async () => 
                 parsingService.GetWordListByLinkAsync(
-                    "https://www.oxfordlearnersdictionaries.com/invalid-path",
+                    "http://oxforddictionary/list/invalid-path",
                     new OxfordParsingWordDTOValidator()
-                );
-            }); //not appropriate url
+                )
+            ).Should().ThrowAsync<TheSourceIsNotAppropriateException>();
+            //not appropriate url
         }
     }
 }

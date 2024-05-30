@@ -1,6 +1,7 @@
 ﻿using VocabularyManager.BlazorApp.Services;
 using VocabularyManager.BlazorApp.Models.Views;
 using AutoFixture;
+using FluentAssertions;
 
 namespace VocabularyManager.UnitTests.Services
 {
@@ -26,11 +27,10 @@ namespace VocabularyManager.UnitTests.Services
             var clonedWord = WordCloner.CloneWord(word);
 
             //Assert
-            Assert.NotEqual(word, clonedWord);
-            Assert.Equal(word.WordContent, clonedWord.WordContent);
-            Assert.Equal(word.Lexeme, clonedWord.Lexeme);
-            Assert.Equal(word.LevelAttribute, clonedWord.LevelAttribute);
-            Assert.Equal(word.Defenition, clonedWord.Defenition);
+            clonedWord
+                .Should().NotBeSameAs(word);
+            clonedWord
+                .Should().BeEquivalentTo(word);
         }
     }
 }

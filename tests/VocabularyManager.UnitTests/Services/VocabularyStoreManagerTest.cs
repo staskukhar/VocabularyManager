@@ -1,5 +1,6 @@
 ﻿using Ardalis.Specification;
 using AutoFixture;
+using FluentAssertions;
 using NSubstitute;
 using VocabularyManager.Core.Entities;
 using VocabularyManager.Core.Specifications;
@@ -41,8 +42,9 @@ namespace VocabularyManager.UnitTests.Services
             int? wordId = await vocabularyStoreService.AddWord(word, vocabularyId);
 
             //Assert
-            Assert.IsType<int>(wordId);
-            Assert.NotNull(wordId);
+            wordId
+                .Should().NotBeNull()
+                .And.BeOfType(typeof(int));
         }
         [Fact]
         public async Task Create_Vocabulary_Test1()
@@ -63,8 +65,9 @@ namespace VocabularyManager.UnitTests.Services
             int? vocabularyId = await vocabularyStoreService.CreateVocabulary(vocabulary);
 
             //Assert
-            Assert.IsType<int>(vocabularyId);
-            Assert.NotNull(vocabularyId);
+            vocabularyId
+                .Should().NotBeNull()
+                .And.BeOfType(typeof(int));
         }
         [Fact]
         public async Task Get_Vocabularies_Test1()
@@ -84,8 +87,9 @@ namespace VocabularyManager.UnitTests.Services
             var result = await vocabularyStoreService.GetVocabularies();
 
             //Assert
-            Assert.IsAssignableFrom<IEnumerable<Vocabulary>>(vocabulary);
-            Assert.NotNull(vocabulary);
+            vocabulary
+                .Should().BeAssignableTo<IEnumerable<Vocabulary>>()
+                .And.NotBeNull();
         }
         [Fact]
         public async Task Get_Vocabulary_By_Id_Test1()
@@ -110,9 +114,11 @@ namespace VocabularyManager.UnitTests.Services
             Vocabulary wordList = await vocabularyStoreService.GetVocabularyWithWordsById(vocabularyId);
 
             //Assert
-            Assert.IsAssignableFrom<Vocabulary>(wordList);
-            Assert.NotNull(wordList);
-            Assert.NotNull(wordList.Words);
+            wordList.Words
+                .Should().NotBeNull();
+            wordList
+                .Should().NotBeNull()
+                .And.BeOfType<Vocabulary>();
         }
     }
 }

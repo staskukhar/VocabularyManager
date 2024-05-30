@@ -1,4 +1,5 @@
-﻿using VocabularyManager.Core.Entities;
+﻿using FluentAssertions;
+using VocabularyManager.Core.Entities;
 using VocabularyManager.UseCases.Validators;
 
 namespace VocabularyManager.UnitTests.Validators
@@ -18,8 +19,10 @@ namespace VocabularyManager.UnitTests.Validators
             var result = validator.Validate(word);
 
             //Assert
-            Assert.Equal(expectedResult, result.IsValid);
-            Assert.Equal(errorsNumber, result.Errors.Count);
+            result.IsValid
+                .Should().Be(expectedResult);
+            result.Errors.Count
+                .Should().Be(errorsNumber); ;
         }
         [Fact]
         public void Validate_Word_Test2()
@@ -34,8 +37,10 @@ namespace VocabularyManager.UnitTests.Validators
             var result = validator.Validate(word);
 
             //Assert
-            Assert.Equal(expectedResult, result.IsValid);
-            Assert.Equal(errorsNumber, result.Errors.Count);
+            result.IsValid
+                .Should().Be(expectedResult);
+            result.Errors.Count
+                .Should().Be(errorsNumber);
         }
         [Fact]
         public void Validate_Word_Test3()
@@ -50,8 +55,10 @@ namespace VocabularyManager.UnitTests.Validators
             var result = validator.Validate(word);
 
             //Assert
-            Assert.Equal(expectedResult, result.IsValid);
-            Assert.Equal(errorsNumber, result.Errors.Count);
+            result.IsValid
+                .Should().Be(expectedResult);
+            result.Errors.Count
+                .Should().Be(errorsNumber);
         }
         [Fact]
         public void Validate_Word_Test4()
@@ -66,8 +73,10 @@ namespace VocabularyManager.UnitTests.Validators
             var result = validator.Validate(word);
 
             //Assert
-            Assert.Equal(expectedResult, result.IsValid);
-            Assert.Equal(errorsNumber, result.Errors.Count);
+            result.IsValid
+                .Should().Be(expectedResult);
+            result.Errors.Count
+                .Should().Be(errorsNumber);
         }
         [Fact]
         public void Validate_Word_Test5()
@@ -82,8 +91,10 @@ namespace VocabularyManager.UnitTests.Validators
             var result = validator.Validate(word);
 
             //Assert
-            Assert.Equal(expectedResult, result.IsValid);
-            Assert.Equal(errorsNumber, result.Errors.Count);
+            result.IsValid
+                .Should().Be(expectedResult);
+            result.Errors.Count
+                .Should().Be(errorsNumber);
         }
         [Fact]
         public void Validate_Word_Test6()
@@ -98,8 +109,10 @@ namespace VocabularyManager.UnitTests.Validators
             var result = validator.Validate(word);
 
             //Assert
-            Assert.Equal(expectedResult, result.IsValid);
-            Assert.Equal(errorsNumber, result.Errors.Count);
+            result.IsValid
+                .Should().Be(expectedResult);
+            result.Errors.Count
+                .Should().Be(errorsNumber);
         }
     }
 }
