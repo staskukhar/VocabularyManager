@@ -42,5 +42,10 @@ namespace VocabularyManager.Api.Controllers
             await _vocabularyStoreManager.UpdateVocabulary(vocabulary);
             return Ok(vocabulary);
         }
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> DeleteVocabularyById(int id)
+        {
+            return Ok(await _vocabularyStoreManager.Delete(id));
+        }
     }
 }
