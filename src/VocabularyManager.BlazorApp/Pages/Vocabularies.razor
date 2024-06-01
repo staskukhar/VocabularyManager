@@ -1,4 +1,4 @@
-﻿@page "/dic/{VocabularyId:int?}"
+﻿@page "/vocabulary/{VocabularyId:int?}"
 
 @using VocabularyManager.BlazorApp.Models.Views
 @using VocabularyManager.BlazorApp.Pages.Modals
@@ -26,13 +26,26 @@
     </div>
     <Button Color="ButtonColor.Primary" Disabled=@vocabularyLoading @onclick=TryToLoadVocabulary>Load</Button>
 </div>
-<div class="mb-1">
-    <Button class="m-1" 
-        Type="ButtonType.Button" 
-        Color="ButtonColor.Success" 
-        @onclick="CreateVocabularyModal">
-        Create new
-    </Button>
+<div class="d-flex flex-row mb-1">
+    <div class="me-1">
+        <Button
+                Type="ButtonType.Button"
+                Color="ButtonColor.Success"
+                @onclick="CreateVocabularyModal">
+            Create
+        </Button>
+    </div>
+    @if(VocabularyStateManager.Vocabulary is not null)
+    {
+        <div>
+            <Button
+                    Type="ButtonType.Button"
+                    Color="ButtonColor.Danger"
+                    @onclick="DeleteVocabularyDialog">
+                Delete
+            </Button>
+        </div>
+    }
 </div>
 @if (vocabularyLoading)
 {
@@ -60,6 +73,7 @@ else
         <div class="text-info">No list loaded</div>
     }
 }
+<ConfirmDialog @ref="dialog"></ConfirmDialog>
 
 @code {
     [Inject]
@@ -72,6 +86,7 @@ else
     private IEnumerable<VocabularyView>? listOfVocabularies;
     private bool vocabularyLoading = false;
     private Modal createVocabularyModal = default!;
+    private ConfirmDialog dialog = default!;
 
     protected override void OnInitialized()
     {
@@ -162,6 +177,38 @@ else
     {
         await createVocabularyModal.HideAsync();
         listOfVocabularies = await GetVocabulariesAsync();
+    }
+
+    private async Task DeleteVocabularyDialog()
+    {
+        var options = new ConfirmDialogOptions()
+        {
+            YesButtonText = "Delete",
+            YesButtonColor = ButtonColor.Danger,
+            NoButtonText = "Cancel",
+            NoButtonColor = ButtonColor.Secondary
+        };
+
+        var confirmation = await dialog.ShowAsync(
+            title: "Delete operation!",
+            message1: $"Are you sure to delete the vocabulary: {VocabularyStateManager.Vocabulary.Name} ?",
+            confirmDialogOptions: options
+        );
+        if(confirmation)
+        {
+            HttpResponseMessage deleteResponse = await HttpService.Delete(
+                HttpPathBuilder.DeleteVocabularyEndpoint(VocabularyStateManager.Vocabulary.Id)
+            );
+            if(deleteResponse.IsSuccessStatusCode)
+            {
+                ToastService.Notify(new ToastMessage(ToastType.Success, "Vocabulary was successfully deleted."));
+                VocabularyStateManager.Pop();
+            }
+            else
+            {
+                ToastService.Notify(new ToastMessage(ToastType.Danger, "Sorry, operation has failed. Try again later."));
+            }
+        }
     }
 
     public void Dispose()
