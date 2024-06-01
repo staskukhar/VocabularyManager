@@ -11,5 +11,6 @@ namespace VocabularyManager.UseCases.Interfaces
         Task<IEnumerable<Vocabulary>> GetVocabularies();
         Task<Vocabulary> GetVocabularyWithWordsById(int wordListId);
         Task UpdateVocabulary(Vocabulary wordList);
+        Task<int> Delete(int vocabularyId);
     }
 }

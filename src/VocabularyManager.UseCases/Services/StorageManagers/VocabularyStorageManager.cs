@@ -68,5 +68,19 @@ namespace VocabularyManager.UseCases.Services.StoreManagers
             await _vocabularyRepository.UpdateAsync(vocabulary);
             await _vocabularyRepository.SaveChangesAsync();
         }
+
+        public async Task<int> Delete(int vocabularyId)
+        {
+            var spec = new VocabularyWithWordsSpecification(vocabularyId);
+
+            Vocabulary? vocabulary = await _vocabularyRepository.FirstOrDefaultAsync(spec);
+            if (vocabulary == null)
+            {
+                throw new VocabularyNotFoundException(vocabularyId);
+            }
+            await _vocabularyRepository.DeleteAsync(vocabulary);
+            await _vocabularyRepository.SaveChangesAsync();
+            return vocabularyId;
+        }
     }
 }
