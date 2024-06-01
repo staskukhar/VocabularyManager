@@ -71,5 +71,10 @@ namespace VocabularyManager.BlazorApp.Services
             }
 
         }
+        public void Pop()
+        {
+            _vocabulary = null;
+            NotifyStateHasChanged();
+        }
     }
 }

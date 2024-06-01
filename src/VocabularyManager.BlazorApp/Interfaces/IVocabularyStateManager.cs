@@ -3,6 +3,7 @@
     public interface IVocabularyStateManager<V> : IStateManager
     {
         public V? Vocabulary { get; set; }
+        public void Pop();
         Task Update();
     }
 }
