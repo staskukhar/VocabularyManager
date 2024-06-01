@@ -86,5 +86,16 @@ namespace VocabularyManager.BlazorApp.Services
                 _httpOptions.WordTree.Update
             );
         }
+        public string DeleteVocabularyEndpoint(int id)
+        {
+            return String.Format(
+                String.Concat(
+                    _httpOptions.ApiBaseURL,
+                    _httpOptions.VocabularyTree.PathPrefix,
+                    _httpOptions.VocabularyTree.Delete
+                ),
+                id
+            );
+        }
     }
 }

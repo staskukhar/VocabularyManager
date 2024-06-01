@@ -33,6 +33,7 @@
         public string GetVocabularies { get; set; } = String.Empty;
         public string GetById { get; set; } = String.Empty;
         public string Update { get; set; } = String.Empty;
+        public string Delete { get; set; } = String.Empty;
         public VocabularyPathes()
         {
             
