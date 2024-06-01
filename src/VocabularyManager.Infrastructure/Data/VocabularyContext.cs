@@ -23,7 +23,8 @@ namespace VocabularyManager.Infrastructure.Data
                 .HasMany(wl => wl.Words)
                 .WithOne(w => w.Vocabulary)
                 .HasForeignKey(w => w.VocabularyId)
-                .HasPrincipalKey(w => w.Id);
+                .HasPrincipalKey(w => w.Id)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
