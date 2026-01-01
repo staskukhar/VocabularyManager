@@ -1,0 +1,73 @@
+﻿@page "/wlplate"
+
+@using VocabularyManager.BlazorApp.Interfaces
+@using VocabularyManager.BlazorApp.Models.Views
+@using VocabularyManager.BlazorApp.Pages.Modals
+
+@inject IVocabularyStateManager<VocabularyView> VocabularyStateManager
+
+@implements IDisposable
+
+<Modal @ref="addWordModal"></Modal>
+<div class="m-2">
+    <Button @onclick="ShowAddWordModal" Type="ButtonType.Submit" Color="ButtonColor.Success">
+        Add new
+    </Button>
+</div>
+@if(Vocabulary is not null)
+{
+    @for (int i = StartOfPage(CurrentPage); i < EndOfPage(CurrentPage); i++)
+    {
+        <WordPlate Word="@Vocabulary.Words[i]"></WordPlate>
+    }
+    <Pagination ActivePageNumber="@CurrentPage"
+                TotalPages="@((int)Math.Ceiling(Vocabulary.Words.Count * 1m / AmountWordsOnPage))"
+                PageChanged="OnPageChangedAsync" />
+}
+else
+{
+    <span class="text-secondary">No data</span>
+}
+
+@code {
+    [Parameter]
+    public VocabularyView Vocabulary { get; set; }
+    private int CurrentPage { get; set; } = 1;
+    private const int AmountWordsOnPage = 50;
+    private Modal addWordModal = default!;
+
+    protected override void OnInitialized()
+    {
+        VocabularyStateManager.SubscribeOnChangeAction(StateHasChanged);
+    }
+
+    private async Task OnPageChangedAsync(int newPageNumber)
+    {
+        await Task.Run(() => { CurrentPage = newPageNumber; });
+    }
+
+    private async Task ShowAddWordModal()
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("OnCloseFunc", OnCloseModal);
+        await addWordModal.ShowAsync<AddWordModal>(title: "Add word", parameters: parameters);
+    }
+
+    private async Task OnCloseModal()
+    {
+        await addWordModal.HideAsync();
+    }
+
+    private int StartOfPage(int currentPage) => (currentPage - 1) * AmountWordsOnPage;
+    private int EndOfPage(int currentPage)
+    {
+        // the code help to prevent exception index out of... when we try get last page
+        int end = currentPage * AmountWordsOnPage;
+        return end > Vocabulary.Words.Count ? Vocabulary.Words.Count : end;
+    }
+
+    public void Dispose()
+    {
+        VocabularyStateManager.UnsubscribeOnChangeAction(StateHasChanged);
+    }
+}

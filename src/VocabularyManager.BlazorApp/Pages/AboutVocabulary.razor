@@ -1,0 +1,27 @@
+﻿@using VocabularyManager.BlazorApp.Models.Views
+@using VocabularyManager.UseCases.Interfaces
+
+<div class="mt-1">
+    @if (Vocabulary is not null)
+    {
+        <div class="flex-column border border-1 border-secondary rounded-2 p-2">
+            <div class="text-secondary">Vocabulary's name: @Vocabulary.Name</div>
+            <div class="text-secondary">Number of words: @Vocabulary.Words?.Count</div>
+            <div class="text-secondary">Source: @Vocabulary.SourceUrl</div>
+        </div>
+    }
+    else
+    {
+        <div class="text-danger">Sorry, no vocabulary found!</div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public VocabularyView? Vocabulary { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        StateHasChanged();
+    }
+}
