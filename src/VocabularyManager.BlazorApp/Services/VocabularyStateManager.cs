@@ -56,8 +56,8 @@ namespace VocabularyManager.BlazorApp.Services
             }
             else
             {
-                HttpResponseMessage response = await _httpService.Get(
-                    _httpPathBuilder.GetVocabularytByIdEndpoint(_vocabulary.Id));
+                HttpResponseMessage response = await _httpService.GetAsync(
+                    _httpPathBuilder.GetVocabularyByIdEndpoint(_vocabulary.Id));
 
                 if(response.IsSuccessStatusCode)
                 {

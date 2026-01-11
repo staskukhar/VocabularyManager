@@ -65,7 +65,7 @@ else
         );
         if(deleteForSure)
         {
-            HttpResponseMessage deleteResponse = await HttpService.Delete(
+            HttpResponseMessage deleteResponse = await HttpService.DeleteAsync(
                 HttpPathBuilder.DeleteWordEndpoint(Word.Id)
             );
             if (deleteResponse.IsSuccessStatusCode)

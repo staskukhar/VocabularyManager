@@ -51,7 +51,7 @@ namespace VocabularyManager.BlazorApp.Services
                 _httpOptions.VocabularyTree.Create
             );
         }
-        public string GetVocabularyEndpoint()
+        public string GetVocabulariesEndpoint()
         {
             return String.Concat(
                 _httpOptions.ApiBaseURL,
@@ -59,7 +59,7 @@ namespace VocabularyManager.BlazorApp.Services
                 _httpOptions.VocabularyTree.GetVocabularies
             );
         }
-        public string GetVocabularytByIdEndpoint(int vocabularyId)
+        public string GetVocabularyByIdEndpoint(int vocabularyId)
         {
             return String.Format(
                 String.Concat(

@@ -111,8 +111,8 @@ else
 
     private async Task<IEnumerable<VocabularyView>> GetVocabulariesAsync()
     {
-        HttpResponseMessage response = await HttpService.Get(
-            HttpPathBuilder.GetVocabularyEndpoint()
+        HttpResponseMessage response = await HttpService.GetAsync(
+            HttpPathBuilder.GetVocabulariesEndpoint()
         );
         if (response.IsSuccessStatusCode)
         {
@@ -142,7 +142,7 @@ else
         try
         {
             HttpResponseMessage response = await HttpService
-                .Get(HttpPathBuilder.GetVocabularytByIdEndpoint(vocabularyId ?? -1));
+                .GetAsync(HttpPathBuilder.GetVocabularyByIdEndpoint(vocabularyId ?? -1));
             if (response.IsSuccessStatusCode)
             {
                 vocabularyLoading = false;
@@ -196,7 +196,7 @@ else
         );
         if(confirmation)
         {
-            HttpResponseMessage deleteResponse = await HttpService.Delete(
+            HttpResponseMessage deleteResponse = await HttpService.DeleteAsync(
                 HttpPathBuilder.DeleteVocabularyEndpoint(VocabularyStateManager.Vocabulary.Id)
             );
             if(deleteResponse.IsSuccessStatusCode)

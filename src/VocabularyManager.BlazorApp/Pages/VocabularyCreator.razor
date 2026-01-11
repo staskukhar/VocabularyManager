@@ -99,11 +99,9 @@
 
     private async Task<IEnumerable<WordDTO>> GetVocabulary(string url)
     {
-        HttpResponseMessage response = await HttpService
-            .Get(
-                HttpPathBuilder.ParseListOfWordEndpoint(url)
-            );
-        Console.WriteLine(await response.Content.ReadAsStringAsync());
+        HttpResponseMessage response = await HttpService.GetAsync(
+                HttpPathBuilder.ParseListOfWordEndpoint(url));
+
         if (response.IsSuccessStatusCode)
         {
             return await response.Content.ReadFromJsonAsync<IEnumerable<WordDTO>>() ?? 
@@ -158,7 +156,7 @@
         else
         {
             //the ok response of word list's creation return its id
-            HttpResponseMessage vocabularyCreationResponse = await HttpService.PostWithJson<VocabularyView>(
+            HttpResponseMessage vocabularyCreationResponse = await HttpService.PostWithJsonAsync<VocabularyView>(
                 HttpPathBuilder.CreateVocabularyEndpoint(),
                 new VocabularyView(VocabularyName, Url)
             );
@@ -171,7 +169,7 @@
 
             int vocabularyId = int.Parse(await vocabularyCreationResponse.Content.ReadAsStringAsync());
 
-            HttpResponseMessage wordsSavingResponse = await HttpService.PostWithJson<IEnumerable<WordDTO>>(
+            HttpResponseMessage wordsSavingResponse = await HttpService.PostWithJsonAsync<IEnumerable<WordDTO>>(
                 HttpPathBuilder.AddWordEndpoint(vocabularyId),
                 WordList
             );

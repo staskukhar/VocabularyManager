@@ -44,7 +44,7 @@
         ValidationResult result = WordValidator.Validate(wordData);
         if (result.IsValid)
         {
-            HttpResponseMessage updateReposne = await HttpService.Put<WordView>(
+            HttpResponseMessage updateReposne = await HttpService.PutAsync<WordView>(
                 HttpPathBuilder.UpdateWordEndpoint(),
                 wordData
             );

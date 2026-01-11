@@ -1,0 +1,97 @@
+﻿@page "/wordsearch"
+
+@using VocabularyManager.BlazorApp.Models
+@using VocabularyManager.BlazorApp.Models.Views
+@using VocabularyManager.BlazorApp.Services
+
+@inject HttpPathBuilder HttpPathBuilder
+@inject HttpService HttpService
+
+<div class="row">
+    <div class="col-md-5 col-sm-12">
+        <AutoComplete @bind-Value="vocabularyName"
+                      TItem="ShortVocabulary"
+                      DataProvider="VocabularyDataProvider"
+                      PropertyName="Name"
+                      Placeholder="Search a vocabulary..."
+                      OnChanged="OnVocabularyChosen" />
+    </div>
+</div>
+
+<br />
+
+@if (currentVocabulary is not null)
+{
+    <div class="row">
+        <div class="col-md-5 col-sm-12">
+            <AutoComplete @bind-Value="wordName"
+                          TItem="WordView"
+                          DataProvider="WordDataProvider"
+                          PropertyName="WordContent"
+                          Placeholder="Search a word..."
+                          OnChanged="OnWordChosen" />
+        </div>
+    </div>
+    <br />
+}
+
+@if (currentWord is not null)
+{
+    <WordPlate Word="currentWord" />
+}
+
+@code {
+    [Inject] protected ToastService ToastService { get; set; } = default!;
+
+    private string? vocabularyName;
+    private string? wordName;
+    private IEnumerable<ShortVocabulary> vocabularies = [];
+
+    private VocabularyView? currentVocabulary;
+    private WordView? currentWord;
+
+
+    private async Task<AutoCompleteDataProviderResult<ShortVocabulary>> VocabularyDataProvider(
+        AutoCompleteDataProviderRequest<ShortVocabulary> request)
+    {
+        if (!vocabularies.Any())
+        {
+            vocabularies = await GetVocabulariesAsync();
+        }
+
+        return await Task.FromResult(
+            request.ApplyTo(
+                vocabularies.OrderBy(v => v.Name)));
+    }
+
+    private async Task<AutoCompleteDataProviderResult<WordView>> WordDataProvider(
+    AutoCompleteDataProviderRequest<WordView> request)
+    {
+        return await Task.FromResult(
+            request.ApplyTo(
+                currentVocabulary!.Words.OrderBy(w => w.WordContent)));
+    }
+
+    private async Task<IEnumerable<ShortVocabulary>> GetVocabulariesAsync()
+    {
+        string path = HttpPathBuilder.GetVocabulariesEndpoint();
+        HttpResponseMessage response = await HttpService.GetAsync(path);
+        IEnumerable<ShortVocabulary>? vocabularies = await response.Content
+            .ReadFromJsonAsync<IEnumerable<ShortVocabulary>>();
+
+        return vocabularies ?? [];
+    }
+
+    private async Task OnVocabularyChosen(ShortVocabulary vocabulary)
+    {
+        string path = HttpPathBuilder.GetVocabularyByIdEndpoint(vocabulary.Id);
+        HttpResponseMessage responseMessage = await HttpService.GetAsync(path);
+
+        currentVocabulary = await responseMessage.Content.ReadFromJsonAsync<VocabularyView>();
+    }
+
+    private void OnWordChosen(WordView word)
+    {
+        currentWord = word;
+    }
+}

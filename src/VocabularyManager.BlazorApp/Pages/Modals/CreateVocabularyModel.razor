@@ -40,7 +40,7 @@
         ValidationResult result = VocabularyValidator.Validate(vocabulary);
         if(result.IsValid)
         {
-            HttpResponseMessage vocabularyCreationResponse = await HttpService.PostWithJson<VocabularyView>(
+            HttpResponseMessage vocabularyCreationResponse = await HttpService.PostWithJsonAsync<VocabularyView>(
                 HttpPathBuilder.CreateVocabularyEndpoint(),
                 vocabulary
             );
