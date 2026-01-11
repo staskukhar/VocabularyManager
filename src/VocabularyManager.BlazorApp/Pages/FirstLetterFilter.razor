@@ -1,0 +1,33 @@
+﻿<div class="btn-group" role="group" aria-label="First letter toggle">
+    @foreach (char letter in Letters)
+    {
+        <input
+            id="btn-radio-@letter"
+            type="radio"
+            class="btn-check"
+            @onclick="@(() => OnChange(letter))"
+            name="btnradio"
+            autocomplete="off" />
+        <label class="btn btn-outline-primary" for="btn-radio-@letter">@letter</label>
+    }
+
+    <input
+        id="btn-clear"
+        type="radio"
+        class="btn-check"
+        @onclick="@(() => OnFilterCleared())"
+        name="btnradio"
+        autocomplete="off" />
+    <label class="btn btn-outline-danger" for="btn-clear">clear</label>
+</div>
+
+@code {
+    [Parameter]
+    public IEnumerable<char> Letters { get; set; } = System.Array.Empty<char>();
+
+    [Parameter]
+    public Action<char> OnChange { get; set; } = (char c) => { };
+
+    [Parameter]
+    public Action OnFilterCleared { get; set; } = () => { };
+}

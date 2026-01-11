@@ -14,14 +14,20 @@
         Add new
     </Button>
 </div>
+<div class="m-2">
+    <FirstLetterFilter 
+        Letters="Vocabulary.Words.Select(w => w.WordContent.ToLower().FirstOrDefault()).Distinct()"
+        OnChange="OnFilterChanged" 
+        OnFilterCleared="OnFilterCleared"/>
+</div>
 @if(Vocabulary is not null)
 {
     @for (int i = StartOfPage(CurrentPage); i < EndOfPage(CurrentPage); i++)
     {
-        <WordPlate Word="@Vocabulary.Words[i]"></WordPlate>
+        <WordPlate Word="@FilteredWords[i]"></WordPlate>
     }
     <Pagination ActivePageNumber="@CurrentPage"
-                TotalPages="@((int)Math.Ceiling(Vocabulary.Words.Count * 1m / AmountWordsOnPage))"
+                TotalPages="@((int)Math.Ceiling(FilteredWords.Count * 1m / AmountWordsOnPage))"
                 PageChanged="OnPageChangedAsync" />
 }
 else
@@ -32,6 +38,7 @@ else
 @code {
     [Parameter]
     public VocabularyView Vocabulary { get; set; }
+    private IList<WordView> FilteredWords = [];
     private int CurrentPage { get; set; } = 1;
     private const int AmountWordsOnPage = 50;
     private Modal addWordModal = default!;
@@ -39,11 +46,27 @@ else
     protected override void OnInitialized()
     {
         VocabularyStateManager.SubscribeOnChangeAction(StateHasChanged);
+        FilteredWords = Vocabulary.Words;
     }
 
     private async Task OnPageChangedAsync(int newPageNumber)
     {
         await Task.Run(() => { CurrentPage = newPageNumber; });
+    }
+
+    private void OnFilterChanged(char letter)
+    {
+        FilteredWords = Vocabulary.Words
+            .Where(w => w.WordContent.ToLower().FirstOrDefault() == letter)
+            .ToList();
+
+        StateHasChanged();
+    }
+
+    private void OnFilterCleared()
+    {
+        FilteredWords = Vocabulary.Words;
+        StateHasChanged();
     }
 
     private async Task ShowAddWordModal()
@@ -63,7 +86,7 @@ else
     {
         // the code help to prevent exception index out of... when we try get last page
         int end = currentPage * AmountWordsOnPage;
-        return end > Vocabulary.Words.Count ? Vocabulary.Words.Count : end;
+        return end > FilteredWords.Count ? FilteredWords.Count : end;
     }
 
     public void Dispose()
