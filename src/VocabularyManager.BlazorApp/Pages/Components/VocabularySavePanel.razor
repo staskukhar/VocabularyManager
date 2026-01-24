@@ -1,0 +1,127 @@
+@using VocabularyManager.BlazorApp.Models
+@using VocabularyManager.BlazorApp.Models.Views
+
+<div class="card mb-3">
+    <div class="card-header">
+        <h5 class="mb-0">Save Vocabulary</h5>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="saveOption" id="saveNew" 
+                           checked="@SaveToNewVocabulary" @onchange="@(() => SetSaveOption(true))" />
+                    <label class="form-check-label" for="saveNew">
+                        Create new vocabulary
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="saveOption" id="saveExisting"
+                           checked="@(!SaveToNewVocabulary)" @onchange="@(() => SetSaveOption(false))" />
+                    <label class="form-check-label" for="saveExisting">
+                        Add to existing vocabulary
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        @if (SaveToNewVocabulary)
+        {
+            <div class="input-group mb-3">
+                <span class="input-group-text">Name</span>
+                <input class="form-control @(!IsVocabularyNameValid ? "is-invalid" : "")" 
+                       @bind="VocabularyName" @bind:event="oninput" placeholder="Enter vocabulary name" />
+                @if (!IsVocabularyNameValid)
+                {
+                    <div class="invalid-feedback">
+                        Vocabulary name is required
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="input-group mb-3">
+                <span class="input-group-text">Vocabulary</span>
+                <select class="form-select @(SelectedVocabularyId == 0 ? "is-invalid" : "")" 
+                        @bind="SelectedVocabularyId">
+                    <option value="0">-- Select Vocabulary --</option>
+                    @foreach (VocabularyView vocab in ExistingVocabularies)
+                    {
+                        <option value="@vocab.Id">@vocab.Name</option>
+                    }
+                </select>
+                @if (SelectedVocabularyId == 0)
+                {
+                    <div class="invalid-feedback">
+                        Please select a vocabulary
+                    </div>
+                }
+                <Button Color="ButtonColor.Secondary" @onclick="OnRefreshClick" 
+                        Disabled="@IsLoadingVocabularies">
+                    @(IsLoadingVocabularies ? "Loading..." : "Refresh")
+                </Button>
+            </div>
+        }
+        
+        <Button Color="ButtonColor.Primary" @onclick="OnSaveClick" Disabled="@IsSaving">
+            @(IsSaving ? "Saving..." : "Save Vocabulary")
+        </Button>
+    </div>
+</div>
+
+@if (IsSaving)
+{
+    <div class="text-primary text-center align-content-center">
+        Saving...
+    </div>
+}
+
+@code {
+    [Parameter]
+    public List<VocabularyView> ExistingVocabularies { get; set; } = new();
+
+    [Parameter]
+    public bool IsSaving { get; set; }
+
+    [Parameter]
+    public bool IsLoadingVocabularies { get; set; }
+
+    [Parameter]
+    public EventCallback<SaveVocabularyRequest> OnSaveVocabulary { get; set; }
+
+    [Parameter]
+    public EventCallback OnRefreshVocabularies { get; set; }
+
+    private bool SaveToNewVocabulary { get; set; } = true;
+    private string VocabularyName { get; set; } = string.Empty;
+    private int SelectedVocabularyId { get; set; } = 0;
+    private bool IsVocabularyNameValid => !string.IsNullOrWhiteSpace(VocabularyName);
+
+    private async Task SetSaveOption(bool toNew)
+    {
+        SaveToNewVocabulary = toNew;
+        if (!toNew && ExistingVocabularies.Count == 0)
+        {
+            await OnRefreshVocabularies.InvokeAsync();
+        }
+    }
+
+    private async Task OnRefreshClick()
+    {
+        await OnRefreshVocabularies.InvokeAsync();
+    }
+
+    private async Task OnSaveClick()
+    {
+        SaveVocabularyRequest request = new SaveVocabularyRequest
+        {
+            SaveToNew = SaveToNewVocabulary,
+            VocabularyName = VocabularyName,
+            SelectedVocabularyId = SelectedVocabularyId
+        };
+        await OnSaveVocabulary.InvokeAsync(request);
+    }
+}

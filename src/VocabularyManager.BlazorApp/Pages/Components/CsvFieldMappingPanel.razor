@@ -1,0 +1,89 @@
+@using VocabularyManager.BlazorApp.Models
+@using VocabularyManager.BlazorApp.Services
+
+<div class="card mt-3">
+    <div class="card-header">
+        <h5 class="mb-0">Field Mapping</h5>
+        <small class="text-muted">Map CSV columns to Word properties. Fields marked with * are required.</small>
+    </div>
+    <div class="card-body">
+        @foreach (CsvFieldMapping mapping in FieldMappings)
+        {
+            <div class="row mb-2 align-items-center">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border">
+                            @mapping.ModelPropertyDisplayName
+                            @if (mapping.IsRequired)
+                            {
+                                <span class="text-danger ms-1" style="font-size: 1.2em; font-weight: bold;">*</span>
+                            }
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-2 text-center">
+                    <span class="text-primary fw-bold">→</span>
+                </div>
+                <div class="col-md-5">
+                    <select class="form-select @(mapping.IsRequired && string.IsNullOrEmpty(mapping.CsvColumnName) ? "is-invalid" : "")"
+                            @bind="mapping.CsvColumnName">
+                        <option value="">-- Select CSV Column --</option>
+                        @foreach (string header in CsvHeaders)
+                        {
+                            <option value="@header">@header</option>
+                        }
+                    </select>
+                    @if (mapping.IsRequired && string.IsNullOrEmpty(mapping.CsvColumnName))
+                    {
+                        <div class="invalid-feedback">
+                            This field is required
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        
+        <div class="mt-3">
+            <Button Color="ButtonColor.Success" @onclick="OnApply" Disabled="@(!IsMappingValid())">
+                Apply Mapping
+            </Button>
+            <Button Color="ButtonColor.Secondary" class="ms-2" @onclick="OnCancel">
+                Cancel
+            </Button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public List<CsvFieldMapping> FieldMappings { get; set; } = new();
+
+    [Parameter]
+    public List<string> CsvHeaders { get; set; } = new();
+
+    [Parameter]
+    public EventCallback OnApplyMapping { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancelMapping { get; set; }
+
+    private bool IsMappingValid()
+    {
+        return FieldMappings
+            .Where(m => m.IsRequired)
+            .All(m => !string.IsNullOrEmpty(m.CsvColumnName));
+    }
+
+    private async Task OnApply()
+    {
+        if (IsMappingValid())
+        {
+            await OnApplyMapping.InvokeAsync();
+        }
+    }
+
+    private async Task OnCancel()
+    {
+        await OnCancelMapping.InvokeAsync();
+    }
+}

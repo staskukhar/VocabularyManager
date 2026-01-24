@@ -1,0 +1,58 @@
+@using VocabularyManager.UseCases.DTOs
+
+<div class="flex-row">
+    <h5>Preview (@Words.Count words)</h5>
+    @for (int i = StartOfPage(CurrentPage); i < EndOfPage(CurrentPage); i++)
+    {
+        <div class="card mb-1 p-0 border-1 bg-transparent">
+            <div class="d-flex justify-content-between bg-gradient">
+                <div class="col m-auto ms-lg-2">
+                    <div>@PositionLabelText(i + 1): @Words[i].WordContent</div>
+                    <div>Lexeme: @Words[i].Lexeme</div>
+                    <div>Level: @Words[i].LevelAttribute</div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<Pagination ActivePageNumber="@CurrentPage"
+            TotalPages="@TotalPages"
+            PageChanged="OnPageChangedAsync" />
+
+@code {
+    [Parameter]
+    public List<WordDTO> Words { get; set; } = new();
+
+    [Parameter]
+    public int PageSize { get; set; } = 50;
+
+    private int CurrentPage { get; set; } = 1;
+
+    private int TotalPages => (int)Math.Ceiling(Words.Count * 1m / PageSize);
+
+    private int StartOfPage(int currentPage) => (currentPage - 1) * PageSize;
+    
+    private int EndOfPage(int currentPage)
+    {
+        int end = currentPage * PageSize;
+        return end > Words.Count ? Words.Count : end;
+    }
+
+    private string PositionLabelText(int index)
+    {
+        if (index == 1) return string.Concat(index, "st");
+        else if (index == 2) return string.Concat(index, "nd");
+        else if (index == 3) return string.Concat(index, "rd");
+        else return string.Concat(index, "th");
+    }
+
+    private async Task OnPageChangedAsync(int newPageNumber)
+    {
+        await Task.Run(() => { CurrentPage = newPageNumber; });
+    }
+
+    public void ResetPage()
+    {
+        CurrentPage = 1;
+    }
+}

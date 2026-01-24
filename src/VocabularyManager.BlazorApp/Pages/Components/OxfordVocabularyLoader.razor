@@ -1,0 +1,41 @@
+@using VocabularyManager.UseCases.DTOs
+
+<div class="col mb-3 mt-3">
+    <label>Enter a parsing url</label>
+    <div class="input-group">
+        <input class="form-control" @bind="Url" @bind:event="oninput" @onkeyup="ValidateUrl" />
+        <a class="btn btn-outline-dark @(IsUrlValid && !IsLoading ? "" : "disabled")"
+           @onclick="OnLoadClick">
+            Load
+        </a>
+    </div>
+    @if (!IsUrlValid)
+    {
+        <span class="text-danger">"It seems like passed url isn't valid."</span>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnLoadVocabulary { get; set; }
+
+    private string Url { get; set; } = string.Empty;
+    private bool IsUrlValid { get; set; } = true;
+
+    private void ValidateUrl()
+    {
+        IsUrlValid = Uri.IsWellFormedUriString(Url, UriKind.Absolute);
+    }
+
+    private async Task OnLoadClick()
+    {
+        ValidateUrl();
+        if (IsUrlValid && !IsLoading)
+        {
+            await OnLoadVocabulary.InvokeAsync(Url);
+        }
+    }
+}
