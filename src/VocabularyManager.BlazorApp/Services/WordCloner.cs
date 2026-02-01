@@ -1,21 +1,39 @@
-﻿using VocabularyManager.BlazorApp.Models.Views;
+using VocabularyManager.BlazorApp.Models.Views;
 
 namespace VocabularyManager.BlazorApp.Services
 {
-    public class WordCloner
+    public static class WordCloner
     {
         public static WordView CloneWord(WordView word)
         {
-            WordView clone = new WordView()
+            List<MeaningView> clonedMeanings = word.Meanings.Select(m => new MeaningView
+            {
+                Id = m.Id,
+                LexemeType = m.LexemeType,
+                Definition = m.Definition,
+                Level = m.Level,
+                WordId = m.WordId
+            }).ToList();
+
+            return new WordView
             {
                 Id = word.Id,
                 WordContent = word.WordContent,
-                Lexeme = word.Lexeme,
-                LevelAttribute = word.LevelAttribute,
-                Defenition = word.Defenition,
                 VocabularyId = word.VocabularyId,
+                Meanings = clonedMeanings
             };
-            return clone;
+        }
+
+        public static MeaningView CloneMeaning(MeaningView meaning)
+        {
+            return new MeaningView
+            {
+                Id = meaning.Id,
+                LexemeType = meaning.LexemeType,
+                Definition = meaning.Definition,
+                Level = meaning.Level,
+                WordId = meaning.WordId
+            };
         }
     }
 }

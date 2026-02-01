@@ -1,4 +1,4 @@
-﻿using Ardalis.Specification;
+using Ardalis.Specification;
 using AutoFixture;
 using FluentAssertions;
 using NSubstitute;
@@ -15,32 +15,20 @@ namespace VocabularyManager.UnitTests.Services
         {
             _fixture = new Fixture();
         }
+
         [Fact]
         public async Task Delete_Word_By_Id_Test1()
         {
-            //Arramge
+            //Arrange
             IRepositoryBase<Word> repository = Substitute.For<IRepositoryBase<Word>>();
             int wordId = _fixture.Create<int>();
-            var word = new Word(
-                _fixture.Create<string>(),
-                _fixture.Create<string>(),
-                _fixture.Create<string>(), 
-                null
-            ) { Id = wordId };
+            var word = new Word(_fixture.Create<string>()) { Id = wordId };
             repository
                 .GetByIdAsync(Arg.Any<int>())
-                .Returns(
-                    Task.Run(
-                        () => word
-                    )
-                );
+                .Returns(Task.FromResult<Word?>(word));
             repository
                 .DeleteAsync(Arg.Any<Word>())
-                .Returns(
-                    Task.Run(
-                        () => word
-                    )
-                );
+                .Returns(Task.CompletedTask);
             IWordStorageManager wordStoreService = new WordStorageManager(repository);
 
             //Act
@@ -52,21 +40,17 @@ namespace VocabularyManager.UnitTests.Services
                 .And.Be(wordId);
             wordId.Should().BeOfType(typeof(int));
         }
+
         [Fact]
         public async Task Update_Word_Test1()
         {
             //Arrange
             IRepositoryBase<Word> repository = Substitute.For<IRepositoryBase<Word>>();
             int wordId = _fixture.Create<int>();
-            var word = new Word(
-                _fixture.Create<string>(),
-                _fixture.Create<string>(),
-                _fixture.Create<string>(), 
-                null
-            ) { Id = wordId };
+            var word = new Word(_fixture.Create<string>()) { Id = wordId };
             repository
                 .UpdateAsync(Arg.Any<Word>())
-                .Returns(Task.Run(() => word));
+                .Returns(Task.CompletedTask);
             WordStorageManager wordStoreService = new WordStorageManager(repository);
 
             //Act && Assert

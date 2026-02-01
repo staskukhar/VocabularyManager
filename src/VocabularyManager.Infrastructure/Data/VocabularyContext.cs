@@ -1,5 +1,6 @@
-﻿using VocabularyManager.Core.Entities;
 using Microsoft.EntityFrameworkCore;
+using VocabularyManager.Core.Entities;
+using VocabularyManager.Infrastructure.Data.Configurations;
 
 namespace VocabularyManager.Infrastructure.Data
 {
@@ -7,24 +8,15 @@ namespace VocabularyManager.Infrastructure.Data
     {
         public DbSet<Vocabulary> Vocabularies { get; set; }
         public DbSet<Word> Words { get; set; }
-        public VocabularyContext(
-            DbContextOptions<VocabularyContext> options) : base(options) { }
+        public DbSet<Meaning> Meanings { get; set; }
+
+        public VocabularyContext(DbContextOptions<VocabularyContext> options) : base(options) { }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Vocabulary>()
-                .Property(wl => wl.Id)
-                .HasIdentityOptions(startValue: 1);
-
-            modelBuilder.Entity<Word>()
-                .Property(w => w.Id)
-                .HasIdentityOptions(startValue: 1);
-
-            modelBuilder.Entity<Vocabulary>()
-                .HasMany(wl => wl.Words)
-                .WithOne(w => w.Vocabulary)
-                .HasForeignKey(w => w.VocabularyId)
-                .HasPrincipalKey(w => w.Id)
-                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.ApplyConfiguration(new VocabularyConfiguration());
+            modelBuilder.ApplyConfiguration(new WordConfiguration());
+            modelBuilder.ApplyConfiguration(new MeaningConfiguration());
         }
     }
 }

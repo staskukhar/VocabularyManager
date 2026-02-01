@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using VocabularyManager.BlazorApp.Interfaces;
 using VocabularyManager.BlazorApp.Models.Views;
 using VocabularyManager.BlazorApp.Services;
@@ -8,18 +8,20 @@ namespace VocabularyManager.BlazorApp.DIExtensions
 {
     public static class DependencyInjectionExtensions
     {
-        public static IServiceCollection InjectDependencies(this IServiceCollection services) 
+        public static IServiceCollection InjectDependencies(this IServiceCollection services)
         {
-            services.AddScoped<HttpService, HttpService>();
+            services.AddScoped<HttpService>();
             services.AddScoped<IVocabularyStateManager<VocabularyView>, VocabularyStateManager>();
-            services.AddSingleton<HttpPathBuilder, HttpPathBuilder>();
+            services.AddSingleton<HttpPathBuilder>();
             services.AddValidators();
             return services;
         }
+
         public static IServiceCollection AddValidators(this IServiceCollection services)
         {
             services.AddScoped<IValidator<VocabularyView>, VocabularyViewValidator>();
             services.AddScoped<IValidator<WordView>, WordViewValidator>();
+            services.AddScoped<IValidator<MeaningView>, MeaningViewValidator>();
             return services;
         }
     }

@@ -3,6 +3,7 @@
 @using VocabularyManager.BlazorApp.Interfaces
 @using VocabularyManager.BlazorApp.Models.Views
 @using VocabularyManager.BlazorApp.Pages.Modals
+@using VocabularyManager.BlazorApp.Pages.Components
 
 @inject IVocabularyStateManager<VocabularyView> VocabularyStateManager
 
@@ -16,7 +17,7 @@
 </div>
 <div class="m-2">
     <FirstLetterFilter 
-        Letters="Vocabulary.Words.Select(w => w.WordContent.ToLower().FirstOrDefault()).Distinct()"
+        Letters="Vocabulary?.Words.Select(w => w.WordContent.ToLower().FirstOrDefault()).Distinct()"
         OnChange="OnFilterChanged" 
         OnFilterCleared="OnFilterCleared"/>
 </div>
@@ -37,7 +38,7 @@ else
 
 @code {
     [Parameter]
-    public VocabularyView Vocabulary { get; set; }
+    public VocabularyView? Vocabulary { get; set; }
     private IList<WordView> FilteredWords = [];
     private int CurrentPage { get; set; } = 1;
     private const int AmountWordsOnPage = 50;
@@ -46,7 +47,14 @@ else
     protected override void OnInitialized()
     {
         VocabularyStateManager.SubscribeOnChangeAction(StateHasChanged);
-        FilteredWords = Vocabulary.Words;
+        FilteredWords = Vocabulary?.Words ?? [];
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        FilteredWords = Vocabulary?.Words ?? [];
+
+        return base.OnAfterRenderAsync(firstRender);
     }
 
     private async Task OnPageChangedAsync(int newPageNumber)
@@ -56,23 +64,23 @@ else
 
     private void OnFilterChanged(char letter)
     {
-        FilteredWords = Vocabulary.Words
+        FilteredWords = Vocabulary?.Words
             .Where(w => w.WordContent.ToLower().FirstOrDefault() == letter)
-            .ToList();
+            .ToList() ?? [];
 
         StateHasChanged();
     }
 
     private void OnFilterCleared()
     {
-        FilteredWords = Vocabulary.Words;
+        FilteredWords = Vocabulary?.Words ?? [];
         StateHasChanged();
     }
 
     private async Task ShowAddWordModal()
     {
-        var parameters = new Dictionary<string, object>();
-        parameters.Add("OnCloseFunc", OnCloseModal);
+        Dictionary<string, object> parameters = [];
+        parameters.Add("OnCloseFunc", (object)OnCloseModal);
         await addWordModal.ShowAsync<AddWordModal>(title: "Add word", parameters: parameters);
     }
 
@@ -82,6 +90,7 @@ else
     }
 
     private int StartOfPage(int currentPage) => (currentPage - 1) * AmountWordsOnPage;
+
     private int EndOfPage(int currentPage)
     {
         // the code help to prevent exception index out of... when we try get last page

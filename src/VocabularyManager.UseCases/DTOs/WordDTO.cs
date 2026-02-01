@@ -3,23 +3,21 @@ namespace VocabularyManager.UseCases.DTOs
     public class WordDTO
     {
         public int Id { get; init; }
-        public string WordContent { get; set; }
-        public string? LevelAttribute { get; set; }
-        public string? Lexeme { get; set; }
-        public string? Defenition { get; set; }
+        public string WordContent { get; set; } = string.Empty;
         public int VocabularyId { get; set; }
-        public WordDTO(
-            string wordContent,
-            string? levelAttribute,
-            string? lexeme,
-            string? defenition
-        )
+        public List<MeaningDTO> Meanings { get; set; } = [];
+
+        public WordDTO() { }
+
+        public WordDTO(string wordContent)
         {
             WordContent = wordContent;
-            LevelAttribute = levelAttribute;
-            Lexeme = lexeme;
-            Defenition = defenition;
         }
-        public WordDTO() { }
-    }   
+
+        public WordDTO(string wordContent, List<MeaningDTO> meanings)
+        {
+            WordContent = wordContent;
+            Meanings = meanings;
+        }
+    }
 }

@@ -1,0 +1,60 @@
+using Ardalis.Specification;
+using VocabularyManager.Core.Entities;
+using VocabularyManager.UseCases.Exceptions;
+using VocabularyManager.UseCases.Interfaces;
+
+namespace VocabularyManager.UseCases.Services.StoreManagers
+{
+    public class MeaningStorageManager : IMeaningStorageManager
+    {
+        private readonly IRepositoryBase<Meaning> _meaningRepository;
+        private readonly IRepositoryBase<Word> _wordRepository;
+
+        public MeaningStorageManager(
+            IRepositoryBase<Meaning> meaningRepository,
+            IRepositoryBase<Word> wordRepository)
+        {
+            _meaningRepository = meaningRepository;
+            _wordRepository = wordRepository;
+        }
+
+        public async Task<int> AddMeaning(Meaning meaning, int wordId)
+        {
+            Word? word = await _wordRepository.GetByIdAsync(wordId);
+            if (word == null)
+            {
+                throw new WordNotFoundException(wordId);
+            }
+
+            meaning.WordId = wordId;
+            await _meaningRepository.AddAsync(meaning);
+            await _meaningRepository.SaveChangesAsync();
+            return meaning.Id;
+        }
+
+        public async Task<int> DeleteMeaningById(int meaningId)
+        {
+            Meaning? meaningToDelete = await _meaningRepository.GetByIdAsync(meaningId);
+            if (meaningToDelete == null)
+            {
+                throw new MeaningNotFoundException(meaningId);
+            }
+
+            await _meaningRepository.DeleteAsync(meaningToDelete);
+            await _meaningRepository.SaveChangesAsync();
+            return meaningToDelete.Id;
+        }
+
+        public async Task UpdateMeaning(Meaning meaning)
+        {
+            Meaning? existingMeaning = await _meaningRepository.GetByIdAsync(meaning.Id);
+            if (existingMeaning == null)
+            {
+                throw new MeaningNotFoundException(meaning.Id);
+            }
+
+            await _meaningRepository.UpdateAsync(meaning);
+            await _meaningRepository.SaveChangesAsync();
+        }
+    }
+}

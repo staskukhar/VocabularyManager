@@ -1,7 +1,7 @@
 namespace VocabularyManager.BlazorApp.Models
 {
     /// <summary>
-    /// Represents a mapping between a Word model property and a CSV column.
+    /// Represents a mapping between a Word/Meaning model property and a CSV column.
     /// </summary>
     public class CsvFieldMapping
     {
@@ -9,38 +9,48 @@ namespace VocabularyManager.BlazorApp.Models
         public string ModelPropertyDisplayName { get; set; } = string.Empty;
         public string? CsvColumnName { get; set; }
         public bool IsRequired { get; set; }
+        public bool IsMeaningProperty { get; set; }
     }
 
     /// <summary>
-    /// Provides available Word model properties for CSV mapping.
+    /// Provides available Word and Meaning model properties for CSV mapping.
     /// </summary>
     public static class WordModelProperties
     {
+        public const string WordContent = "WordContent";
+        public const string LexemeType = "LexemeType";
+        public const string Level = "Level";
+        public const string Definition = "Definition";
+
         public static List<CsvFieldMapping> GetMappingFields() => new()
         {
-            new CsvFieldMapping 
-            { 
-                ModelProperty = nameof(Views.WordView.WordContent), 
+            new CsvFieldMapping
+            {
+                ModelProperty = WordContent,
                 ModelPropertyDisplayName = "Word Content",
-                IsRequired = true 
+                IsRequired = true,
+                IsMeaningProperty = false
             },
-            new CsvFieldMapping 
-            { 
-                ModelProperty = nameof(Views.WordView.Lexeme), 
-                ModelPropertyDisplayName = "Lexeme",
-                IsRequired = false 
+            new CsvFieldMapping
+            {
+                ModelProperty = LexemeType,
+                ModelPropertyDisplayName = "Lexeme Type",
+                IsRequired = false,
+                IsMeaningProperty = true
             },
-            new CsvFieldMapping 
-            { 
-                ModelProperty = nameof(Views.WordView.LevelAttribute), 
+            new CsvFieldMapping
+            {
+                ModelProperty = Level,
                 ModelPropertyDisplayName = "Level",
-                IsRequired = false 
+                IsRequired = false,
+                IsMeaningProperty = true
             },
-            new CsvFieldMapping 
-            { 
-                ModelProperty = nameof(Views.WordView.Defenition), 
+            new CsvFieldMapping
+            {
+                ModelProperty = Definition,
                 ModelPropertyDisplayName = "Definition",
-                IsRequired = false 
+                IsRequired = false,
+                IsMeaningProperty = true
             }
         };
     }

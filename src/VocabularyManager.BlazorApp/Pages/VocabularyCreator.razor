@@ -29,6 +29,8 @@
                             <CsvFieldMappingPanel 
                                 FieldMappings="fieldMappings"
                                 CsvHeaders="csvParseResult.Headers"
+                                IncludeMeanings="includeMeanings"
+                                IncludeMeaningsChanged="OnIncludeMeaningsChanged"
                                 OnApplyMapping="ApplyMapping"
                                 OnCancelMapping="CancelMapping" />
                         }
@@ -88,17 +90,14 @@
     private Modal modalResult = default!;
     private WordPreviewList? wordPreviewList;
 
-    // CSV Parsing fields
     private CsvParserService csvParser = new CsvParserService();
     private CsvParseResult? csvParseResult;
     private List<CsvFieldMapping> fieldMappings = new();
     private bool showMappingUI = false;
+    private bool includeMeanings = true;
 
-    // Save options fields
     private List<VocabularyView> existingVocabularies = new();
     private bool isLoadingVocabularies = false;
-
-    #region Oxford Vocabulary Loading
 
     private async Task LoadVocabularyFromUrl(string url)
     {
@@ -110,8 +109,13 @@
 
         if (response.IsSuccessStatusCode)
         {
-            IEnumerable<WordDTO>? words = await response.Content.ReadFromJsonAsync<IEnumerable<WordDTO>>();
-            WordList.AddRange(words ?? Enumerable.Empty<WordDTO>());
+            PlainListOfWordsResponseDTO? list = await response.Content
+                .ReadFromJsonAsync<PlainListOfWordsResponseDTO>();
+            if (list is not null && list.Words.Any())
+            {
+                WordList.AddRange(
+                    list.Words.Select(s => new WordDTO(s)));
+            }
         }
         else
         {
@@ -120,10 +124,6 @@
 
         areWordsLoading = false;
     }
-
-    #endregion
-
-    #region CSV File Loading and Parsing
 
     private async Task LoadFiles(InputFileChangeEventArgs e)
     {
@@ -177,10 +177,16 @@
         foreach (List<string> row in csvParseResult.DataRows)
         {
             WordDTO word = new WordDTO();
+            MeaningDTO meaning = new MeaningDTO();
+            bool hasMeaningData = false;
 
             foreach (CsvFieldMapping mapping in fieldMappings)
             {
                 if (string.IsNullOrEmpty(mapping.CsvColumnName))
+                    continue;
+
+                // Skip meaning properties if includeMeanings is false
+                if (mapping.IsMeaningProperty && !includeMeanings)
                     continue;
 
                 if (!columnIndices.TryGetValue(mapping.CsvColumnName, out int colIndex))
@@ -193,23 +199,30 @@
 
                 switch (mapping.ModelProperty)
                 {
-                    case nameof(WordDTO.WordContent):
+                    case WordModelProperties.WordContent:
                         word.WordContent = value;
                         break;
-                    case nameof(WordDTO.Lexeme):
-                        word.Lexeme = value;
+                    case WordModelProperties.LexemeType:
+                        meaning.LexemeType = value;
+                        if (!string.IsNullOrWhiteSpace(value)) hasMeaningData = true;
                         break;
-                    case nameof(WordDTO.LevelAttribute):
-                        word.LevelAttribute = value;
+                    case WordModelProperties.Level:
+                        meaning.Level = value;
+                        if (!string.IsNullOrWhiteSpace(value)) hasMeaningData = true;
                         break;
-                    case nameof(WordDTO.Defenition):
-                        word.Defenition = value;
+                    case WordModelProperties.Definition:
+                        meaning.Definition = value;
+                        if (!string.IsNullOrWhiteSpace(value)) hasMeaningData = true;
                         break;
                 }
             }
 
             if (!string.IsNullOrWhiteSpace(word.WordContent))
             {
+                if (includeMeanings && hasMeaningData)
+                {
+                    word.Meanings.Add(meaning);
+                }
                 WordList.Add(word);
             }
         }
@@ -223,11 +236,13 @@
         showMappingUI = false;
         csvParseResult = null;
         fieldMappings.Clear();
+        includeMeanings = true;
     }
 
-    #endregion
-
-    #region Save Vocabulary
+    private void OnIncludeMeaningsChanged(bool value)
+    {
+        includeMeanings = value;
+    }
 
     private async Task HandleSaveVocabulary(SaveVocabularyRequest request)
     {
@@ -327,16 +342,10 @@
         }
     }
 
-    #endregion
-
-    #region Helpers
-
     private async Task ShowModalMessage(string title, string message)
     {
         Dictionary<string, object> parameters = new Dictionary<string, object>();
         parameters.Add("Message", message);
         await modalResult.ShowAsync<ModalResult>(title: title, parameters: parameters);
     }
-
-    #endregion
 }

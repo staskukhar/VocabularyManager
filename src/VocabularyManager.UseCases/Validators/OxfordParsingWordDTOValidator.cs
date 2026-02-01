@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using VocabularyManager.UseCases.DTOs;
 
 namespace VocabularyManager.UseCases.Validators
@@ -11,14 +11,23 @@ namespace VocabularyManager.UseCases.Validators
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty()
                 .NotNull();
-            RuleFor(w => w.Lexeme)
-                .Cascade(CascadeMode.Stop)
+
+            RuleFor(w => w.Meanings)
                 .NotEmpty()
-                .NotNull();
-            RuleFor(w => w.LevelAttribute)
-                .Cascade(CascadeMode.Stop)
-                .NotEmpty()
-                .NotNull();
+                .WithMessage("Word must have at least one meaning.");
+
+            RuleForEach(w => w.Meanings).ChildRules(meaning =>
+            {
+                meaning.RuleFor(m => m.LexemeType)
+                    .Cascade(CascadeMode.Stop)
+                    .NotEmpty()
+                    .NotNull();
+
+                meaning.RuleFor(m => m.Level)
+                    .Cascade(CascadeMode.Stop)
+                    .NotEmpty()
+                    .NotNull();
+            });
         }
     }
 }

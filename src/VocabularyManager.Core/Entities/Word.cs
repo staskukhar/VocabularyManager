@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace VocabularyManager.Core.Entities
@@ -7,20 +7,22 @@ namespace VocabularyManager.Core.Entities
     {
         [Required]
         public int Id { get; init; }
+
         [Required]
-        public string WordContent { get; set; }
-        public string? Lexeme { get; set; }
-        public string? LevelAttribute { get; set; }
-        public string? Defenition { get; set; }
+        public string WordContent { get; set; } = string.Empty;
+
         public int VocabularyId { get; set; }
+
         [JsonIgnore]
         public Vocabulary? Vocabulary { get; set; }
-        public Word(string wordContent, string? lexeme, string? levelAttribute, string? defenition)
+
+        public List<Meaning> Meanings { get; set; } = new List<Meaning>();
+
+        public Word() { }
+
+        public Word(string wordContent)
         {
             WordContent = wordContent;
-            Lexeme = lexeme;
-            LevelAttribute = levelAttribute;
-            Defenition = defenition;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Ardalis.Specification;
+using Ardalis.Specification;
 using VocabularyManager.Core.Entities;
 using VocabularyManager.UseCases.Exceptions;
 using VocabularyManager.UseCases.Interfaces;
@@ -10,9 +10,14 @@ namespace VocabularyManager.UseCases.Services.StoreManagers
     public class VocabularyStorageManager : IVocabularyStorageManager
     {
         private readonly IRepositoryBase<Vocabulary> _vocabularyRepository;
-        public VocabularyStorageManager(IRepositoryBase<Vocabulary> vocabularyRepository)
+        private readonly IRepositoryBase<Word> _wordRepository;
+
+        public VocabularyStorageManager(
+            IRepositoryBase<Vocabulary> vocabularyRepository,
+            IRepositoryBase<Word> wordRepository)
         {
             _vocabularyRepository = vocabularyRepository;
+            _wordRepository = wordRepository;
         }
 
         public async Task<ImmutableList<int>> AddWords(IEnumerable<Word> words, int vocabularyId)
@@ -22,9 +27,28 @@ namespace VocabularyManager.UseCases.Services.StoreManagers
             {
                 throw new VocabularyNotFoundException(vocabularyId);
             }
-            vocabulary.Words.AddRange(words);
+
+            // Filter out duplicates - words that already exist in the vocabulary
+            var wordContents = words.Select(w => w.WordContent).ToList();
+            var existingWordsSpec = new WordsByContentsAndVocabularySpecification(wordContents, vocabularyId);
+            var existingWords = await _wordRepository.ListAsync(existingWordsSpec);
+            var existingWordContents = existingWords.Select(w => w.WordContent).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            // Also filter out duplicates within the input itself
+            var uniqueNewWords = words
+                .Where(w => !existingWordContents.Contains(w.WordContent))
+                .GroupBy(w => w.WordContent, StringComparer.OrdinalIgnoreCase)
+                .Select(g => g.First())
+                .ToList();
+
+            if (uniqueNewWords.Count == 0)
+            {
+                return ImmutableList<int>.Empty;
+            }
+
+            vocabulary.Words.AddRange(uniqueNewWords);
             await _vocabularyRepository.SaveChangesAsync();
-            return words.Select(w => w.Id).ToImmutableList();
+            return uniqueNewWords.Select(w => w.Id).ToImmutableList();
         }
 
         public async Task<int> AddWord(Word word, int vocabularyId)
@@ -34,6 +58,15 @@ namespace VocabularyManager.UseCases.Services.StoreManagers
             {
                 throw new VocabularyNotFoundException(vocabularyId);
             }
+
+            // Check if word already exists in this vocabulary
+            var spec = new WordByContentAndVocabularySpecification(word.WordContent, vocabularyId);
+            var existingWord = await _wordRepository.FirstOrDefaultAsync(spec);
+            if (existingWord != null)
+            {
+                throw new DuplicateWordException(word.WordContent, vocabularyId);
+            }
+
             vocabulary.Words.Add(word);
             await _vocabularyRepository.SaveChangesAsync();
             return word.Id;

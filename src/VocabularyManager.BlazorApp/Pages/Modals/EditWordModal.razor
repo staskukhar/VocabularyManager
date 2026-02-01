@@ -1,17 +1,31 @@
-﻿@using FluentValidation
+@using FluentValidation
 @using FluentValidation.Results
 @using VocabularyManager.BlazorApp.Models.Views
 @using VocabularyManager.BlazorApp.Services
 @using VocabularyManager.BlazorApp.Interfaces
 @using VocabularyManager.BlazorApp.Validators
+@using VocabularyManager.BlazorApp.Pages.Components
 
 @inject HttpService HttpService
 @inject HttpPathBuilder HttpPathBuilder
 @inject IVocabularyStateManager<VocabularyView> VocabularyStateManager
 @inject IValidator<WordView> WordValidator
+@inject IValidator<MeaningView> MeaningValidator
 
 <WordForm Word="wordData"></WordForm>
-<div class="m-1">
+
+<div class="mt-3">
+    <h6>Meanings</h6>
+    @foreach (var meaning in wordData.Meanings)
+    {
+        <MeaningForm Meaning="meaning" OnDelete="@(() => RemoveMeaning(meaning))" />
+    }
+    <Button Type="ButtonType.Button" Color="ButtonColor.Primary" Size="Size.Small" @onclick="AddMeaning">
+        + Add Meaning
+    </Button>
+</div>
+
+<div class="m-1 mt-3">
     @if (validationErrors.Count > 0)
     {
         foreach (var error in validationErrors)
@@ -20,17 +34,24 @@
         }
     }
 </div>
-<Button Type="ButtonType.Submit" Color="ButtonColor.Success" @onclick="UpdateWord">Update</Button>
-<Button Type="ButtonType.Reset" Color="ButtonColor.Danger" @onclick="OnCloseFunc">Cancel</Button>
+
+<div class="mt-2">
+    <Button Type="ButtonType.Submit" Color="ButtonColor.Success" @onclick="UpdateWord">Update</Button>
+    <Button Type="ButtonType.Reset" Color="ButtonColor.Danger" @onclick="OnCloseFunc">Cancel</Button>
+</div>
 
 @code {
+
     [Inject]
     protected ToastService ToastService { get; set; } = default!;
+
     [Parameter]
-    public WordView Word { get; set; }
+    public required WordView Word { get; set; }
+
     [Parameter]
-    public Func<Task> OnCloseFunc { get; init; }
-    private WordView wordData;
+    public Func<Task> OnCloseFunc { get; init; } = () => Task.CompletedTask;
+
+    private WordView wordData = new();
     private List<ValidationFailure> validationErrors = [];
 
     protected override void OnParametersSet()
@@ -38,30 +59,51 @@
         wordData = WordCloner.CloneWord(Word);
     }
 
+    private void AddMeaning()
+    {
+        wordData.Meanings.Add(new MeaningView() { WordId = Word.Id });
+    }
+
+    private void RemoveMeaning(MeaningView meaning)
+    {
+        wordData.Meanings.Remove(meaning);
+    }
+
     private async Task UpdateWord()
     {
         validationErrors.Clear();
-        ValidationResult result = WordValidator.Validate(wordData);
-        if (result.IsValid)
+        ValidationResult wordResult = WordValidator.Validate(wordData);
+
+        if (!wordResult.IsValid)
         {
-            HttpResponseMessage updateReposne = await HttpService.PutAsync<WordView>(
-                HttpPathBuilder.UpdateWordEndpoint(),
-                wordData
-            );
-            if (updateReposne.IsSuccessStatusCode)
+            validationErrors.AddRange(wordResult.Errors);
+            return;
+        }
+
+        foreach (MeaningView meaning in wordData.Meanings)
+        {
+            ValidationResult meaningResult = MeaningValidator.Validate(meaning);
+            if (!meaningResult.IsValid)
             {
-                ToastService.Notify(new(ToastType.Info, "Word was updated."));
-                await VocabularyStateManager.Update();
-                await OnCloseFunc();
+                validationErrors.AddRange(meaningResult.Errors);
+                return;
             }
-            else
-            {
-                ToastService.Notify(new(ToastType.Info, "Sorry, update operation failed."));
-            }
+        }
+
+        HttpResponseMessage updateResponse = await HttpService.PutAsync<WordView>(
+            HttpPathBuilder.UpdateWordEndpoint(),
+            wordData
+        );
+
+        if (updateResponse.IsSuccessStatusCode)
+        {
+            ToastService.Notify(new(ToastType.Info, "Word was updated."));
+            await VocabularyStateManager.Update();
+            await OnCloseFunc();
         }
         else
         {
-            validationErrors.AddRange(result.Errors);
+            ToastService.Notify(new(ToastType.Danger, "Sorry, update operation failed."));
         }
     }
 }

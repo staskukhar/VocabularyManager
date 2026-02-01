@@ -1,4 +1,4 @@
-﻿@using FluentValidation
+@using FluentValidation
 @using FluentValidation.Results
 @using VocabularyManager.BlazorApp.Models.Views
 @using VocabularyManager.BlazorApp.Services
@@ -8,9 +8,22 @@
 @inject HttpPathBuilder HttpPathBuilder
 @inject IVocabularyStateManager<VocabularyView> VocabularyStateManager
 @inject IValidator<WordView> WordValidator
+@inject IValidator<MeaningView> MeaningValidator
 
 <WordForm Word="word"></WordForm>
-<div class="m-1">
+
+<div class="mt-3">
+    <h6>Meanings (optional)</h6>
+    @foreach (var meaning in word.Meanings)
+    {
+        <MeaningForm Meaning="meaning" OnDelete="@(() => RemoveMeaning(meaning))" />
+    }
+    <Button Type="ButtonType.Button" Color="ButtonColor.Primary" Size="Size.Small" @onclick="AddMeaning">
+        + Add Meaning
+    </Button>
+</div>
+
+<div class="m-1 mt-3">
     @if (validationErrors.Count > 0)
     {
         foreach (var error in validationErrors)
@@ -20,47 +33,72 @@
     }
 </div>
 
-<Button Type="ButtonType.Submit" Color="ButtonColor.Success" @onclick="CreateWord">Create</Button>
-<Button Type="ButtonType.Reset" Color="ButtonColor.Danger" @onclick="OnCloseFunc">Cancel</Button>
+<div class="mt-2">
+    <Button Type="ButtonType.Submit" Color="ButtonColor.Success" @onclick="CreateWord">Create</Button>
+    <Button Type="ButtonType.Reset" Color="ButtonColor.Danger" @onclick="OnCloseFunc">Cancel</Button>
+</div>
 
 @code {
+
     [Inject]
     protected ToastService ToastService { get; set; } = default!;
+
     [Parameter]
-    public Func<Task> OnCloseFunc { get; init; }
-    private WordView? word;
+    public Func<Task> OnCloseFunc { get; init; } = () => Task.CompletedTask;
+
+    private WordView word = new();
     private List<ValidationFailure> validationErrors = [];
 
     protected override void OnParametersSet()
     {
-        word = new WordView("word", "level", "lexeme", null);
+        word = new WordView("New word");
+    }
+
+    private void AddMeaning()
+    {
+        word.Meanings.Add(new MeaningView() { WordId = word.Id });
+    }
+
+    private void RemoveMeaning(MeaningView meaning)
+    {
+        word.Meanings.Remove(meaning);
     }
 
     private async Task CreateWord()
     {
         validationErrors.Clear();
-        ValidationResult result = WordValidator.Validate(word);
-        if(result.IsValid)
-        {
-            HttpResponseMessage wordCreationResponse = await HttpService.PostWithJsonAsync<IEnumerable<WordView>>(
-                HttpPathBuilder.AddWordEndpoint(VocabularyStateManager?.Vocabulary?.Id ?? -1),
-                [word]
-            );
+        ValidationResult wordResult = WordValidator.Validate(word);
 
-            if (wordCreationResponse.IsSuccessStatusCode)
+        if (!wordResult.IsValid)
+        {
+            validationErrors.AddRange(wordResult.Errors);
+            return;
+        }
+
+        foreach (var meaning in word.Meanings)
+        {
+            ValidationResult meaningResult = MeaningValidator.Validate(meaning);
+            if (!meaningResult.IsValid)
             {
-                ToastService.Notify(new(ToastType.Info, "Word was successfuly created."));
-                await VocabularyStateManager.Update();
-                await OnCloseFunc();
+                validationErrors.AddRange(meaningResult.Errors);
+                return;
             }
-            else
-            {
-                ToastService.Notify(new(ToastType.Danger, "Sorry, creation failed."));
-            }
+        }
+
+        HttpResponseMessage wordCreationResponse = await HttpService.PostWithJsonAsync<IEnumerable<WordView>>(
+            HttpPathBuilder.AddWordEndpoint(VocabularyStateManager?.Vocabulary?.Id ?? -1),
+            [word]
+        );
+
+        if (wordCreationResponse.IsSuccessStatusCode)
+        {
+            ToastService.Notify(new(ToastType.Info, "Word was successfully created."));
+            await VocabularyStateManager.Update();
+            await OnCloseFunc();
         }
         else
         {
-            validationErrors.AddRange(result.Errors);
+            ToastService.Notify(new(ToastType.Danger, "Sorry, creation failed."));
         }
     }
 }

@@ -1,19 +1,21 @@
-﻿using VocabularyManager.BlazorApp.Models.Configurations;
+using VocabularyManager.BlazorApp.Models.Configurations;
 
 namespace VocabularyManager.BlazorApp.Services
 {
     public class HttpPathBuilder
     {
-        private HttpClientOptions _httpOptions;
-        public HttpPathBuilder(HttpClientOptions httpOptions) 
+        private readonly HttpClientOptions _httpOptions;
+
+        public HttpPathBuilder(HttpClientOptions httpOptions)
         {
             _httpOptions = httpOptions;
         }
 
+        // Word endpoints
         public string AddWordEndpoint(int vocabularyId)
         {
-            return String.Format(
-                String.Concat(
+            return string.Format(
+                string.Concat(
                     _httpOptions.ApiBaseURL,
                     _httpOptions.WordTree.PathPrefix,
                     _httpOptions.WordTree.Add
@@ -21,10 +23,11 @@ namespace VocabularyManager.BlazorApp.Services
                 vocabularyId
             );
         }
+
         public string DeleteWordEndpoint(int wordId)
         {
-            return String.Format(
-                String.Concat(
+            return string.Format(
+                string.Concat(
                     _httpOptions.ApiBaseURL,
                     _httpOptions.WordTree.PathPrefix,
                     _httpOptions.WordTree.Delete
@@ -32,10 +35,11 @@ namespace VocabularyManager.BlazorApp.Services
                 wordId
             );
         }
+
         public string ParseListOfWordEndpoint(string url)
         {
-            return String.Format(
-                String.Concat(
+            return string.Format(
+                string.Concat(
                     _httpOptions.ApiBaseURL,
                     _httpOptions.WordTree.PathPrefix,
                     _httpOptions.WordTree.Get
@@ -43,26 +47,39 @@ namespace VocabularyManager.BlazorApp.Services
                 url
             );
         }
+
+        public string UpdateWordEndpoint()
+        {
+            return string.Concat(
+                _httpOptions.ApiBaseURL,
+                _httpOptions.WordTree.PathPrefix,
+                _httpOptions.WordTree.Update
+            );
+        }
+
+        // Vocabulary endpoints
         public string CreateVocabularyEndpoint()
         {
-            return String.Concat(
+            return string.Concat(
                 _httpOptions.ApiBaseURL,
                 _httpOptions.VocabularyTree.PathPrefix,
                 _httpOptions.VocabularyTree.Create
             );
         }
+
         public string GetVocabulariesEndpoint()
         {
-            return String.Concat(
+            return string.Concat(
                 _httpOptions.ApiBaseURL,
                 _httpOptions.VocabularyTree.PathPrefix,
                 _httpOptions.VocabularyTree.GetVocabularies
             );
         }
+
         public string GetVocabularyByIdEndpoint(int vocabularyId)
         {
-            return String.Format(
-                String.Concat(
+            return string.Format(
+                string.Concat(
                     _httpOptions.ApiBaseURL,
                     _httpOptions.VocabularyTree.PathPrefix,
                     _httpOptions.VocabularyTree.GetById
@@ -70,31 +87,59 @@ namespace VocabularyManager.BlazorApp.Services
                 vocabularyId
             );
         }
+
         public string UpdateVocabularyEndpoint()
         {
-            return String.Concat(
+            return string.Concat(
                 _httpOptions.ApiBaseURL,
                 _httpOptions.VocabularyTree.PathPrefix,
                 _httpOptions.VocabularyTree.Update
             );
         }
-        public string UpdateWordEndpoint()
-        {
-            return String.Concat(
-                _httpOptions.ApiBaseURL,
-                _httpOptions.WordTree.PathPrefix,
-                _httpOptions.WordTree.Update
-            );
-        }
+
         public string DeleteVocabularyEndpoint(int id)
         {
-            return String.Format(
-                String.Concat(
+            return string.Format(
+                string.Concat(
                     _httpOptions.ApiBaseURL,
                     _httpOptions.VocabularyTree.PathPrefix,
                     _httpOptions.VocabularyTree.Delete
                 ),
                 id
+            );
+        }
+
+        // Meaning endpoints
+        public string AddMeaningEndpoint(int wordId)
+        {
+            return string.Format(
+                string.Concat(
+                    _httpOptions.ApiBaseURL,
+                    _httpOptions.MeaningTree.PathPrefix,
+                    _httpOptions.MeaningTree.Add
+                ),
+                wordId
+            );
+        }
+
+        public string DeleteMeaningEndpoint(int meaningId)
+        {
+            return string.Format(
+                string.Concat(
+                    _httpOptions.ApiBaseURL,
+                    _httpOptions.MeaningTree.PathPrefix,
+                    _httpOptions.MeaningTree.Delete
+                ),
+                meaningId
+            );
+        }
+
+        public string UpdateMeaningEndpoint()
+        {
+            return string.Concat(
+                _httpOptions.ApiBaseURL,
+                _httpOptions.MeaningTree.PathPrefix,
+                _httpOptions.MeaningTree.Update
             );
         }
     }

@@ -7,7 +7,8 @@
         <small class="text-muted">Map CSV columns to Word properties. Fields marked with * are required.</small>
     </div>
     <div class="card-body">
-        @foreach (CsvFieldMapping mapping in FieldMappings)
+        <h6 class="mb-3">Word Fields</h6>
+        @foreach (CsvFieldMapping mapping in FieldMappings.Where(m => !m.IsMeaningProperty))
         {
             <div class="row mb-2 align-items-center">
                 <div class="col-md-5">
@@ -42,6 +43,36 @@
                 </div>
             </div>
         }
+
+        @if (IncludeMeanings)
+        {
+            <hr class="my-3" />
+            <h6 class="mb-3">Meaning Fields <span class="badge bg-info">Optional</span></h6>
+            @foreach (CsvFieldMapping mapping in FieldMappings.Where(m => m.IsMeaningProperty))
+            {
+                <div class="row mb-2 align-items-center">
+                    <div class="col-md-5">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border">
+                                @mapping.ModelPropertyDisplayName
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <span class="text-primary fw-bold">→</span>
+                    </div>
+                    <div class="col-md-5">
+                        <select class="form-select" @bind="mapping.CsvColumnName">
+                            <option value="">-- Select CSV Column (optional) --</option>
+                            @foreach (string header in CsvHeaders)
+                            {
+                                <option value="@header">@header</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            }
+        }
         
         <div class="mt-3">
             <Button Color="ButtonColor.Success" @onclick="OnApply" Disabled="@(!IsMappingValid())">
@@ -67,10 +98,16 @@
     [Parameter]
     public EventCallback OnCancelMapping { get; set; }
 
+    [Parameter]
+    public bool IncludeMeanings { get; set; } = true;
+
+    [Parameter]
+    public EventCallback<bool> IncludeMeaningsChanged { get; set; }
+
     private bool IsMappingValid()
     {
         return FieldMappings
-            .Where(m => m.IsRequired)
+            .Where(m => m.IsRequired && !m.IsMeaningProperty)
             .All(m => !string.IsNullOrEmpty(m.CsvColumnName));
     }
 

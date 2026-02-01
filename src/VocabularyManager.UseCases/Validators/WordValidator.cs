@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using VocabularyManager.Core.Entities;
 
 namespace VocabularyManager.UseCases.Validators
@@ -11,7 +11,9 @@ namespace VocabularyManager.UseCases.Validators
                 .Cascade(CascadeMode.Stop)
                 .NotNull()
                 .WithMessage("Word content is required.")
-                .NotEmpty();
+                .NotEmpty()
+                .MaximumLength(200)
+                .WithMessage("Word content must not exceed 200 characters.");
         }
     }
 }

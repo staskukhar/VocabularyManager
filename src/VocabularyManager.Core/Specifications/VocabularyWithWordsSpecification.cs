@@ -1,15 +1,16 @@
-﻿using Ardalis.Specification;
+using Ardalis.Specification;
 using VocabularyManager.Core.Entities;
 
 namespace VocabularyManager.Core.Specifications
 {
     public class VocabularyWithWordsSpecification : Specification<Vocabulary>
     {
-        public VocabularyWithWordsSpecification(int wordListId) 
+        public VocabularyWithWordsSpecification(int vocabularyId)
         {
             Query
-                .Where(wl => wl.Id == wordListId)
-                .Include(wl => wl.Words);
+                .Where(v => v.Id == vocabularyId)
+                .Include(v => v.Words)
+                    .ThenInclude(w => w.Meanings);
         }
     }
 }

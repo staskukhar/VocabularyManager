@@ -1,4 +1,4 @@
-﻿using AngleSharp;
+using AngleSharp;
 using AngleSharp.Dom;
 using FluentValidation;
 using FluentValidation.Results;
@@ -8,12 +8,10 @@ using VocabularyManager.UseCases.Interfaces;
 
 namespace VocabularyManager.UseCases.Services.Parsers
 {
-    public class OxfordDictionaryParser : IWordParser<WordDTO>
+    public class OxfordDictionaryParser(IValidator<WordDTO> validator)
+        : IWordParser<WordDTO>
     {
-        public async IAsyncEnumerable<WordDTO> GetWordListByLinkAsync(
-            string url,
-            IValidator<WordDTO> validationFilter
-        )
+        public async IAsyncEnumerable<WordDTO> GetWordListByLinkAsync(string url)
         {
             if (string.IsNullOrEmpty(url))
             {
@@ -29,7 +27,7 @@ namespace VocabularyManager.UseCases.Services.Parsers
                 throw new NullReferenceException("The content of source shouldn't be a null value.");
             }
 
-            IHtmlCollection<IElement> wordsAsLiElements = document
+            IHtmlCollection<IElement>? wordsAsLiElements = document
                 .QuerySelector("div#ox-container")?
                 .QuerySelector("div.responsive_container.xonecolumn")?
                 .QuerySelector("div.responsive_row")?
@@ -49,7 +47,7 @@ namespace VocabularyManager.UseCases.Services.Parsers
             IEnumerable<WordDTO> words = wordsAsLiElements.Select(li => GetDataAsObject(li));
             foreach (WordDTO word in words)
             {
-                ValidationResult result = validationFilter.Validate(word);
+                ValidationResult result = validator.Validate(word);
                 if (result.IsValid)
                 {
                     yield return word;
@@ -60,12 +58,14 @@ namespace VocabularyManager.UseCases.Services.Parsers
         {
             var nestedDiv = element.QuerySelector("div"); // should contain level attribute and audio content
 
-            return new WordDTO(
-                wordContent: element.QuerySelector("a")?.TextContent, // tag a contain word text
-                lexeme: element.QuerySelector(".pos")?.TextContent, // span with class .pos contain lexema info
-                levelAttribute: nestedDiv?.QuerySelector("span.belong-to")?.TextContent, //tag div contain level info
-                defenition: null
-            );
+            string? wordContent = element.QuerySelector("a")?.TextContent; // tag a contain word text
+            string? lexemeType = element.QuerySelector(".pos")?.TextContent; // span with class .pos contain lexema info
+            string? level = nestedDiv?.QuerySelector("span.belong-to")?.TextContent; // tag div contain level info
+
+            var meaning = new MeaningDTO(lexemeType, definition: null, level);
+            var meanings = new List<MeaningDTO> { meaning };
+
+            return new WordDTO(wordContent ?? string.Empty, meanings);
         }
     }
 }

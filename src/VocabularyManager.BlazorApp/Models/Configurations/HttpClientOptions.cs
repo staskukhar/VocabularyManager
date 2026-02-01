@@ -1,42 +1,41 @@
-﻿namespace VocabularyManager.BlazorApp.Models.Configurations
+namespace VocabularyManager.BlazorApp.Models.Configurations
 {
     public class HttpClientOptions
     {
         public const string SectionKey = "HttpClient";
-        public string ApiBaseURL { get; set; } = String.Empty;
-        public WordPathes WordTree { get; set; }
-        public VocabularyPathes VocabularyTree { get; set; }
-        public HttpClientOptions()
-        {
-
-        }
-
+        public string ApiBaseURL { get; set; } = string.Empty;
+        public WordPathes WordTree { get; set; } = new();
+        public VocabularyPathes VocabularyTree { get; set; } = new();
+        public MeaningPathes MeaningTree { get; set; } = new();
     }
+
     public class WordPathes
     {
         public const string SectionKey = "Word";
-        public string PathPrefix { get; set; } = String.Empty;
-        public string Get { get; set; } = String.Empty;
-        public string Add { get; set; } = String.Empty;
-        public string Delete { get; set; } = String.Empty;
-        public string Update { get; set; } = String.Empty;
-        public WordPathes()
-        {
-            
-        }
+        public string PathPrefix { get; set; } = string.Empty;
+        public string Get { get; set; } = string.Empty;
+        public string Add { get; set; } = string.Empty;
+        public string Delete { get; set; } = string.Empty;
+        public string Update { get; set; } = string.Empty;
     }
+
     public class VocabularyPathes
     {
         public const string SectionKey = "Vocabulary";
-        public string PathPrefix { get; set; } = String.Empty;
-        public string Create { get; set; } = String.Empty;
-        public string GetVocabularies { get; set; } = String.Empty;
-        public string GetById { get; set; } = String.Empty;
-        public string Update { get; set; } = String.Empty;
-        public string Delete { get; set; } = String.Empty;
-        public VocabularyPathes()
-        {
-            
-        }
+        public string PathPrefix { get; set; } = string.Empty;
+        public string Create { get; set; } = string.Empty;
+        public string GetVocabularies { get; set; } = string.Empty;
+        public string GetById { get; set; } = string.Empty;
+        public string Update { get; set; } = string.Empty;
+        public string Delete { get; set; } = string.Empty;
+    }
+
+    public class MeaningPathes
+    {
+        public const string SectionKey = "Meaning";
+        public string PathPrefix { get; set; } = string.Empty;
+        public string Add { get; set; } = string.Empty;
+        public string Delete { get; set; } = string.Empty;
+        public string Update { get; set; } = string.Empty;
     }
 }

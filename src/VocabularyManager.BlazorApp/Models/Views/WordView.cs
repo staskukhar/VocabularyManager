@@ -1,20 +1,23 @@
-﻿namespace VocabularyManager.BlazorApp.Models.Views
+namespace VocabularyManager.BlazorApp.Models.Views
 {
     public class WordView
     {
         public int Id { get; init; }
-        public string WordContent { get; set; }
-        public string? Lexeme { get; set; }
-        public string? LevelAttribute { get; set; }
-        public string? Defenition { get; set; }
+        public string WordContent { get; set; } = string.Empty;
         public int VocabularyId { get; set; }
-        public WordView(){ }
-        public WordView(string wordContent, string? lexeme, string? levelAttribute, string? defenition)
+        public List<MeaningView> Meanings { get; set; } = new List<MeaningView>();
+
+        public WordView() { }
+
+        public WordView(string wordContent)
         {
             WordContent = wordContent;
-            Lexeme = lexeme;
-            LevelAttribute = levelAttribute;
-            Defenition = defenition;
+        }
+
+        public WordView(string wordContent, List<MeaningView> meanings)
+        {
+            WordContent = wordContent;
+            Meanings = meanings;
         }
     }
 }

@@ -4,13 +4,20 @@
     <h5>Preview (@Words.Count words)</h5>
     @for (int i = StartOfPage(CurrentPage); i < EndOfPage(CurrentPage); i++)
     {
-        <div class="card mb-1 p-0 border-1 bg-transparent">
-            <div class="d-flex justify-content-between bg-gradient">
-                <div class="col m-auto ms-lg-2">
-                    <div>@PositionLabelText(i + 1): @Words[i].WordContent</div>
-                    <div>Lexeme: @Words[i].Lexeme</div>
-                    <div>Level: @Words[i].LevelAttribute</div>
-                </div>
+        <div class="card mb-1 p-2 border-1 bg-transparent">
+            <div class="d-flex align-items-center">
+                <span class="text-muted me-2">@PositionLabelText(i + 1):</span>
+                <span class="fw-bold text-primary">@Words[i].WordContent</span>
+                @if (Words[i].Meanings?.Any() == true)
+                {
+                    <span class="badge bg-secondary ms-2">
+                        @Words[i].Meanings.Count @(Words[i].Meanings.Count == 1 ? "meaning" : "meanings")
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-light text-muted ms-2">No meanings</span>
+                }
             </div>
         </div>
     }
