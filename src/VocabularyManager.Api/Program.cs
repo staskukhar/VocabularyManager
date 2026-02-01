@@ -1,6 +1,6 @@
 using VocabularyManager.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using VocabularyManager.Api.Middleware;
+using VocabularyManager.Api.ExceptionHandlers;
 using VocabularyManager.Api.DIExtensions;
 
 
@@ -30,6 +30,9 @@ builder.Services.AddDbContext<VocabularyContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("VocabularyDbConnection")));
 builder.Services.InjectDependencies();
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -39,7 +42,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 

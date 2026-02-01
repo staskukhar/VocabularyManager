@@ -25,7 +25,7 @@ namespace VocabularyManager.UseCases.Services.StoreManagers
             Vocabulary? vocabulary = await _vocabularyRepository.GetByIdAsync(vocabularyId);
             if (vocabulary == null)
             {
-                throw new VocabularyNotFoundException(vocabularyId);
+                throw new EntityNotFoundException(nameof(Vocabulary), vocabularyId);
             }
 
             // Filter out duplicates - words that already exist in the vocabulary
@@ -56,7 +56,7 @@ namespace VocabularyManager.UseCases.Services.StoreManagers
             Vocabulary? vocabulary = await _vocabularyRepository.GetByIdAsync(vocabularyId);
             if (vocabulary == null)
             {
-                throw new VocabularyNotFoundException(vocabularyId);
+                throw new EntityNotFoundException(nameof(Vocabulary), vocabularyId);
             }
 
             // Check if word already exists in this vocabulary
@@ -86,7 +86,7 @@ namespace VocabularyManager.UseCases.Services.StoreManagers
             Vocabulary? vocabulary = await _vocabularyRepository.FirstOrDefaultAsync(spec);
             if (vocabulary == null)
             {
-                throw new VocabularyNotFoundException(vocabularyId);
+                throw new EntityNotFoundException(nameof(Vocabulary), vocabularyId);
             }
             return vocabulary;
         }
@@ -109,7 +109,7 @@ namespace VocabularyManager.UseCases.Services.StoreManagers
             Vocabulary? vocabulary = await _vocabularyRepository.FirstOrDefaultAsync(spec);
             if (vocabulary == null)
             {
-                throw new VocabularyNotFoundException(vocabularyId);
+                throw new EntityNotFoundException(nameof(Vocabulary), vocabularyId);
             }
             await _vocabularyRepository.DeleteAsync(vocabulary);
             await _vocabularyRepository.SaveChangesAsync();

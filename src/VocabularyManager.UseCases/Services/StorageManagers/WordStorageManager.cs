@@ -1,4 +1,4 @@
-﻿using Ardalis.Specification;
+using Ardalis.Specification;
 using VocabularyManager.Core.Entities;
 using VocabularyManager.UseCases.Exceptions;
 using VocabularyManager.UseCases.Interfaces;
@@ -17,7 +17,7 @@ namespace VocabularyManager.UseCases.Services.StoreManagers
             Word? wordToDelete = await _wordRepository.GetByIdAsync(wordId);
             if (wordToDelete == null)
             {
-                throw new WordNotFoundException(wordId);
+                throw new EntityNotFoundException(nameof(Word), wordId);
             }
 
             await _wordRepository.DeleteAsync(wordToDelete);

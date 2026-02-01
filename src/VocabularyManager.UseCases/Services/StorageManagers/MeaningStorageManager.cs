@@ -23,7 +23,7 @@ namespace VocabularyManager.UseCases.Services.StoreManagers
             Word? word = await _wordRepository.GetByIdAsync(wordId);
             if (word == null)
             {
-                throw new WordNotFoundException(wordId);
+                throw new EntityNotFoundException(nameof(Word), wordId);
             }
 
             meaning.WordId = wordId;
@@ -37,7 +37,7 @@ namespace VocabularyManager.UseCases.Services.StoreManagers
             Meaning? meaningToDelete = await _meaningRepository.GetByIdAsync(meaningId);
             if (meaningToDelete == null)
             {
-                throw new MeaningNotFoundException(meaningId);
+                throw new EntityNotFoundException(nameof(Meaning), meaningId);
             }
 
             await _meaningRepository.DeleteAsync(meaningToDelete);
@@ -50,7 +50,7 @@ namespace VocabularyManager.UseCases.Services.StoreManagers
             Meaning? existingMeaning = await _meaningRepository.GetByIdAsync(meaning.Id);
             if (existingMeaning == null)
             {
-                throw new MeaningNotFoundException(meaning.Id);
+                throw new EntityNotFoundException(nameof(Meaning), meaning.Id);
             }
 
             await _meaningRepository.UpdateAsync(meaning);

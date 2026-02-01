@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using VocabularyManager.Core.Entities;
 using VocabularyManager.UseCases.Exceptions;
 
@@ -11,7 +11,7 @@ public class WordRepository(VocabularyContext context)
     {
         Word? existingWord = await _vocabularyContext.Words.Include(w => w.Meanings)
             .FirstOrDefaultAsync(w => w.Id == entity.Id, cancellationToken)
-            ?? throw new WordNotFoundException(entity.Id);
+            ?? throw new EntityNotFoundException(nameof(Word), entity.Id);
 
         _vocabularyContext.Entry(existingWord).CurrentValues.SetValues(entity);
 
