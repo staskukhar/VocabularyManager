@@ -86,7 +86,7 @@ namespace VocabularyManager.UnitTests.Services
             IVocabularyStorageManager vocabularyStoreService = new VocabularyStorageManager(repository, _wordRepository);
 
             //Act
-            var result = await vocabularyStoreService.GetVocabularies();
+            var result = await vocabularyStoreService.GetVocabularies(false);
 
             //Assert
             vocabulary

@@ -1,5 +1,4 @@
 using FluentAssertions;
-using NSubstitute.ExceptionExtensions;
 using VocabularyManager.UseCases.DTOs;
 using VocabularyManager.UseCases.Exceptions;
 using VocabularyManager.UseCases.Services.Parsers;
