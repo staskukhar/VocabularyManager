@@ -91,9 +91,11 @@ namespace VocabularyManager.UseCases.Services.StoreManagers
             return vocabulary;
         }
 
-        public async Task<IEnumerable<Vocabulary>> GetVocabularies()
+        public async Task<IEnumerable<Vocabulary>> GetVocabularies(bool withWords)
         {
-            return await _vocabularyRepository.ListAsync();
+            return withWords ?
+                await _vocabularyRepository.ListAsync(new VocabularyWithWordsSpecification()) :
+                await _vocabularyRepository.ListAsync();
         }
 
         public async Task UpdateVocabulary(Vocabulary vocabulary)

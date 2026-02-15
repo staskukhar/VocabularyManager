@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.FluentUI.AspNetCore.Components;
 using VocabularyManager.BlazorApp;
-using VocabularyManager.BlazorApp.Models.Configurations;
 using VocabularyManager.BlazorApp.DIExtensions;
+using VocabularyManager.BlazorApp.Models.Configurations;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.Logging.SetMinimumLevel(LogLevel.Information);
@@ -26,6 +27,9 @@ builder.Services.AddScoped(sp =>
         BaseAddress = new Uri(httpOptions.ApiBaseURL)
     }
 );
+
+builder.Services.AddFluentUIComponents();
+
 builder.Services.InjectDependencies();
 
 builder.Services.AddBlazorBootstrap();

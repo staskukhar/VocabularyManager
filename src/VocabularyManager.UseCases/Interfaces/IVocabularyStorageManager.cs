@@ -8,7 +8,7 @@ namespace VocabularyManager.UseCases.Interfaces
         Task<int> AddWord(Word word, int wordListId);
         Task<ImmutableList<int>> AddWords(IEnumerable<Word> words, int wordListId);
         Task<int> CreateVocabulary(Vocabulary wordList);
-        Task<IEnumerable<Vocabulary>> GetVocabularies();
+        Task<IEnumerable<Vocabulary>> GetVocabularies(bool withWords);
         Task<Vocabulary> GetVocabularyWithWordsById(int wordListId);
         Task UpdateVocabulary(Vocabulary wordList);
         Task<int> Delete(int vocabularyId);

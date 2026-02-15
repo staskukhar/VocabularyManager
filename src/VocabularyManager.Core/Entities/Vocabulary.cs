@@ -9,7 +9,7 @@ namespace VocabularyManager.Core.Entities
         [Required]
         public string Name { get; set; }
         public string? SourceUrl { get; set; }
-        public List<Word> Words { get; set; } = new List<Word> { };
+        public List<Word> Words { get; set; } = [];
         public Vocabulary(string name, string? sourceUrl)
         {
             Name = name;

@@ -5,12 +5,17 @@ namespace VocabularyManager.Core.Specifications
 {
     public class VocabularyWithWordsSpecification : Specification<Vocabulary>
     {
+        public VocabularyWithWordsSpecification()
+        {
+            Query
+                .Include(v => v.Words);
+        }
+
         public VocabularyWithWordsSpecification(int vocabularyId)
         {
             Query
                 .Where(v => v.Id == vocabularyId)
-                .Include(v => v.Words)
-                    .ThenInclude(w => w.Meanings);
+                .Include(v => v.Words);
         }
     }
 }

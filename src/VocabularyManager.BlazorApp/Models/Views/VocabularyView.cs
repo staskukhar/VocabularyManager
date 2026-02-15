@@ -3,11 +3,11 @@
     public class VocabularyView
     {
         public int Id { get; init; }
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public string? SourceUrl { get; set; }
-        public List<WordView> Words { get; set; } = new List<WordView> { };
+        public List<WordView> Words { get; set; } = [];
 
-        public VocabularyView(){ }
+        public VocabularyView() { }
         public VocabularyView(string name, string? sourceUrl)
         {
             Name = name;

@@ -67,13 +67,14 @@ namespace VocabularyManager.BlazorApp.Services
             );
         }
 
-        public string GetVocabulariesEndpoint()
+        public string GetVocabulariesEndpoint(bool withWords = false)
         {
-            return string.Concat(
+            string rawPath = string.Concat(
                 _httpOptions.ApiBaseURL,
                 _httpOptions.VocabularyTree.PathPrefix,
-                _httpOptions.VocabularyTree.GetVocabularies
-            );
+                _httpOptions.VocabularyTree.GetVocabularies); // contains ?withWords={0}
+
+            return string.Format(rawPath, withWords.ToString());
         }
 
         public string GetVocabularyByIdEndpoint(int vocabularyId)

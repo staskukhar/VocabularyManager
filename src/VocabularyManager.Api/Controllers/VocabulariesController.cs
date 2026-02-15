@@ -15,6 +15,7 @@ namespace VocabularyManager.Api.Controllers
         {
             _vocabularyStoreManager = vocabularyStoreManager;
         }
+
         [HttpPost]
         [ServiceFilter(typeof(VocabularyValidationFilter))]
         public async Task<IActionResult> CreateVocabulary(
@@ -23,17 +24,20 @@ namespace VocabularyManager.Api.Controllers
             int vocabularyId = await _vocabularyStoreManager.CreateVocabulary(vocabulary);
             return Ok(vocabularyId);
         }
+
         [HttpGet]
-        public async Task<IActionResult> GetVocabularies()
+        public async Task<IActionResult> GetVocabularies([FromQuery] bool withWords = false)
         {
-            return Ok(await _vocabularyStoreManager.GetVocabularies());
+            return Ok(await _vocabularyStoreManager.GetVocabularies(withWords));
         }
+
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetVocabularyWithWordsById(int id)
         {
             Vocabulary vocabulary = await _vocabularyStoreManager.GetVocabularyWithWordsById(id);
             return Ok(vocabulary);
         }
+
         [HttpPut]
         [ServiceFilter(typeof(VocabularyValidationFilter))]
         public async Task<IActionResult> UpdateVocabularyWithRelations(
@@ -42,6 +46,7 @@ namespace VocabularyManager.Api.Controllers
             await _vocabularyStoreManager.UpdateVocabulary(vocabulary);
             return Ok(vocabulary);
         }
+
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteVocabularyById(int id)
         {
