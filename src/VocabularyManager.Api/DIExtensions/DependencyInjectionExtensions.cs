@@ -1,7 +1,9 @@
 using Ardalis.Specification;
 using VocabularyManager.Api.ActionFilters;
 using VocabularyManager.Core.Entities;
+using VocabularyManager.Infrastructure.Data;
 using VocabularyManager.Infrastructure.Data.Repositories;
+using VocabularyManager.UseCases.Interfaces;
 using VocabularyManager.UseCases.Services.DIExtensions;
 using VocabularyManager.UseCases.Validators.DIExtensions;
 
@@ -23,6 +25,7 @@ namespace VocabularyManager.Api.DIExtensions
             services.AddScoped<IRepositoryBase<Vocabulary>, GenericRepository<Vocabulary>>();
             services.AddScoped<IRepositoryBase<Word>, WordRepository>();
             services.AddScoped<IRepositoryBase<Meaning>, GenericRepository<Meaning>>();
+            services.AddScoped<IDashboardMetricsProvider, DashboardMetricsProvider>();
             return services;
         }
 

@@ -13,6 +13,19 @@ namespace VocabularyManager.BlazorApp.Models.Configurations
         public VocabularyPathes VocabularyTree { get; set; } = new();
 
         public MeaningPathes MeaningTree { get; set; } = new();
+
+        public DashboardPathes DashboardTree { get; set; } = new();
+    }
+
+    public class DashboardPathes
+    {
+        public const string SectionKey = "Dashboard";
+
+        public string PathPrefix { get; set; } = string.Empty;
+
+        public string TopWords { get; set; } = string.Empty;
+
+        public string TopVocabularies { get; set; } = string.Empty;
     }
 
     public class WordParserPathes

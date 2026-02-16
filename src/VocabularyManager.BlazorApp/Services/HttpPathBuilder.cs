@@ -155,5 +155,26 @@ namespace VocabularyManager.BlazorApp.Services
                 _httpOptions.MeaningTree.Update
             );
         }
+
+        // Dashboard endpoints
+        public string GetDashboardTopWordsEndpoint(int count = 5)
+        {
+            string path = string.Concat(
+                _httpOptions.ApiBaseURL,
+                _httpOptions.DashboardTree.PathPrefix,
+                _httpOptions.DashboardTree.TopWords
+            );
+            return $"{path}?count={count}";
+        }
+
+        public string GetDashboardTopVocabulariesEndpoint(int count = 5)
+        {
+            string path = string.Concat(
+                _httpOptions.ApiBaseURL,
+                _httpOptions.DashboardTree.PathPrefix,
+                _httpOptions.DashboardTree.TopVocabularies
+            );
+            return $"{path}?count={count}";
+        }
     }
 }
