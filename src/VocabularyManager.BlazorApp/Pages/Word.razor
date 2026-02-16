@@ -1,0 +1,204 @@
+@page "/word/{WordId:int}"
+@using Microsoft.FluentUI.AspNetCore.Components
+@using FluentValidation
+@using FluentValidation.Results
+@using VocabularyManager.BlazorApp.Models.Views
+@using VocabularyManager.BlazorApp.Services
+@using VocabularyManager.BlazorApp.Interfaces
+@using VocabularyManager.BlazorApp.Validators
+@using VocabularyManager.BlazorApp.Pages.Components
+@using ToastService = BlazorBootstrap.ToastService
+
+@inject HttpService HttpService
+@inject HttpPathBuilder HttpPathBuilder
+@inject IJSRuntime JS
+@inject IVocabularyStateManager<VocabularyView> VocabularyStateManager
+@inject IValidator<WordView> WordValidator
+@inject IValidator<MeaningView> MeaningValidator
+
+<PageTitle>@(wordData?.WordContent ?? "Word")</PageTitle>
+
+@if (loading)
+{
+    <FluentProgressRing />
+    <p class="text-secondary">Loading word...</p>
+}
+else if (wordData is null)
+{
+    <FluentMessageBar Intent="MessageIntent.Warning">Word not found.</FluentMessageBar>
+    <FluentButton Appearance="Appearance.Outline" @onclick="GoBack">Go back</FluentButton>
+}
+else
+{
+    <FluentCard class="word-page-card">
+        <div class="card-header">
+            <h2 class="fluent-typography-title-2">@wordData.WordContent</h2>
+            <div class="card-actions">
+                <FluentButton Appearance="Appearance.Outline" AppearanceVariant="AppearanceVariant.Neutral" @onclick="GoBack">Cancel</FluentButton>
+                <FluentButton Appearance="Appearance.Accent" @onclick="UpdateWord">Update</FluentButton>
+                <FluentButton Appearance="Appearance.Outline" AppearanceVariant="AppearanceVariant.Danger" @onclick="ConfirmDelete">Delete</FluentButton>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <WordForm Word="wordData" />
+
+            <h3 class="fluent-typography-subtitle-1 mt-4">Meanings</h3>
+            @foreach (var meaning in wordData.Meanings)
+            {
+                <MeaningForm Meaning="meaning" OnDelete="@(() => RemoveMeaning(meaning))" />
+            }
+            <FluentButton Appearance="Appearance.Outline" AppearanceVariant="AppearanceVariant.Neutral" Size="Size.Small" @onclick="AddMeaning">
+                + Add Meaning
+            </FluentButton>
+
+            @if (validationErrors.Count > 0)
+            {
+                <div class="mt-3">
+                    @foreach (var error in validationErrors)
+                    {
+                        <ValidationError Error="error" />
+                    }
+                </div>
+            }
+        </div>
+    </FluentCard>
+}
+
+<ConfirmDialog @ref="deleteConfirmationDialog" />
+
+@code {
+    [Inject]
+    protected ToastService ToastService { get; set; } = default!;
+
+    [Parameter]
+    public int WordId { get; set; }
+
+    private bool loading = true;
+    private WordView? wordData;
+    private List<ValidationFailure> validationErrors = [];
+    private ConfirmDialog deleteConfirmationDialog = default!;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadWord();
+    }
+
+    private async Task LoadWord()
+    {
+        loading = true;
+        validationErrors.Clear();
+        try
+        {
+            HttpResponseMessage response = await HttpService.GetAsync(HttpPathBuilder.GetWordByIdEndpoint(WordId));
+            if (response.IsSuccessStatusCode)
+            {
+                wordData = await response.Content.ReadFromJsonAsync<WordView>();
+                if (wordData is not null)
+                    wordData = WordCloner.CloneWord(wordData);
+            }
+            else
+            {
+                wordData = null;
+                ToastService.Notify(new ToastMessage(ToastType.Danger, $"Failed to load the word."));
+            }
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private async Task GoBack()
+    {
+        await JS.InvokeVoidAsync("history.back");
+    }
+
+    private void AddMeaning()
+    {
+        if (wordData is null) return;
+        wordData.Meanings.Add(new MeaningView() { WordId = WordId });
+    }
+
+    private void RemoveMeaning(MeaningView meaning)
+    {
+        wordData?.Meanings.Remove(meaning);
+    }
+
+    private async Task UpdateWord()
+    {
+        if (wordData is null) return;
+        validationErrors.Clear();
+        ValidationResult wordResult = WordValidator.Validate(wordData);
+
+        if (!wordResult.IsValid)
+        {
+            validationErrors.AddRange(wordResult.Errors);
+            return;
+        }
+
+        foreach (MeaningView meaning in wordData.Meanings)
+        {
+            ValidationResult meaningResult = MeaningValidator.Validate(meaning);
+            if (!meaningResult.IsValid)
+            {
+                validationErrors.AddRange(meaningResult.Errors);
+                return;
+            }
+        }
+
+        HttpResponseMessage updateResponse = await HttpService.PutAsync<WordView>(
+            HttpPathBuilder.UpdateWordEndpoint(),
+            wordData
+        );
+
+        if (updateResponse.IsSuccessStatusCode)
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Info, "Word was updated."));
+            await VocabularyStateManager.Update();
+            wordData = WordCloner.CloneWord(wordData);
+        }
+        else
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Danger, "Sorry, update operation failed."));
+        }
+    }
+
+    private async Task ConfirmDelete()
+    {
+        if (wordData is null) return;
+
+        ConfirmDialogOptions options = new()
+        {
+            YesButtonText = "Yes, delete",
+            YesButtonColor = ButtonColor.Danger,
+            NoButtonText = "No, cancel",
+            NoButtonColor = ButtonColor.Secondary
+        };
+        bool deleteForSure = await deleteConfirmationDialog.ShowAsync(
+            "Delete word",
+            $"Do you want to delete the word: \"{wordData.WordContent}\"?",
+            options
+        );
+        if (deleteForSure) await DeleteWord();
+    }
+
+    private async Task DeleteWord()
+    {
+        if (wordData is null) return;
+
+        HttpResponseMessage deleteResponse = await HttpService.DeleteAsync(
+            HttpPathBuilder.DeleteWordEndpoint(wordData.Id)
+        );
+        if (deleteResponse.IsSuccessStatusCode)
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Info, "Word was deleted."));
+            await VocabularyStateManager.Update();
+            await GoBack();
+        }
+        else
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Danger, "Delete operation couldn't be done."));
+        }
+    }
+}

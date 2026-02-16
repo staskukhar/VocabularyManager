@@ -1,37 +1,37 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Immutable;
 using VocabularyManager.Api.ActionFilters;
 using VocabularyManager.Core.Entities;
-using VocabularyManager.UseCases.DTOs;
 using VocabularyManager.UseCases.Interfaces;
 
 namespace VocabularyManager.Api.Controllers
 {
+    /// <summary>
+    /// REST resource for words: get by id, add, update, delete.
+    /// Parse-by-URL is under GET /api/WordParser?url=...
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class WordsController : ControllerBase
     {
         private readonly IWordStorageManager _wordStoreManager;
         private readonly IVocabularyStorageManager _vocabularyStoreManager;
-        private readonly IWordParser<string> _oxfordDictionaryParser;
+
         public WordsController(
             IWordStorageManager wordStoreManager,
-            IVocabularyStorageManager vocabularyStoreManager,
-            IWordParser<string> oxfordDictionaryParser)
+            IVocabularyStorageManager vocabularyStoreManager)
         {
-            _wordStoreManager = wordStoreManager;  
+            _wordStoreManager = wordStoreManager;
             _vocabularyStoreManager = vocabularyStoreManager;
-            _oxfordDictionaryParser = oxfordDictionaryParser;
         }
-        [HttpGet]
-        public ActionResult<PlainListOfWordsResponseDTO> GetListOfWordsByUrlAsync([FromQuery] string url)
+
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<Word>> GetWordById([FromRoute] int id)
         {
-            IAsyncEnumerable<string> listOfWords = _oxfordDictionaryParser
-                    .GetWordListByLinkAsync(url);
-            return Ok(
-                new PlainListOfWordsResponseDTO(
-                    listOfWords.ToBlockingEnumerable().Distinct()));
+            Word word = await _wordStoreManager.GetWordById(id);
+            return Ok(word);
         }
+
         [HttpPost]
         [ServiceFilter(typeof(WordsValidationFilter))]
         public async Task<IActionResult> AddWords(
@@ -41,12 +41,14 @@ namespace VocabularyManager.Api.Controllers
             ImmutableList<int> ids = await _vocabularyStoreManager.AddWords(words, vocabularyId);
             return Ok(ids);
         }
+
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteWord([FromRoute] int id)
         {
             await _wordStoreManager.DeleteWordById(id);
             return Ok($"Word by id: {id} removed successfuly.");
         }
+
         [HttpPut]
         [ServiceFilter(typeof(WordValidationFilter))]
         public async Task<IActionResult> UpdateWord([FromBody] Word word)

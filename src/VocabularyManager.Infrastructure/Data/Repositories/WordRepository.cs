@@ -10,7 +10,7 @@ public class WordRepository(VocabularyContext context)
     public override async Task UpdateAsync(Word entity, CancellationToken cancellationToken = default)
     {
         Word? existingWord = await _vocabularyContext.Words.Include(w => w.Meanings)
-            .FirstOrDefaultAsync(w => w.Id == entity.Id, cancellationToken)
+            .FirstOrDefaultAsync(w => w.Id == entity.Id && w.VocabularyId == entity.VocabularyId, cancellationToken)
             ?? throw new EntityNotFoundException(nameof(Word), entity.Id);
 
         _vocabularyContext.Entry(existingWord).CurrentValues.SetValues(entity);

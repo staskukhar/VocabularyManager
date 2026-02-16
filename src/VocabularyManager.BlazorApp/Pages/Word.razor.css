@@ -1,0 +1,21 @@
+.word-page-card {
+    max-width: 42rem;
+}
+
+.word-page-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.word-page-card .card-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.word-page-card .card-body {
+    padding-top: 0;
+}

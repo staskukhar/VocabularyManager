@@ -12,6 +12,18 @@ namespace VocabularyManager.BlazorApp.Services
         }
 
         // Word endpoints
+        public string GetWordByIdEndpoint(int wordId)
+        {
+            return string.Format(
+                string.Concat(
+                    _httpOptions.ApiBaseURL,
+                    _httpOptions.WordTree.PathPrefix,
+                    _httpOptions.WordTree.GetById
+                ),
+                wordId
+            );
+        }
+
         public string AddWordEndpoint(int vocabularyId)
         {
             return string.Format(
@@ -41,8 +53,8 @@ namespace VocabularyManager.BlazorApp.Services
             return string.Format(
                 string.Concat(
                     _httpOptions.ApiBaseURL,
-                    _httpOptions.WordTree.PathPrefix,
-                    _httpOptions.WordTree.Get
+                    _httpOptions.WordParserTree.PathPrefix,
+                    _httpOptions.WordParserTree.ParseByUrl
                 ),
                 url
             );

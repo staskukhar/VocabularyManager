@@ -7,13 +7,14 @@
 
 @inject HttpPathBuilder HttpPathBuilder
 @inject HttpService HttpService
+@inject NavigationManager NavigationManager
 
 <div class="d-flex flex-row">
     <div class="col-md-5 col-sm-12 me-4">
         <AutoComplete @bind-Value="wordName"
-                      TItem="WordView"
+                      TItem="WordSearchItem"
                       DataProvider="WordDataProvider"
-                      PropertyName="WordContent"
+                      PropertyName="DisplayText"
                       Placeholder="Search a word..."
                       OnChanged="OnWordChosen" />
     </div>
@@ -25,11 +26,6 @@
         @bind-SelectedOption="@selectedVocabulary" />
 </div>
 
-@if (currentWord is not null)
-{
-    <WordPlate Word="currentWord" />
-}
-
 @code {
     [Inject] protected ToastService ToastService { get; set; } = default!;
 
@@ -38,8 +34,6 @@
     private IEnumerable<VocabularyView> vocabulariesWithWords = [];
     private List<Option<ShortVocabulary>> vocabularyOptions = [];
 
-    private WordView? currentWord;
-
     protected override async Task OnInitializedAsync()
     {
         vocabulariesWithWords = await LoadVocabulariesWithWordsAsync();
@@ -47,15 +41,15 @@
         vocabularyOptions = vocabulariesWithWords
             .Select(v => new Option<ShortVocabulary>()
             {
-                Value = new ShortVocabulary(v.Id, v.Name),
+                Value = new(v.Id, v.Name),
                 Text = v.Name
             })
             .ToList();
 
-        ShortVocabulary defaultVocabulary = new ShortVocabulary(
+        ShortVocabulary defaultVocabulary = new(
                 VocabularyConstants.AllVocabulariesId,
                 VocabularyConstants.AllVocabulariesLabel);
-        Option<ShortVocabulary> defaultOption = new Option<ShortVocabulary>()
+        Option<ShortVocabulary> defaultOption = new()
         {
             Value = defaultVocabulary,
             Text = defaultVocabulary.Name,
@@ -65,16 +59,22 @@
         vocabularyOptions.Add(defaultOption);
     }
 
-    private async Task<AutoCompleteDataProviderResult<WordView>> WordDataProvider(
-        AutoCompleteDataProviderRequest<WordView> request)
+    private async Task<AutoCompleteDataProviderResult<WordSearchItem>> WordDataProvider(
+        AutoCompleteDataProviderRequest<WordSearchItem> request)
     {
-        IEnumerable<WordView> words = selectedVocabulary.Value?.Id == VocabularyConstants.AllVocabulariesId
-            ? vocabulariesWithWords.SelectMany(v => v.Words)
-            : vocabulariesWithWords.FirstOrDefault(v => v.Id == selectedVocabulary.Value?.Id)?.Words ?? [];
+        IEnumerable<WordSearchItem> items = GetWordSearchItems();
 
-        Console.WriteLine(words.Count());
+        return await Task.FromResult(request.ApplyTo(items));
+    }
 
-        return await Task.FromResult(request.ApplyTo(words));
+    private IEnumerable<WordSearchItem> GetWordSearchItems()
+    {
+        IEnumerable<VocabularyView> sources = selectedVocabulary.Value?.Id == VocabularyConstants.AllVocabulariesId
+            ? vocabulariesWithWords
+            : vocabulariesWithWords.Where(v => v.Id == selectedVocabulary.Value?.Id);
+
+        return sources
+            .SelectMany(v => v.Words.Select(w => new WordSearchItem { Word = w, VocabularyName = v.Name }));
     }
 
     private async Task<IEnumerable<VocabularyView>> LoadVocabulariesWithWordsAsync()
@@ -86,8 +86,9 @@
         return list ?? [];
     }
 
-    private void OnWordChosen(WordView word)
+    private void OnWordChosen(WordSearchItem? item)
     {
-        currentWord = word;
+        if (item is not null)
+            NavigationManager.NavigateTo($"/word/{item.Word.Id}");
     }
 }
