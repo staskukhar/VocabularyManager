@@ -453,6 +453,9 @@ $RECYCLE.BIN/
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# Environment / secrets
+.env
+
 # My changes
 /DictionaryManagerApp/wwwroot/appsettings.json
 /DictionaryManagerAPI/appsettings.json

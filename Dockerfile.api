@@ -1,0 +1,30 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+COPY src/VocabularyManager.Api/VocabularyManager.Api.csproj src/VocabularyManager.Api/
+COPY src/VocabularyManager.Core/VocabularyManager.Core.csproj src/VocabularyManager.Core/
+COPY src/VocabularyManager.Infrastructure/VocabularyManager.Infrastructure.csproj src/VocabularyManager.Infrastructure/
+COPY src/VocabularyManager.UseCases/VocabularyManager.UseCases.csproj src/VocabularyManager.UseCases/
+
+RUN dotnet restore src/VocabularyManager.Api/VocabularyManager.Api.csproj
+
+COPY src/ src/
+
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+RUN dotnet ef migrations add InitialCreate \
+    --project src/VocabularyManager.Infrastructure \
+    --startup-project src/VocabularyManager.Api
+
+RUN dotnet publish src/VocabularyManager.Api/VocabularyManager.Api.csproj \
+    -c Release \
+    -o /app/publish \
+    --no-restore
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080
+ENTRYPOINT ["dotnet", "VocabularyManager.Api.dll"]

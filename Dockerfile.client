@@ -1,0 +1,20 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+COPY src/VocabularyManager.BlazorApp/VocabularyManager.BlazorApp.csproj src/VocabularyManager.BlazorApp/
+COPY src/VocabularyManager.Core/VocabularyManager.Core.csproj src/VocabularyManager.Core/
+COPY src/VocabularyManager.UseCases/VocabularyManager.UseCases.csproj src/VocabularyManager.UseCases/
+
+RUN dotnet restore src/VocabularyManager.BlazorApp/VocabularyManager.BlazorApp.csproj
+
+COPY src/ src/
+
+RUN dotnet publish src/VocabularyManager.BlazorApp/VocabularyManager.BlazorApp.csproj \
+    -c Release \
+    -o /app/publish \
+    --no-restore
+
+FROM nginx:alpine AS runtime
+COPY --from=build /app/publish/wwwroot /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
