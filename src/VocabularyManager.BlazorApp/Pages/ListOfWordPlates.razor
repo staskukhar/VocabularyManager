@@ -1,4 +1,4 @@
-﻿@page "/wlplate"
+@page "/wlplate"
 
 @using VocabularyManager.BlazorApp.Interfaces
 @using VocabularyManager.BlazorApp.Models.Views
@@ -9,7 +9,7 @@
 
 @implements IDisposable
 
-<Modal @ref="addWordModal"></Modal>
+<Modal @ref="_addWordModal"></Modal>
 <div class="m-2">
     <Button @onclick="ShowAddWordModal" Type="ButtonType.Submit" Color="ButtonColor.Success">
         Add new
@@ -17,7 +17,7 @@
 </div>
 <div class="m-2">
     <FirstLetterFilter 
-        Letters="Vocabulary?.Words.Select(w => w.WordContent.ToLower().FirstOrDefault()).Distinct()"
+        Letters="Vocabulary?.Words.Select(w => w.WordContent.ToLower().FirstOrDefault()).Distinct() ?? []"
         OnChange="OnFilterChanged" 
         OnFilterCleared="OnFilterCleared"/>
 </div>
@@ -25,10 +25,10 @@
 {
     @for (int i = StartOfPage(CurrentPage); i < EndOfPage(CurrentPage); i++)
     {
-        <WordPlate Word="@FilteredWords[i]"></WordPlate>
+        <WordPlate Word="@_filteredWords[i]"></WordPlate>
     }
     <Pagination ActivePageNumber="@CurrentPage"
-                TotalPages="@((int)Math.Ceiling(FilteredWords.Count * 1m / AmountWordsOnPage))"
+                TotalPages="@((int)Math.Ceiling(_filteredWords.Count * 1m / AmountWordsOnPage))"
                 PageChanged="OnPageChangedAsync" />
 }
 else
@@ -39,20 +39,23 @@ else
 @code {
     [Parameter]
     public VocabularyView? Vocabulary { get; set; }
-    private IList<WordView> FilteredWords = [];
+    private IList<WordView> _filteredWords = [];
+    private char? _activeFilter;
     private int CurrentPage { get; set; } = 1;
-    private const int AmountWordsOnPage = 50;
-    private Modal addWordModal = default!;
+    private const int AmountWordsOnPage = 20;
+    private Modal _addWordModal = default!;
 
     protected override void OnInitialized()
     {
         VocabularyStateManager.SubscribeOnChangeAction(StateHasChanged);
-        FilteredWords = Vocabulary?.Words ?? [];
+        _filteredWords = Vocabulary?.Words ?? [];
     }
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
-        FilteredWords = Vocabulary?.Words ?? [];
+        _filteredWords = _activeFilter.HasValue
+            ? Vocabulary?.Words.Where(w => w.WordContent.ToLower().FirstOrDefault() == _activeFilter.Value).ToList() ?? []
+            : Vocabulary?.Words ?? [];
 
         return base.OnAfterRenderAsync(firstRender);
     }
@@ -64,16 +67,20 @@ else
 
     private void OnFilterChanged(char letter)
     {
-        FilteredWords = Vocabulary?.Words
+        _activeFilter = letter;
+        _filteredWords = Vocabulary?.Words
             .Where(w => w.WordContent.ToLower().FirstOrDefault() == letter)
             .ToList() ?? [];
+        CurrentPage = 1;
 
         StateHasChanged();
     }
 
     private void OnFilterCleared()
     {
-        FilteredWords = Vocabulary?.Words ?? [];
+        _activeFilter = null;
+        _filteredWords = Vocabulary?.Words ?? [];
+        CurrentPage = 1;
         StateHasChanged();
     }
 
@@ -81,12 +88,12 @@ else
     {
         Dictionary<string, object> parameters = [];
         parameters.Add("OnCloseFunc", (object)OnCloseModal);
-        await addWordModal.ShowAsync<AddWordModal>(title: "Add word", parameters: parameters);
+        await _addWordModal.ShowAsync<AddWordModal>(title: "Add word", parameters: parameters);
     }
 
     private async Task OnCloseModal()
     {
-        await addWordModal.HideAsync();
+        await _addWordModal.HideAsync();
     }
 
     private int StartOfPage(int currentPage) => (currentPage - 1) * AmountWordsOnPage;
@@ -95,7 +102,7 @@ else
     {
         // the code help to prevent exception index out of... when we try get last page
         int end = currentPage * AmountWordsOnPage;
-        return end > FilteredWords.Count ? FilteredWords.Count : end;
+        return end > _filteredWords.Count ? _filteredWords.Count : end;
     }
 
     public void Dispose()
