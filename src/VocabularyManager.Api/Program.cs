@@ -1,5 +1,7 @@
 using VocabularyManager.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using VocabularyManager.Api.ExceptionHandlers;
 using VocabularyManager.Api.DIExtensions;
 
@@ -7,13 +9,30 @@ using VocabularyManager.Api.DIExtensions;
 var builder = WebApplication.CreateBuilder(args);
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-// Add services to the container.
 
 builder.Services.AddControllers();
 builder.Services.AddValidationFilters();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+string keycloakAuthority = builder.Configuration["Keycloak:Authority"]
+    ?? throw new InvalidOperationException("Keycloak:Authority configuration is required.");
+string? keycloakValidIssuer = builder.Configuration["Keycloak:ValidIssuer"];
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = keycloakAuthority;
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = keycloakValidIssuer ?? keycloakAuthority,
+            ValidateAudience = false,
+            ValidateLifetime = true
+        };
+    });
+builder.Services.AddAuthorization();
 
 var allowedOrigins = builder.Configuration
     .GetSection("Cors:AllowedOrigins")
@@ -39,10 +58,20 @@ builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
+using (IServiceScope scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<VocabularyContext>();
-    await context.Database.MigrateAsync();
+    VocabularyContext context = scope.ServiceProvider.GetRequiredService<VocabularyContext>();
+    bool schemaExists = context.Database
+        .SqlQueryRaw<int>(
+            @"SELECT COUNT(*)::int AS ""Value"" FROM information_schema.tables
+              WHERE table_schema = 'public' AND table_name = 'Vocabularies'")
+        .AsEnumerable()
+        .First() > 0;
+
+    if (!schemaExists)
+    {
+        await context.Database.MigrateAsync();
+    }
 }
 
 // Configure the HTTP request pipeline.
@@ -61,8 +90,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors(MyAllowSpecificOrigins);
 
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapControllers().RequireAuthorization();
 
 await app.RunAsync();

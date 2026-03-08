@@ -8,8 +8,10 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      KEYCLOAK_DB: ${KEYCLOAK_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./db/init-keycloak-db.sh:/docker-entrypoint-initdb.d/init-keycloak-db.sh:ro
     ports:
       - "${DB_PORT}:5432"
     healthcheck:
@@ -17,6 +19,57 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - vocabulary_network
+
+  keycloak-db-init:
+    image: postgres:16-alpine
+    container_name: vocabulary_keycloak_db_init
+    environment:
+      PGHOST: db
+      PGPORT: 5432
+      PGUSER: ${POSTGRES_USER}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      KEYCLOAK_DB: ${KEYCLOAK_DB}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        until pg_isready -h db -U "$${PGUSER}"; do echo "Waiting for db..."; sleep 2; done
+        psql -h db -U "$${PGUSER}" -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = '$${KEYCLOAK_DB}'" | grep -q 1 \
+          || psql -h db -U "$${PGUSER}" -d postgres -c "CREATE DATABASE \"$${KEYCLOAK_DB}\""
+        echo "Keycloak database ready."
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - vocabulary_network
+    restart: "no"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: vocabulary_keycloak
+    command: start-dev --import-realm
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: "jdbc:postgresql://db:5432/${KEYCLOAK_DB}"
+      KC_DB_USERNAME: ${POSTGRES_USER}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      KC_HEALTH_ENABLED: "true"
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+    volumes:
+      - ./keycloak/realm-import.json:/opt/keycloak/data/import/realm-import.json:ro
+    ports:
+      - "${KEYCLOAK_PORT}:8080"
+    depends_on:
+      keycloak-db-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q UP"]
+      interval: 15s
+      timeout: 10s
+      retries: 15
+      start_period: 60s
     networks:
       - vocabulary_network
 
@@ -28,10 +81,14 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
       ConnectionStrings__VocabularyDbConnection: "Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
+      Keycloak__Authority: "http://keycloak:8080/realms/vocabulary-manager"
+      Keycloak__ValidIssuer: "http://localhost:${KEYCLOAK_PORT}/realms/vocabulary-manager"
     ports:
       - "${API_PORT}:8080"
     depends_on:
       db:
+        condition: service_healthy
+      keycloak:
         condition: service_healthy
     networks:
       - vocabulary_network

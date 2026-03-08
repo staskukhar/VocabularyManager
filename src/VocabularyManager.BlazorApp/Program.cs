@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.FluentUI.AspNetCore.Components;
 using VocabularyManager.BlazorApp;
+using VocabularyManager.BlazorApp.Auth;
 using VocabularyManager.BlazorApp.DIExtensions;
 using VocabularyManager.BlazorApp.Models.Configurations;
 
@@ -13,20 +14,28 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 HttpClientOptions? httpOptions = builder.Configuration
     .GetSection(HttpClientOptions.SectionKey).Get<HttpClientOptions>();
-if(httpOptions == null)
+if (httpOptions == null)
 {
-    throw new NullReferenceException("Configurations weren't set.");
+    throw new InvalidOperationException("HttpClient configuration is required.");
 }
 
-builder.Services.AddSingleton( sg =>
-    httpOptions!
-);
-builder.Services.AddScoped(sp =>
-    new HttpClient()
+builder.Services.AddSingleton(httpOptions);
+
+builder.Services.AddOidcAuthentication(options =>
+{
+    options.ProviderOptions.Authority = builder.Configuration["Keycloak:Authority"];
+    options.ProviderOptions.ClientId = builder.Configuration["Keycloak:ClientId"];
+    options.ProviderOptions.ResponseType = "code";
+});
+
+builder.Services.AddScoped<ApiAuthorizationMessageHandler>();
+builder.Services.AddHttpClient("API", client =>
     {
-        BaseAddress = new Uri(httpOptions.ApiBaseURL)
-    }
-);
+        client.BaseAddress = new Uri(httpOptions.ApiBaseURL);
+    })
+    .AddHttpMessageHandler<ApiAuthorizationMessageHandler>();
+builder.Services.AddScoped(serviceProvider =>
+    serviceProvider.GetRequiredService<IHttpClientFactory>().CreateClient("API"));
 
 builder.Services.AddFluentUIComponents();
 
