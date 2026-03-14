@@ -27,6 +27,7 @@ namespace VocabularyManager.UnitTests.Services
             Vocabulary vocabulary = new Vocabulary(_fixture.Create<string>(), null);
             Word word = new Word(_fixture.Create<string>());
             int vocabularyId = _fixture.Create<int>();
+            IMeaningStorageManager meaningStorageManager = Substitute.For<IMeaningStorageManager>();
             IRepositoryBase<Vocabulary> repository = Substitute.For<IRepositoryBase<Vocabulary>>();
             repository
                 .GetByIdAsync(vocabularyId)
@@ -39,7 +40,7 @@ namespace VocabularyManager.UnitTests.Services
                 .FirstOrDefaultAsync(Arg.Any<ISpecification<Word>>())
                 .Returns(Task.FromResult<Word?>(null));
 
-            IVocabularyStorageManager vocabularyStoreService = new VocabularyStorageManager(repository, _wordRepository);
+            IVocabularyStorageManager vocabularyStoreService = new VocabularyStorageManager(meaningStorageManager, repository, _wordRepository);
 
             //Act
             int? wordId = await vocabularyStoreService.AddWord(word, vocabularyId);
@@ -56,13 +57,14 @@ namespace VocabularyManager.UnitTests.Services
             // Arrange
             Vocabulary vocabulary = new Vocabulary(_fixture.Create<string>(), null);
             int expectedId = _fixture.Create<int>();
+            IMeaningStorageManager meaningStorageManager = Substitute.For<IMeaningStorageManager>();
             IRepositoryBase<Vocabulary> repository = Substitute.For<IRepositoryBase<Vocabulary>>();
             repository
                 .AddAsync(vocabulary)
                 .Returns(
                     Task.FromResult(new Vocabulary(vocabulary.Name, vocabulary.SourceUrl) { Id = expectedId })
             );
-            IVocabularyStorageManager vocabularyStoreService = new VocabularyStorageManager(repository, _wordRepository);
+            IVocabularyStorageManager vocabularyStoreService = new VocabularyStorageManager(meaningStorageManager, repository, _wordRepository);
 
             //Act
             int? vocabularyId = await vocabularyStoreService.CreateVocabulary(vocabulary);
@@ -79,11 +81,12 @@ namespace VocabularyManager.UnitTests.Services
             //Arrange
             List<Vocabulary> vocabulary = new List<Vocabulary>();
             vocabulary.Add(new Vocabulary(_fixture.Create<string>(), null));
+            IMeaningStorageManager meaningStorageManager = Substitute.For<IMeaningStorageManager>();
             IRepositoryBase<Vocabulary> repository = Substitute.For<IRepositoryBase<Vocabulary>>();
             repository
                 .ListAsync()
                 .Returns(Task.FromResult(vocabulary));
-            IVocabularyStorageManager vocabularyStoreService = new VocabularyStorageManager(repository, _wordRepository);
+            IVocabularyStorageManager vocabularyStoreService = new VocabularyStorageManager(meaningStorageManager, repository, _wordRepository);
 
             //Act
             var result = await vocabularyStoreService.GetVocabularies(false);
@@ -101,6 +104,7 @@ namespace VocabularyManager.UnitTests.Services
             Vocabulary expectedVocabulary = new Vocabulary(_fixture.Create<string>(), null);
             int vocabularyId = _fixture.Create<int>();
             ISpecification<Vocabulary> spec = new VocabularyWithWordsSpecification(vocabularyId);
+            IMeaningStorageManager meaningStorageManager = Substitute.For<IMeaningStorageManager>();
             IRepositoryBase<Vocabulary> repository = Substitute.For<IRepositoryBase<Vocabulary>>();
             repository
                 .FirstOrDefaultAsync(
@@ -110,7 +114,7 @@ namespace VocabularyManager.UnitTests.Services
                     Task.FromResult<Vocabulary?>(new Vocabulary(expectedVocabulary.Name, expectedVocabulary.SourceUrl)
                         { Id = vocabularyId, Words = new List<Word>() })
             );
-            IVocabularyStorageManager vocabularyStoreService = new VocabularyStorageManager(repository, _wordRepository);
+            IVocabularyStorageManager vocabularyStoreService = new VocabularyStorageManager(meaningStorageManager, repository, _wordRepository);
 
             //Act
             Vocabulary wordList = await vocabularyStoreService.GetVocabularyWithWordsById(vocabularyId);

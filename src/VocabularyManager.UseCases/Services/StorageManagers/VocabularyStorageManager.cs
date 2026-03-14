@@ -9,46 +9,49 @@ namespace VocabularyManager.UseCases.Services.StoreManagers
 {
     public class VocabularyStorageManager : IVocabularyStorageManager
     {
+        private readonly IMeaningStorageManager _meaningStorageManager;
+
         private readonly IRepositoryBase<Vocabulary> _vocabularyRepository;
+
         private readonly IRepositoryBase<Word> _wordRepository;
 
         public VocabularyStorageManager(
+            IMeaningStorageManager meaningStorageManager,
             IRepositoryBase<Vocabulary> vocabularyRepository,
             IRepositoryBase<Word> wordRepository)
         {
+            _meaningStorageManager = meaningStorageManager;
             _vocabularyRepository = vocabularyRepository;
             _wordRepository = wordRepository;
         }
 
         public async Task<ImmutableList<int>> AddWords(IEnumerable<Word> words, int vocabularyId)
         {
-            Vocabulary? vocabulary = await _vocabularyRepository.GetByIdAsync(vocabularyId);
+            Vocabulary? vocabulary = await _vocabularyRepository.FirstOrDefaultAsync(
+                new VocabularyWithWordsSpecification(vocabularyId));
             if (vocabulary == null)
             {
                 throw new EntityNotFoundException(nameof(Vocabulary), vocabularyId);
             }
 
-            // Filter out duplicates - words that already exist in the vocabulary
-            var wordContents = words.Select(w => w.WordContent).ToList();
-            var existingWordsSpec = new WordsByContentsAndVocabularySpecification(wordContents, vocabularyId);
-            var existingWords = await _wordRepository.ListAsync(existingWordsSpec);
-            var existingWordContents = existingWords.Select(w => w.WordContent).ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-            // Also filter out duplicates within the input itself
-            var uniqueNewWords = words
-                .Where(w => !existingWordContents.Contains(w.WordContent))
-                .GroupBy(w => w.WordContent, StringComparer.OrdinalIgnoreCase)
-                .Select(g => g.First())
-                .ToList();
-
-            if (uniqueNewWords.Count == 0)
+            List<Word> newWords = [];
+            foreach (Word word in words)
             {
-                return ImmutableList<int>.Empty;
+                Word? existingWord = vocabulary.Words.FirstOrDefault(w => w.WordContent == word.WordContent && w.VocabularyId == vocabularyId);
+                if (existingWord != null)
+                {
+                    await _meaningStorageManager.AddMeanings(word.Meanings, existingWord.Id);
+                }
+                else
+                {
+                    word.VocabularyId = vocabularyId;
+                    newWords.Add(
+                        await _wordRepository.AddAsync(word));
+                }
             }
 
-            vocabulary.Words.AddRange(uniqueNewWords);
             await _vocabularyRepository.SaveChangesAsync();
-            return uniqueNewWords.Select(w => w.Id).ToImmutableList();
+            return newWords.Select(w => w.Id).ToImmutableList();
         }
 
         public async Task<int> AddWord(Word word, int vocabularyId)

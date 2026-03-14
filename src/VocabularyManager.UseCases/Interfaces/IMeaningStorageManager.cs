@@ -5,7 +5,11 @@ namespace VocabularyManager.UseCases.Interfaces
     public interface IMeaningStorageManager
     {
         Task<int> AddMeaning(Meaning meaning, int wordId);
+
+        Task<IEnumerable<int>> AddMeanings(IEnumerable<Meaning> meanings, int wordId);
+
         Task<int> DeleteMeaningById(int meaningId);
+
         Task UpdateMeaning(Meaning meaning);
     }
 }

@@ -32,6 +32,26 @@ namespace VocabularyManager.UseCases.Services.StoreManagers
             return meaning.Id;
         }
 
+        public async Task<IEnumerable<int>> AddMeanings(IEnumerable<Meaning> meanings, int wordId)
+        {
+            Word? word = await _wordRepository.GetByIdAsync(wordId);
+            if (word == null)
+            {
+                throw new EntityNotFoundException(nameof(Word), wordId);
+            }
+
+            IList<int> addedMeaningIds = new List<int>();
+            foreach (Meaning m in meanings)
+            {
+                m.WordId = wordId;
+                await _meaningRepository.AddAsync(m);
+                addedMeaningIds.Add(m.Id);
+            }
+
+            await _meaningRepository.SaveChangesAsync();
+            return addedMeaningIds;
+        }
+
         public async Task<int> DeleteMeaningById(int meaningId)
         {
             Meaning? meaningToDelete = await _meaningRepository.GetByIdAsync(meaningId);
