@@ -1,5 +1,6 @@
 using Ardalis.Specification;
 using VocabularyManager.Core.Entities;
+using VocabularyManager.Core.Specifications;
 using VocabularyManager.UseCases.Exceptions;
 using VocabularyManager.UseCases.Interfaces;
 
@@ -34,22 +35,37 @@ namespace VocabularyManager.UseCases.Services.StoreManagers
 
         public async Task<IEnumerable<int>> AddMeanings(IEnumerable<Meaning> meanings, int wordId)
         {
-            Word? word = await _wordRepository.GetByIdAsync(wordId);
+            Word? word = await _wordRepository.FirstOrDefaultAsync(
+                new WordByIdWithMeaningsSpecification(wordId));
             if (word == null)
             {
                 throw new EntityNotFoundException(nameof(Word), wordId);
             }
 
             IList<int> addedMeaningIds = new List<int>();
-            foreach (Meaning m in meanings)
+            foreach (Meaning meaning in meanings)
             {
-                m.WordId = wordId;
-                await _meaningRepository.AddAsync(m);
-                addedMeaningIds.Add(m.Id);
+                if (IsDuplicateMeaning(word.Meanings, meaning))
+                {
+                    continue;
+                }
+
+                meaning.WordId = wordId;
+                await _meaningRepository.AddAsync(meaning);
+                addedMeaningIds.Add(meaning.Id);
+                word.Meanings.Add(meaning);
             }
 
             await _meaningRepository.SaveChangesAsync();
             return addedMeaningIds;
+        }
+
+        private bool IsDuplicateMeaning(List<Meaning> existingMeanings, Meaning candidate)
+        {
+            return existingMeanings.Any(existing =>
+                existing.Definition == candidate.Definition &&
+                existing.LexemeType == candidate.LexemeType &&
+                existing.Level == candidate.Level);
         }
 
         public async Task<int> DeleteMeaningById(int meaningId)
