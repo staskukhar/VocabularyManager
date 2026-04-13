@@ -1,4 +1,4 @@
-﻿@page "/vocabulary/{VocabularyId:int?}"
+@page "/vocabulary/{VocabularyId:int?}"
 
 @using VocabularyManager.BlazorApp.Models.Views
 @using VocabularyManager.BlazorApp.Pages.Modals
@@ -8,23 +8,26 @@
 @inject HttpPathBuilder HttpPathBuilder
 @inject HttpService HttpService
 @inject IVocabularyStateManager<VocabularyView> VocabularyStateManager
+@inject IRecentlyOpenedService RecentlyOpenedService
+@inject IStringLocalizer<SharedResource> SharedLoc
+@inject IStringLocalizer<VocabulariesResource> Loc
 
 @implements IDisposable
 
 <Modal @ref="createVocabularyModal"></Modal>
 
-<h3>Vocabularies</h3>
+<h3>@Loc["Title"]</h3>
 <div class="input-group mb-3">
     <div class="col-md-5 col-sm-12">
         <AutoComplete @bind-Value="vocabularyName"
                       TItem="VocabularyView"
                       DataProvider="VocabulariesDataProvider"
                       PropertyName="Name"
-                      Placeholder="Search a vocabulary..."
+                      Placeholder="@Loc["SearchPlaceholder"]"
                       Disabled=@vocabularyLoading
                       OnChanged="(VocabularyView? vocabulary) => OnAutoCompleteChanged(vocabulary)" />
     </div>
-    <Button Color="ButtonColor.Primary" Disabled=@vocabularyLoading @onclick=TryToLoadVocabulary>Load</Button>
+    <Button Color="ButtonColor.Primary" Disabled=@vocabularyLoading @onclick=TryToLoadVocabulary>@SharedLoc["Btn_Load"]</Button>
 </div>
 <div class="d-flex flex-row mb-1">
     <div class="me-1">
@@ -32,7 +35,7 @@
                 Type="ButtonType.Button"
                 Color="ButtonColor.Success"
                 @onclick="CreateVocabularyModal">
-            Create
+            @SharedLoc["Btn_Create"]
         </Button>
     </div>
     @if(VocabularyStateManager.Vocabulary is not null)
@@ -42,26 +45,26 @@
                     Type="ButtonType.Button"
                     Color="ButtonColor.Danger"
                     @onclick="DeleteVocabularyDialog">
-                Delete
+                @SharedLoc["Btn_Delete"]
             </Button>
         </div>
     }
 </div>
 @if (vocabularyLoading)
 {
-<div class="text-info">Loading...</div>
+<div class="text-info">@SharedLoc["State_Loading"]</div>
 }
 else
 {
     if (VocabularyStateManager.Vocabulary is not null)
     {
         <Tabs>
-            <Tab Title="About" IsActive="true">
+            <Tab Title="@SharedLoc["Label_About"]" IsActive="true">
                 <Content>
                     <AboutVocabulary Vocabulary="@VocabularyStateManager.Vocabulary"></AboutVocabulary>
                 </Content>
             </Tab>
-            <Tab Title="Edit">
+            <Tab Title="@SharedLoc["Label_Edit"]">
                 <Content>
                     <ListOfWordPlates Vocabulary="@VocabularyStateManager.Vocabulary"></ListOfWordPlates>
                 </Content>
@@ -70,7 +73,7 @@ else
     }
     else
     {
-        <div class="text-info">No list loaded</div>
+        <div class="text-info">@Loc["NoListLoaded"]</div>
     }
 }
 <ConfirmDialog @ref="dialog"></ConfirmDialog>
@@ -160,6 +163,12 @@ else
         if(VocabularyId is not null)
         {
             VocabularyStateManager.Vocabulary = await GetVocabularyWithWordsById(VocabularyId);
+            if (VocabularyStateManager.Vocabulary is not null)
+            {
+                await RecentlyOpenedService.RecordVocabulary(
+                    VocabularyStateManager.Vocabulary.Id,
+                    VocabularyStateManager.Vocabulary.Name);
+            }
         }
     }
 
@@ -168,7 +177,7 @@ else
         Dictionary<string, object> parameters = new Dictionary<string, object>();
         parameters.Add("OnCloseFunc", CloseVocabularyCreationModal);
         await createVocabularyModal.ShowAsync<CreateVocabularyModel>(
-            title: "Create vocabulary",
+            title: Loc["CreateVocabulary"],
             parameters: parameters
         );
     }
@@ -183,15 +192,15 @@ else
     {
         var options = new ConfirmDialogOptions()
         {
-            YesButtonText = "Delete",
+            YesButtonText = SharedLoc["Btn_Delete"],
             YesButtonColor = ButtonColor.Danger,
-            NoButtonText = "Cancel",
+            NoButtonText = SharedLoc["Btn_Cancel"],
             NoButtonColor = ButtonColor.Secondary
         };
 
         var confirmation = await dialog.ShowAsync(
-            title: "Delete operation!",
-            message1: $"Are you sure to delete the vocabulary: {VocabularyStateManager.Vocabulary.Name} ?",
+            title: Loc["DeleteOperation"],
+            message1: string.Format(Loc["ConfirmDeleteVocabulary"], VocabularyStateManager.Vocabulary.Name),
             confirmDialogOptions: options
         );
         if(confirmation)
@@ -201,12 +210,12 @@ else
             );
             if(deleteResponse.IsSuccessStatusCode)
             {
-                ToastService.Notify(new ToastMessage(ToastType.Success, "Vocabulary was successfully deleted."));
+                ToastService.Notify(new ToastMessage(ToastType.Success, SharedLoc["Toast_VocabularyDeleted"]));
                 VocabularyStateManager.Pop();
             }
             else
             {
-                ToastService.Notify(new ToastMessage(ToastType.Danger, "Sorry, operation has failed. Try again later."));
+                ToastService.Notify(new ToastMessage(ToastType.Danger, SharedLoc["Toast_OperationFailed"]));
             }
         }
     }

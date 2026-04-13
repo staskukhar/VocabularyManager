@@ -1,13 +1,16 @@
 @using VocabularyManager.BlazorApp.Models
 @using VocabularyManager.BlazorApp.Services
 
+@inject IStringLocalizer<SharedResource> SharedLoc
+@inject IStringLocalizer<VocabularyCreatorResource> Loc
+
 <div class="card mt-3">
     <div class="card-header">
-        <h5 class="mb-0">Field Mapping</h5>
-        <small class="text-muted">Map CSV columns to Word properties. Fields marked with * are required.</small>
+        <h5 class="mb-0">@Loc["FieldMapping"]</h5>
+        <small class="text-muted">@Loc["MapCsvDescription"]</small>
     </div>
     <div class="card-body">
-        <h6 class="mb-3">Word Fields</h6>
+        <h6 class="mb-3">@Loc["WordFields"]</h6>
         @foreach (CsvFieldMapping mapping in FieldMappings.Where(m => !m.IsMeaningProperty))
         {
             <div class="row mb-2 align-items-center">
@@ -28,7 +31,7 @@
                 <div class="col-md-5">
                     <select class="form-select @(mapping.IsRequired && string.IsNullOrEmpty(mapping.CsvColumnName) ? "is-invalid" : "")"
                             @bind="mapping.CsvColumnName">
-                        <option value="">-- Select CSV Column --</option>
+                        <option value="">@Loc["SelectCsvColumn"]</option>
                         @foreach (string header in CsvHeaders)
                         {
                             <option value="@header">@header</option>
@@ -37,7 +40,7 @@
                     @if (mapping.IsRequired && string.IsNullOrEmpty(mapping.CsvColumnName))
                     {
                         <div class="invalid-feedback">
-                            This field is required
+                            @Loc["FieldIsRequired"]
                         </div>
                     }
                 </div>
@@ -47,7 +50,7 @@
         @if (IncludeMeanings)
         {
             <hr class="my-3" />
-            <h6 class="mb-3">Meaning Fields <span class="badge bg-info">Optional</span></h6>
+            <h6 class="mb-3">@Loc["MeaningFields"] <span class="badge bg-info">@SharedLoc["Label_Optional"]</span></h6>
             @foreach (CsvFieldMapping mapping in FieldMappings.Where(m => m.IsMeaningProperty))
             {
                 <div class="row mb-2 align-items-center">
@@ -63,7 +66,7 @@
                     </div>
                     <div class="col-md-5">
                         <select class="form-select" @bind="mapping.CsvColumnName">
-                            <option value="">-- Select CSV Column (optional) --</option>
+                            <option value="">@Loc["SelectCsvColumnOptional"]</option>
                             @foreach (string header in CsvHeaders)
                             {
                                 <option value="@header">@header</option>
@@ -76,10 +79,10 @@
         
         <div class="mt-3">
             <Button Color="ButtonColor.Success" @onclick="OnApply" Disabled="@(!IsMappingValid())">
-                Apply Mapping
+                @Loc["ApplyMapping"]
             </Button>
             <Button Color="ButtonColor.Secondary" class="ms-2" @onclick="OnCancel">
-                Cancel
+                @SharedLoc["Btn_Cancel"]
             </Button>
         </div>
     </div>

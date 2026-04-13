@@ -1,6 +1,8 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.FluentUI.AspNetCore.Components;
+using Microsoft.JSInterop;
 using VocabularyManager.BlazorApp;
 using VocabularyManager.BlazorApp.Auth;
 using VocabularyManager.BlazorApp.DIExtensions;
@@ -43,4 +45,18 @@ builder.Services.InjectDependencies();
 
 builder.Services.AddBlazorBootstrap();
 
-await builder.Build().RunAsync();
+builder.Services.AddLocalization();
+
+var host = builder.Build();
+
+var jsRuntime = host.Services.GetRequiredService<IJSRuntime>();
+var cultureString = await jsRuntime.InvokeAsync<string?>("blazorCulture.get");
+
+if (!string.IsNullOrEmpty(cultureString))
+{
+    var culture = new CultureInfo(cultureString);
+    CultureInfo.DefaultThreadCurrentCulture = culture;
+    CultureInfo.DefaultThreadCurrentUICulture = culture;
+}
+
+await host.RunAsync();

@@ -1,4 +1,4 @@
-﻿@using FluentValidation
+@using FluentValidation
 @using FluentValidation.Results
 @using VocabularyManager.BlazorApp.Models.Views
 @using VocabularyManager.BlazorApp.Services
@@ -7,6 +7,7 @@
 @inject HttpService HttpService
 @inject HttpPathBuilder HttpPathBuilder
 @inject IValidator<VocabularyView> VocabularyValidator
+@inject IStringLocalizer<SharedResource> SharedLoc
 
 <VocabularyForm Vocabulary="vocabulary"></VocabularyForm>
 <div class="m-1">
@@ -18,8 +19,8 @@
         }
     }
 </div>
-<Button Type="ButtonType.Submit" Color="ButtonColor.Success" @onclick="CreateVocabulary">Create</Button>
-<Button Type="ButtonType.Reset" Color="ButtonColor.Danger" @onclick="OnCloseFunc">Cancel</Button>
+<Button Type="ButtonType.Submit" Color="ButtonColor.Success" @onclick="CreateVocabulary">@SharedLoc["Btn_Create"]</Button>
+<Button Type="ButtonType.Reset" Color="ButtonColor.Danger" @onclick="OnCloseFunc">@SharedLoc["Btn_Cancel"]</Button>
 
 @code {
     [Inject]
@@ -46,12 +47,12 @@
             );
             if (vocabularyCreationResponse.IsSuccessStatusCode)
             {
-                ToastService.Notify(new(ToastType.Success, $"Vocabulary saved successfully."));
+                ToastService.Notify(new(ToastType.Success, SharedLoc["Toast_VocabularySaved"]));
                 await OnCloseFunc();
             }
             else
             {
-                ToastService.Notify(new(ToastType.Danger, $"Vocabulary creation failed."));
+                ToastService.Notify(new(ToastType.Danger, SharedLoc["Toast_VocabularyCreationFailed"]));
             }
         }
         else

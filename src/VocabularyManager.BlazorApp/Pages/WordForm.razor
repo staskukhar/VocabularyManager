@@ -1,7 +1,9 @@
 @using VocabularyManager.BlazorApp.Models.Views
 
+@inject IStringLocalizer<SharedResource> SharedLoc
+
 <div class="input-group mb-2">
-    <span class="input-group-text">Word</span>
+    <span class="input-group-text">@SharedLoc["Label_Word"]</span>
     <InputText class="form-control" @bind-Value="Word.WordContent"></InputText>
 </div>
 

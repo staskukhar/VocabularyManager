@@ -1,11 +1,13 @@
-﻿@using VocabularyManager.BlazorApp.Models.Views
+@using VocabularyManager.BlazorApp.Models.Views
+
+@inject IStringLocalizer<SharedResource> SharedLoc
 
 <div class="input-group mb-2">
-    <span class="input-group-text">Vocabulary's name</span>
+    <span class="input-group-text">@SharedLoc["Label_VocabularyName"]</span>
     <InputText class="form-control" @bind-Value="Vocabulary.Name"></InputText>
 </div>
 <div class="input-group mb-2">
-    <span class="input-group-text">Source url</span>
+    <span class="input-group-text">@SharedLoc["Label_SourceUrl"]</span>
     <InputText class="form-control" @bind-Value="Vocabulary.SourceUrl"></InputText>
 </div>
 

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>1.3</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <data name="Title" xml:space="preserve"><value>Vocabulary craft</value></data>
+  <data name="FromFile" xml:space="preserve"><value>From File</value></data>
+  <data name="ParseSchema" xml:space="preserve"><value>Parse schema</value></data>
+  <data name="FromOxfordVocabulary" xml:space="preserve"><value>From Oxford Vocabulary</value></data>
+  <data name="EnterParsingUrl" xml:space="preserve"><value>Enter a parsing url</value></data>
+  <data name="UrlInvalid" xml:space="preserve"><value>It seems like passed url isn't valid.</value></data>
+  <data name="Oops" xml:space="preserve"><value>Oops!</value></data>
+  <data name="ProblemOccurred" xml:space="preserve"><value>Some problem was occurred!</value></data>
+  <data name="Warning" xml:space="preserve"><value>Warning</value></data>
+  <data name="PleaseSetVocabularyName" xml:space="preserve"><value>Please set the vocabulary's name</value></data>
+  <data name="PleaseSelectVocabulary" xml:space="preserve"><value>Please select a vocabulary</value></data>
+  <data name="GoodJob" xml:space="preserve"><value>Good job!</value></data>
+  <data name="VocabularySavedWithWords" xml:space="preserve"><value>The vocabulary: {0} is saved with {1} words</value></data>
+  <data name="OperationFailed" xml:space="preserve"><value>Sorry, operation failed.</value></data>
+  <data name="Error" xml:space="preserve"><value>Error</value></data>
+  <data name="FailedToLoadVocabularies" xml:space="preserve"><value>Failed to load existing vocabularies</value></data>
+  <data name="FailedToLoadVocabulariesMessage" xml:space="preserve"><value>Failed to load vocabularies: {0}</value></data>
+  <data name="FieldMapping" xml:space="preserve"><value>Field Mapping</value></data>
+  <data name="MapCsvDescription" xml:space="preserve"><value>Map CSV columns to Word properties. Fields marked with * are required.</value></data>
+  <data name="WordFields" xml:space="preserve"><value>Word Fields</value></data>
+  <data name="MeaningFields" xml:space="preserve"><value>Meaning Fields</value></data>
+  <data name="SelectCsvColumn" xml:space="preserve"><value>-- Select CSV Column --</value></data>
+  <data name="SelectCsvColumnOptional" xml:space="preserve"><value>-- Select CSV Column (optional) --</value></data>
+  <data name="FieldIsRequired" xml:space="preserve"><value>This field is required</value></data>
+  <data name="ApplyMapping" xml:space="preserve"><value>Apply Mapping</value></data>
+  <data name="SaveVocabulary" xml:space="preserve"><value>Save Vocabulary</value></data>
+  <data name="CreateNewVocabulary" xml:space="preserve"><value>Create new vocabulary</value></data>
+  <data name="AddToExistingVocabulary" xml:space="preserve"><value>Add to existing vocabulary</value></data>
+  <data name="EnterVocabularyName" xml:space="preserve"><value>Enter vocabulary name</value></data>
+  <data name="VocabularyNameRequired" xml:space="preserve"><value>Vocabulary name is required</value></data>
+  <data name="SelectVocabulary" xml:space="preserve"><value>-- Select Vocabulary --</value></data>
+  <data name="SelectedVocabulary" xml:space="preserve"><value>Selected vocabulary</value></data>
+</root>

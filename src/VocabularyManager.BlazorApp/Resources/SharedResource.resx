@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>1.3</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- Navigation -->
+  <data name="Nav_Home" xml:space="preserve"><value>Home</value></data>
+  <data name="Nav_Search" xml:space="preserve"><value>Search</value></data>
+  <data name="Nav_Craft" xml:space="preserve"><value>Craft</value></data>
+  <data name="Nav_Vocabularies" xml:space="preserve"><value>Vocabularies</value></data>
+  <data name="Nav_MainMenu" xml:space="preserve"><value>Main menu</value></data>
+  <data name="Nav_NavigationMenu" xml:space="preserve"><value>Navigation menu</value></data>
+
+  <!-- Auth -->
+  <data name="Auth_LogIn" xml:space="preserve"><value>Log in</value></data>
+  <data name="Auth_LogOut" xml:space="preserve"><value>Log out</value></data>
+
+  <!-- Buttons -->
+  <data name="Btn_Create" xml:space="preserve"><value>Create</value></data>
+  <data name="Btn_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Btn_Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Btn_Update" xml:space="preserve"><value>Update</value></data>
+  <data name="Btn_Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Btn_Load" xml:space="preserve"><value>Load</value></data>
+  <data name="Btn_Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="Btn_Refresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="Btn_GoBack" xml:space="preserve"><value>Go back</value></data>
+  <data name="Btn_AddMeaning" xml:space="preserve"><value>+ Add Meaning</value></data>
+
+  <!-- States -->
+  <data name="State_Loading" xml:space="preserve"><value>Loading...</value></data>
+  <data name="State_LoadingEllipsis" xml:space="preserve"><value>Loading…</value></data>
+  <data name="State_NoData" xml:space="preserve"><value>No data</value></data>
+  <data name="State_None" xml:space="preserve"><value>None</value></data>
+  <data name="State_Saving" xml:space="preserve"><value>Saving...</value></data>
+
+  <!-- Labels -->
+  <data name="Label_Word" xml:space="preserve"><value>Word</value></data>
+  <data name="Label_Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Label_Vocabulary" xml:space="preserve"><value>Vocabulary</value></data>
+  <data name="Label_VocabularyName" xml:space="preserve"><value>Vocabulary's name</value></data>
+  <data name="Label_SourceUrl" xml:space="preserve"><value>Source url</value></data>
+  <data name="Label_LexemeType" xml:space="preserve"><value>Lexeme Type</value></data>
+  <data name="Label_Level" xml:space="preserve"><value>Level</value></data>
+  <data name="Label_Definition" xml:space="preserve"><value>Definition</value></data>
+  <data name="Label_Meanings" xml:space="preserve"><value>Meanings</value></data>
+  <data name="Label_MeaningsOptional" xml:space="preserve"><value>Meanings (optional)</value></data>
+  <data name="Label_About" xml:space="preserve"><value>About</value></data>
+  <data name="Label_Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Label_WordContent" xml:space="preserve"><value>Word Content</value></data>
+  <data name="Label_Optional" xml:space="preserve"><value>Optional</value></data>
+
+  <!-- Toast messages -->
+  <data name="Toast_OperationFailed" xml:space="preserve"><value>Sorry, operation has failed. Try again later.</value></data>
+  <data name="Toast_VocabularyDeleted" xml:space="preserve"><value>Vocabulary was successfully deleted.</value></data>
+  <data name="Toast_VocabularySaved" xml:space="preserve"><value>Vocabulary saved successfully.</value></data>
+  <data name="Toast_VocabularyCreationFailed" xml:space="preserve"><value>Vocabulary creation failed.</value></data>
+  <data name="Toast_WordCreated" xml:space="preserve"><value>Word was successfully created.</value></data>
+  <data name="Toast_WordCreationFailed" xml:space="preserve"><value>Sorry, creation failed.</value></data>
+  <data name="Toast_WordUpdated" xml:space="preserve"><value>Word was updated.</value></data>
+  <data name="Toast_WordUpdateFailed" xml:space="preserve"><value>Sorry, update operation failed.</value></data>
+  <data name="Toast_WordDeleted" xml:space="preserve"><value>Word was deleted.</value></data>
+  <data name="Toast_WordDeleteFailed" xml:space="preserve"><value>Delete operation couldn't be done.</value></data>
+  <data name="Toast_WordLoadFailed" xml:space="preserve"><value>Failed to load the word.</value></data>
+
+  <!-- Validation -->
+  <data name="Validation_ListNameRequired" xml:space="preserve"><value>List's name is required.</value></data>
+  <data name="Validation_WordContentRequired" xml:space="preserve"><value>Word content is required.</value></data>
+  <data name="Validation_WordContentMaxLength" xml:space="preserve"><value>Word content must not exceed 200 characters.</value></data>
+  <data name="Validation_LexemeTypeMaxLength" xml:space="preserve"><value>Lexeme type must not exceed 100 characters.</value></data>
+  <data name="Validation_DefinitionMaxLength" xml:space="preserve"><value>Definition must not exceed 2000 characters.</value></data>
+  <data name="Validation_LevelMaxLength" xml:space="preserve"><value>Level must not exceed 50 characters.</value></data>
+
+  <!-- App-level -->
+  <data name="App_NotAuthorized" xml:space="preserve"><value>You are not authorized to access this resource.</value></data>
+  <data name="App_CheckingAuth" xml:space="preserve"><value>Checking authentication...</value></data>
+  <data name="App_NotFound" xml:space="preserve"><value>Not found</value></data>
+  <data name="App_NothingAtAddress" xml:space="preserve"><value>Sorry, there's nothing at this address.</value></data>
+
+  <!-- Confirm dialogs -->
+  <data name="Confirm_YesDelete" xml:space="preserve"><value>Yes, delete</value></data>
+  <data name="Confirm_NoCancel" xml:space="preserve"><value>No, cancel</value></data>
+  <data name="Confirm_DeleteWord" xml:space="preserve"><value>Delete word</value></data>
+  <data name="Confirm_DeleteWordMessage" xml:space="preserve"><value>Do you want to delete the word: "{0}"?</value></data>
+
+  <!-- CSV -->
+  <data name="Csv_Empty" xml:space="preserve"><value>CSV content is empty</value></data>
+  <data name="Csv_NoColumns" xml:space="preserve"><value>No columns found in CSV header</value></data>
+
+  <!-- Misc -->
+  <data name="AllVocabularies" xml:space="preserve"><value>All Vocabularies</value></data>
+  <data name="Filter_Clear" xml:space="preserve"><value>clear</value></data>
+  <data name="WordNotFound" xml:space="preserve"><value>Word not found.</value></data>
+  <data name="LoadingWord" xml:space="preserve"><value>Loading word...</value></data>
+  <data name="Meaning_Singular" xml:space="preserve"><value>meaning</value></data>
+  <data name="Meaning_Plural" xml:space="preserve"><value>meanings</value></data>
+  <data name="Meaning_None" xml:space="preserve"><value>No meanings</value></data>
+  <data name="Preview_Title" xml:space="preserve"><value>Preview ({0} words)</value></data>
+  <data name="Ordinal_1" xml:space="preserve"><value>{0}st</value></data>
+  <data name="Ordinal_2" xml:space="preserve"><value>{0}nd</value></data>
+  <data name="Ordinal_3" xml:space="preserve"><value>{0}rd</value></data>
+  <data name="Ordinal_Default" xml:space="preserve"><value>{0}th</value></data>
+</root>

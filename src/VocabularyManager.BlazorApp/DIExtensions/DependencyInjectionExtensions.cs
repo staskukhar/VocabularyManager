@@ -12,6 +12,7 @@ namespace VocabularyManager.BlazorApp.DIExtensions
         {
             services.AddScoped<HttpService>();
             services.AddScoped<IVocabularyStateManager<VocabularyView>, VocabularyStateManager>();
+            services.AddScoped<IRecentlyOpenedService, RecentlyOpenedService>();
             services.AddSingleton<HttpPathBuilder>();
             services.AddValidators();
             return services;

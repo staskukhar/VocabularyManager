@@ -9,6 +9,8 @@
 @inject HttpPathBuilder HttpPathBuilder
 @inject HttpService HttpService
 @inject NavigationManager NavigationManager
+@inject IStringLocalizer<SharedResource> SharedLoc
+@inject IStringLocalizer<WordSearchResource> Loc
 
 <div class="d-flex flex-row">
     <div class="col-md-5 col-sm-12 me-4">
@@ -16,7 +18,7 @@
                       TItem="WordSearchItem"
                       DataProvider="WordDataProvider"
                       PropertyName="DisplayText"
-                      Placeholder="Search a word..."
+                      Placeholder="@Loc["SearchPlaceholder"]"
                       OnChanged="OnWordChosen" />
     </div>
 
@@ -49,7 +51,7 @@
 
         ShortVocabulary defaultVocabulary = new(
                 VocabularyConstants.AllVocabulariesId,
-                VocabularyConstants.AllVocabulariesLabel);
+                SharedLoc["AllVocabularies"]);
         Option<ShortVocabulary> defaultOption = new()
         {
             Value = defaultVocabulary,

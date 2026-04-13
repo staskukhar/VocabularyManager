@@ -1,0 +1,29 @@
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+
+<select class="form-select form-select-sm" style="width: auto;" @onchange="OnLanguageChanged" value="@currentCulture">
+    @foreach (var culture in supportedCultures)
+    {
+        <option value="@culture.Key">@culture.Value</option>
+    }
+</select>
+
+@code {
+    private string currentCulture = System.Globalization.CultureInfo.CurrentUICulture.Name;
+
+    private static readonly Dictionary<string, string> supportedCultures = new()
+    {
+        { "en", "English" },
+        { "uk", "Українська" }
+    };
+
+    private async Task OnLanguageChanged(ChangeEventArgs e)
+    {
+        var newCulture = e.Value?.ToString() ?? "en";
+        if (newCulture != currentCulture)
+        {
+            await JS.InvokeVoidAsync("blazorCulture.set", newCulture);
+            NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+        }
+    }
+}

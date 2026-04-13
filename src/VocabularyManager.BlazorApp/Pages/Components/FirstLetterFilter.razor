@@ -1,6 +1,8 @@
-﻿@namespace VocabularyManager.BlazorApp.Pages.Components
+@namespace VocabularyManager.BlazorApp.Pages.Components
 
-<div class="btn-group" role="group" aria-label="First letter toggle">
+@inject IStringLocalizer<SharedResource> SharedLoc
+
+<div class="btn-group" role="group" aria-label="@SharedLoc["Filter_Clear"]">
     @foreach (char letter in Letters)
     {
         <input
@@ -20,7 +22,7 @@
         @onclick="@(() => OnFilterCleared())"
         name="btnradio"
         autocomplete="off" />
-    <label class="btn btn-outline-danger" for="btn-clear">clear</label>
+    <label class="btn btn-outline-danger" for="btn-clear">@SharedLoc["Filter_Clear"]</label>
 </div>
 
 @code {

@@ -2,6 +2,9 @@ namespace VocabularyManager.BlazorApp.Services
 {
     public class CsvParserService
     {
+        public const string EmptyContentError = "Csv_Empty";
+        public const string NoColumnsError = "Csv_NoColumns";
+
         private const char DefaultDelimiter = ',';
 
         /// <summary>
@@ -14,7 +17,7 @@ namespace VocabularyManager.BlazorApp.Services
                 return new CsvParseResult
                 {
                     IsSuccess = false,
-                    ErrorMessage = "CSV content is empty"
+                    ErrorMessage = EmptyContentError
                 };
             }
 
@@ -24,7 +27,7 @@ namespace VocabularyManager.BlazorApp.Services
                 return new CsvParseResult
                 {
                     IsSuccess = false,
-                    ErrorMessage = "No columns found in CSV header"
+                    ErrorMessage = NoColumnsError
                 };
             }
 

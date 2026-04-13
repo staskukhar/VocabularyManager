@@ -1,16 +1,18 @@
 @using VocabularyManager.BlazorApp.Models.Views
 
+@inject IStringLocalizer<SharedResource> SharedLoc
+
 <div class="border rounded p-2 mb-2">
     <div class="input-group mb-2">
-        <span class="input-group-text">Lexeme Type</span>
+        <span class="input-group-text">@SharedLoc["Label_LexemeType"]</span>
         <InputText class="form-control" @bind-Value="Meaning.LexemeType"></InputText>
     </div>
     <div class="input-group mb-2">
-        <span class="input-group-text">Level</span>
+        <span class="input-group-text">@SharedLoc["Label_Level"]</span>
         <InputText class="form-control" @bind-Value="Meaning.Level"></InputText>
     </div>
     <div class="input-group mb-2">
-        <span class="input-group-text">Definition</span>
+        <span class="input-group-text">@SharedLoc["Label_Definition"]</span>
         <InputTextArea class="form-control" @bind-Value="Meaning.Definition" rows="2"></InputTextArea>
     </div>
     
@@ -18,7 +20,7 @@
         @if (ShowDeleteButton)
         {
             <Button Type="ButtonType.Button" Color="ButtonColor.Danger" Size="Size.Small" @onclick="OnDelete">
-                Remove
+                @SharedLoc["Btn_Remove"]
             </Button>
         }
     </div>

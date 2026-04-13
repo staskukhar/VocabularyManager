@@ -15,18 +15,21 @@
 @inject IVocabularyStateManager<VocabularyView> VocabularyStateManager
 @inject IValidator<WordView> WordValidator
 @inject IValidator<MeaningView> MeaningValidator
+@inject IRecentlyOpenedService RecentlyOpenedService
+@inject IStringLocalizer<SharedResource> SharedLoc
+@inject IStringLocalizer<WordResource> Loc
 
-<PageTitle>@(wordData?.WordContent ?? "Word")</PageTitle>
+<PageTitle>@(wordData?.WordContent ?? Loc["PageTitle"])</PageTitle>
 
 @if (loading)
 {
     <FluentProgressRing />
-    <p class="text-secondary">Loading word...</p>
+    <p class="text-secondary">@SharedLoc["LoadingWord"]</p>
 }
 else if (wordData is null)
 {
-    <FluentMessageBar Intent="MessageIntent.Warning">Word not found.</FluentMessageBar>
-    <FluentButton Appearance="Appearance.Outline" @onclick="GoBack">Go back</FluentButton>
+    <FluentMessageBar Intent="MessageIntent.Warning">@SharedLoc["WordNotFound"]</FluentMessageBar>
+    <FluentButton Appearance="Appearance.Outline" @onclick="GoBack">@SharedLoc["Btn_GoBack"]</FluentButton>
 }
 else
 {
@@ -34,22 +37,22 @@ else
         <div class="card-header">
             <h2 class="fluent-typography-title-2">@wordData.WordContent</h2>
             <div class="card-actions">
-                <FluentButton Appearance="Appearance.Outline" AppearanceVariant="AppearanceVariant.Neutral" @onclick="GoBack">Cancel</FluentButton>
-                <FluentButton Appearance="Appearance.Accent" @onclick="UpdateWord">Update</FluentButton>
-                <FluentButton Appearance="Appearance.Outline" AppearanceVariant="AppearanceVariant.Danger" @onclick="ConfirmDelete">Delete</FluentButton>
+                <FluentButton Appearance="Appearance.Outline" AppearanceVariant="AppearanceVariant.Neutral" @onclick="GoBack">@SharedLoc["Btn_Cancel"]</FluentButton>
+                <FluentButton Appearance="Appearance.Accent" @onclick="UpdateWord">@SharedLoc["Btn_Update"]</FluentButton>
+                <FluentButton Appearance="Appearance.Outline" AppearanceVariant="AppearanceVariant.Danger" @onclick="ConfirmDelete">@SharedLoc["Btn_Delete"]</FluentButton>
             </div>
         </div>
 
         <div class="card-body">
             <WordForm Word="wordData" />
 
-            <h3 class="fluent-typography-subtitle-1 mt-4">Meanings</h3>
+            <h3 class="fluent-typography-subtitle-1 mt-4">@SharedLoc["Label_Meanings"]</h3>
             @foreach (var meaning in wordData.Meanings)
             {
                 <MeaningForm Meaning="meaning" OnDelete="@(() => RemoveMeaning(meaning))" />
             }
             <FluentButton Appearance="Appearance.Outline" AppearanceVariant="AppearanceVariant.Neutral" Size="Size.Small" @onclick="AddMeaning">
-                + Add Meaning
+                @SharedLoc["Btn_AddMeaning"]
             </FluentButton>
 
             @if (validationErrors.Count > 0)
@@ -95,12 +98,15 @@ else
             {
                 wordData = await response.Content.ReadFromJsonAsync<WordView>();
                 if (wordData is not null)
+                {
                     wordData = WordCloner.CloneWord(wordData);
+                    await RecentlyOpenedService.RecordWord(wordData.Id, wordData.WordContent);
+                }
             }
             else
             {
                 wordData = null;
-                ToastService.Notify(new ToastMessage(ToastType.Danger, $"Failed to load the word."));
+                ToastService.Notify(new ToastMessage(ToastType.Danger, SharedLoc["Toast_WordLoadFailed"]));
             }
         }
         finally
@@ -154,13 +160,13 @@ else
 
         if (updateResponse.IsSuccessStatusCode)
         {
-            ToastService.Notify(new ToastMessage(ToastType.Info, "Word was updated."));
+            ToastService.Notify(new ToastMessage(ToastType.Info, SharedLoc["Toast_WordUpdated"]));
             await VocabularyStateManager.Update();
             wordData = WordCloner.CloneWord(wordData);
         }
         else
         {
-            ToastService.Notify(new ToastMessage(ToastType.Danger, "Sorry, update operation failed."));
+            ToastService.Notify(new ToastMessage(ToastType.Danger, SharedLoc["Toast_WordUpdateFailed"]));
         }
     }
 
@@ -170,14 +176,14 @@ else
 
         ConfirmDialogOptions options = new()
         {
-            YesButtonText = "Yes, delete",
+            YesButtonText = SharedLoc["Confirm_YesDelete"],
             YesButtonColor = ButtonColor.Danger,
-            NoButtonText = "No, cancel",
+            NoButtonText = SharedLoc["Confirm_NoCancel"],
             NoButtonColor = ButtonColor.Secondary
         };
         bool deleteForSure = await deleteConfirmationDialog.ShowAsync(
-            "Delete word",
-            $"Do you want to delete the word: \"{wordData.WordContent}\"?",
+            SharedLoc["Confirm_DeleteWord"],
+            string.Format(SharedLoc["Confirm_DeleteWordMessage"], wordData.WordContent),
             options
         );
         if (deleteForSure) await DeleteWord();
@@ -192,13 +198,13 @@ else
         );
         if (deleteResponse.IsSuccessStatusCode)
         {
-            ToastService.Notify(new ToastMessage(ToastType.Info, "Word was deleted."));
+            ToastService.Notify(new ToastMessage(ToastType.Info, SharedLoc["Toast_WordDeleted"]));
             await VocabularyStateManager.Update();
             await GoBack();
         }
         else
         {
-            ToastService.Notify(new ToastMessage(ToastType.Danger, "Delete operation couldn't be done."));
+            ToastService.Notify(new ToastMessage(ToastType.Danger, SharedLoc["Toast_WordDeleteFailed"]));
         }
     }
 }

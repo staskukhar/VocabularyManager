@@ -1,3 +1,6 @@
+using Microsoft.Extensions.Localization;
+using VocabularyManager.BlazorApp.Resources;
+
 namespace VocabularyManager.BlazorApp.Models
 {
     /// <summary>
@@ -22,33 +25,33 @@ namespace VocabularyManager.BlazorApp.Models
         public const string Level = "Level";
         public const string Definition = "Definition";
 
-        public static List<CsvFieldMapping> GetMappingFields() => new()
+        public static List<CsvFieldMapping> GetMappingFields(IStringLocalizer<SharedResource> localizer) => new()
         {
             new CsvFieldMapping
             {
                 ModelProperty = WordContent,
-                ModelPropertyDisplayName = "Word Content",
+                ModelPropertyDisplayName = localizer["Label_WordContent"],
                 IsRequired = true,
                 IsMeaningProperty = false
             },
             new CsvFieldMapping
             {
                 ModelProperty = LexemeType,
-                ModelPropertyDisplayName = "Lexeme Type",
+                ModelPropertyDisplayName = localizer["Label_LexemeType"],
                 IsRequired = false,
                 IsMeaningProperty = true
             },
             new CsvFieldMapping
             {
                 ModelProperty = Level,
-                ModelPropertyDisplayName = "Level",
+                ModelPropertyDisplayName = localizer["Label_Level"],
                 IsRequired = false,
                 IsMeaningProperty = true
             },
             new CsvFieldMapping
             {
                 ModelProperty = Definition,
-                ModelPropertyDisplayName = "Definition",
+                ModelPropertyDisplayName = localizer["Label_Definition"],
                 IsRequired = false,
                 IsMeaningProperty = true
             }

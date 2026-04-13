@@ -1,17 +1,20 @@
 @using VocabularyManager.UseCases.DTOs
 
+@inject IStringLocalizer<VocabularyCreatorResource> Loc
+@inject IStringLocalizer<SharedResource> SharedLoc
+
 <div class="col mb-3 mt-3">
-    <label>Enter a parsing url</label>
+    <label>@Loc["EnterParsingUrl"]</label>
     <div class="input-group">
         <input class="form-control" @bind="Url" @bind:event="oninput" @onkeyup="ValidateUrl" />
         <a class="btn btn-outline-dark @(IsUrlValid && !IsLoading ? "" : "disabled")"
            @onclick="OnLoadClick">
-            Load
+            @SharedLoc["Btn_Load"]
         </a>
     </div>
     @if (!IsUrlValid)
     {
-        <span class="text-danger">"It seems like passed url isn't valid."</span>
+        <span class="text-danger">@Loc["UrlInvalid"]</span>
     }
 </div>
 

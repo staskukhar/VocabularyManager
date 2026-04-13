@@ -1,9 +1,12 @@
 @using VocabularyManager.BlazorApp.Models
 @using VocabularyManager.BlazorApp.Models.Views
 
+@inject IStringLocalizer<SharedResource> SharedLoc
+@inject IStringLocalizer<VocabularyCreatorResource> Loc
+
 <div class="card mb-3">
     <div class="card-header">
-        <h5 class="mb-0">Save Vocabulary</h5>
+        <h5 class="mb-0">@Loc["SaveVocabulary"]</h5>
     </div>
     <div class="card-body">
         <div class="row mb-3">
@@ -12,7 +15,7 @@
                     <input class="form-check-input" type="radio" name="saveOption" id="saveNew" 
                            checked="@SaveToNewVocabulary" @onchange="@(() => SetSaveOption(true))" />
                     <label class="form-check-label" for="saveNew">
-                        Create new vocabulary
+                        @Loc["CreateNewVocabulary"]
                     </label>
                 </div>
             </div>
@@ -21,7 +24,7 @@
                     <input class="form-check-input" type="radio" name="saveOption" id="saveExisting"
                            checked="@(!SaveToNewVocabulary)" @onchange="@(() => SetSaveOption(false))" />
                     <label class="form-check-label" for="saveExisting">
-                        Add to existing vocabulary
+                        @Loc["AddToExistingVocabulary"]
                     </label>
                 </div>
             </div>
@@ -30,13 +33,13 @@
         @if (SaveToNewVocabulary)
         {
             <div class="input-group mb-3">
-                <span class="input-group-text">Name</span>
+                <span class="input-group-text">@SharedLoc["Label_Name"]</span>
                 <input class="form-control @(!IsVocabularyNameValid ? "is-invalid" : "")" 
-                       @bind="VocabularyName" @bind:event="oninput" placeholder="Enter vocabulary name" />
+                       @bind="VocabularyName" @bind:event="oninput" placeholder="@Loc["EnterVocabularyName"]" />
                 @if (!IsVocabularyNameValid)
                 {
                     <div class="invalid-feedback">
-                        Vocabulary name is required
+                        @Loc["VocabularyNameRequired"]
                     </div>
                 }
             </div>
@@ -44,10 +47,10 @@
         else
         {
             <div class="input-group mb-3">
-                <span class="input-group-text">Vocabulary</span>
+                <span class="input-group-text">@SharedLoc["Label_Vocabulary"]</span>
                 <select class="form-select @(SelectedVocabularyId == 0 ? "is-invalid" : "")" 
                         @bind="SelectedVocabularyId">
-                    <option value="0">-- Select Vocabulary --</option>
+                    <option value="0">@Loc["SelectVocabulary"]</option>
                     @foreach (VocabularyView vocab in ExistingVocabularies)
                     {
                         <option value="@vocab.Id">@vocab.Name</option>
@@ -56,18 +59,18 @@
                 @if (SelectedVocabularyId == 0)
                 {
                     <div class="invalid-feedback">
-                        Please select a vocabulary
+                        @Loc["PleaseSelectVocabulary"]
                     </div>
                 }
                 <Button Color="ButtonColor.Secondary" @onclick="OnRefreshClick" 
                         Disabled="@IsLoadingVocabularies">
-                    @(IsLoadingVocabularies ? "Loading..." : "Refresh")
+                    @(IsLoadingVocabularies ? SharedLoc["State_Loading"] : SharedLoc["Btn_Refresh"])
                 </Button>
             </div>
         }
         
         <Button Color="ButtonColor.Primary" @onclick="OnSaveClick" Disabled="@IsSaving">
-            @(IsSaving ? "Saving..." : "Save Vocabulary")
+            @(IsSaving ? SharedLoc["State_Saving"] : Loc["SaveVocabulary"])
         </Button>
     </div>
 </div>
@@ -75,7 +78,7 @@
 @if (IsSaving)
 {
     <div class="text-primary text-center align-content-center">
-        Saving...
+        @SharedLoc["State_Saving"]
     </div>
 }
 

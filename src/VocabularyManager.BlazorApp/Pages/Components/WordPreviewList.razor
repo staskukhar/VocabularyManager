@@ -1,7 +1,9 @@
 @using VocabularyManager.UseCases.DTOs
 
+@inject IStringLocalizer<SharedResource> SharedLoc
+
 <div class="flex-row">
-    <h5>Preview (@Words.Count words)</h5>
+    <h5>@string.Format(SharedLoc["Preview_Title"], Words.Count)</h5>
     @for (int i = StartOfPage(CurrentPage); i < EndOfPage(CurrentPage); i++)
     {
         <div class="card mb-1 p-2 border-1 bg-transparent">
@@ -11,12 +13,12 @@
                 @if (Words[i].Meanings?.Any() == true)
                 {
                     <span class="badge bg-secondary ms-2">
-                        @Words[i].Meanings.Count @(Words[i].Meanings.Count == 1 ? "meaning" : "meanings")
+                        @Words[i].Meanings.Count @(Words[i].Meanings.Count == 1 ? SharedLoc["Meaning_Singular"] : SharedLoc["Meaning_Plural"])
                     </span>
                 }
                 else
                 {
-                    <span class="badge bg-light text-muted ms-2">No meanings</span>
+                    <span class="badge bg-light text-muted ms-2">@SharedLoc["Meaning_None"]</span>
                 }
             </div>
         </div>
@@ -47,10 +49,10 @@
 
     private string PositionLabelText(int index)
     {
-        if (index == 1) return string.Concat(index, "st");
-        else if (index == 2) return string.Concat(index, "nd");
-        else if (index == 3) return string.Concat(index, "rd");
-        else return string.Concat(index, "th");
+        if (index == 1) return string.Format(SharedLoc["Ordinal_1"], index);
+        else if (index == 2) return string.Format(SharedLoc["Ordinal_2"], index);
+        else if (index == 3) return string.Format(SharedLoc["Ordinal_3"], index);
+        else return string.Format(SharedLoc["Ordinal_Default"], index);
     }
 
     private async Task OnPageChangedAsync(int newPageNumber)

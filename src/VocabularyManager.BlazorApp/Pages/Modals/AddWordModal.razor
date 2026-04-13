@@ -9,17 +9,18 @@
 @inject IVocabularyStateManager<VocabularyView> VocabularyStateManager
 @inject IValidator<WordView> WordValidator
 @inject IValidator<MeaningView> MeaningValidator
+@inject IStringLocalizer<SharedResource> SharedLoc
 
 <WordForm Word="word"></WordForm>
 
 <div class="mt-3">
-    <h6>Meanings (optional)</h6>
+    <h6>@SharedLoc["Label_MeaningsOptional"]</h6>
     @foreach (var meaning in word.Meanings)
     {
         <MeaningForm Meaning="meaning" OnDelete="@(() => RemoveMeaning(meaning))" />
     }
     <Button Type="ButtonType.Button" Color="ButtonColor.Primary" Size="Size.Small" @onclick="AddMeaning">
-        + Add Meaning
+        @SharedLoc["Btn_AddMeaning"]
     </Button>
 </div>
 
@@ -34,8 +35,8 @@
 </div>
 
 <div class="mt-2">
-    <Button Type="ButtonType.Submit" Color="ButtonColor.Success" @onclick="CreateWord">Create</Button>
-    <Button Type="ButtonType.Reset" Color="ButtonColor.Danger" @onclick="OnCloseFunc">Cancel</Button>
+    <Button Type="ButtonType.Submit" Color="ButtonColor.Success" @onclick="CreateWord">@SharedLoc["Btn_Create"]</Button>
+    <Button Type="ButtonType.Reset" Color="ButtonColor.Danger" @onclick="OnCloseFunc">@SharedLoc["Btn_Cancel"]</Button>
 </div>
 
 @code {
@@ -92,13 +93,13 @@
 
         if (wordCreationResponse.IsSuccessStatusCode)
         {
-            ToastService.Notify(new(ToastType.Info, "Word was successfully created."));
+            ToastService.Notify(new(ToastType.Info, SharedLoc["Toast_WordCreated"]));
             await VocabularyStateManager.Update();
             await OnCloseFunc();
         }
         else
         {
-            ToastService.Notify(new(ToastType.Danger, "Sorry, creation failed."));
+            ToastService.Notify(new(ToastType.Danger, SharedLoc["Toast_WordCreationFailed"]));
         }
     }
 }

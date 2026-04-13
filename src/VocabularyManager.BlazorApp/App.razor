@@ -1,3 +1,5 @@
+@inject IStringLocalizer<SharedResource> Loc
+
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
@@ -9,19 +11,19 @@
                     }
                     else
                     {
-                        <p role="alert">You are not authorized to access this resource.</p>
+                        <p role="alert">@Loc["App_NotAuthorized"]</p>
                     }
                 </NotAuthorized>
                 <Authorizing>
-                    <p>Checking authentication...</p>
+                    <p>@Loc["App_CheckingAuth"]</p>
                 </Authorizing>
             </AuthorizeRouteView>
             <FocusOnNavigate RouteData="@routeData" Selector="h1" />
         </Found>
         <NotFound>
-            <PageTitle>Not found</PageTitle>
+            <PageTitle>@Loc["App_NotFound"]</PageTitle>
             <LayoutView Layout="@typeof(MainLayout)">
-                <p role="alert">Sorry, there's nothing at this address.</p>
+                <p role="alert">@Loc["App_NothingAtAddress"]</p>
             </LayoutView>
         </NotFound>
     </Router>

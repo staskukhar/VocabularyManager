@@ -6,13 +6,14 @@
 @using VocabularyManager.BlazorApp.Pages.Components
 
 @inject IVocabularyStateManager<VocabularyView> VocabularyStateManager
+@inject IStringLocalizer<VocabulariesResource> Loc
 
 @implements IDisposable
 
 <Modal @ref="_addWordModal"></Modal>
 <div class="m-2">
     <Button @onclick="ShowAddWordModal" Type="ButtonType.Submit" Color="ButtonColor.Success">
-        Add new
+        @Loc["AddNew"]
     </Button>
 </div>
 <div class="m-2">
@@ -33,7 +34,7 @@
 }
 else
 {
-    <span class="text-secondary">No data</span>
+    <span class="text-secondary">@Loc["NoListLoaded"]</span>
 }
 
 @code {
@@ -88,7 +89,7 @@ else
     {
         Dictionary<string, object> parameters = [];
         parameters.Add("OnCloseFunc", (object)OnCloseModal);
-        await _addWordModal.ShowAsync<AddWordModal>(title: "Add word", parameters: parameters);
+        await _addWordModal.ShowAsync<AddWordModal>(title: Loc["AddWord"], parameters: parameters);
     }
 
     private async Task OnCloseModal()
@@ -100,7 +101,6 @@ else
 
     private int EndOfPage(int currentPage)
     {
-        // the code help to prevent exception index out of... when we try get last page
         int end = currentPage * AmountWordsOnPage;
         return end > _filteredWords.Count ? _filteredWords.Count : end;
     }

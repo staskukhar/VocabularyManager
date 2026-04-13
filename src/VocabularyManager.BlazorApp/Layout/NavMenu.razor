@@ -1,7 +1,9 @@
+@inject IStringLocalizer<SharedResource> Loc
+
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">Main menu</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+        <a class="navbar-brand" href="">@Loc["Nav_MainMenu"]</a>
+        <button title="@Loc["Nav_NavigationMenu"]" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
     </div>
@@ -11,22 +13,22 @@
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> @Loc["Nav_Home"]
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="search">
-                <span class="bi bi-search-nav-menu" aria-hidden="true"></span> Search
+                <span class="bi bi-search-nav-menu" aria-hidden="true"></span> @Loc["Nav_Search"]
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="vocabularycraft">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Craft
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @Loc["Nav_Craft"]
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="vocabulary">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Vocabularies
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @Loc["Nav_Vocabularies"]
             </NavLink>
         </div>
     </nav>

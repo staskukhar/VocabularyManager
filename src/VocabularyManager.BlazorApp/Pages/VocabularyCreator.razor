@@ -9,18 +9,20 @@
 
 @inject HttpService HttpService
 @inject HttpPathBuilder HttpPathBuilder
+@inject IStringLocalizer<SharedResource> SharedLoc
+@inject IStringLocalizer<VocabularyCreatorResource> Loc
 
 <div class="container bg-light rounded-1 border-2">
-    <h3>Vocabulary craft</h3>
+    <h3>@Loc["Title"]</h3>
     <div class="row">
         <Tabs>
-            <Tab Title="From File">
+            <Tab Title="@Loc["FromFile"]">
                 <Content>
                     <div class="col mb-3 mt-3">
                         <div class="input-group mb-2">
                             <InputFile OnChange="LoadFiles" class="form-control" accept=".csv" />
                             <Button Color="ButtonColor.Primary" @onclick="ParseSchema" Disabled="@(csvContent.Count == 0)">
-                                Parse schema
+                                @Loc["ParseSchema"]
                             </Button>
                         </div>
                         
@@ -37,13 +39,13 @@
                         else if (csvParseResult != null && !csvParseResult.IsSuccess)
                         {
                             <div class="alert alert-danger mt-2">
-                                @csvParseResult.ErrorMessage
+                                @SharedLoc[csvParseResult.ErrorMessage!]
                             </div>
                         }
                     </div>
                 </Content>
             </Tab>
-            <Tab Title="From Oxford Vocabulary">
+            <Tab Title="@Loc["FromOxfordVocabulary"]">
                 <Content>
                     <OxfordVocabularyLoader 
                         IsLoading="areWordsLoading"
@@ -72,7 +74,7 @@
         else if (areWordsLoading)
         {
             <div class="text-primary text-center align-content-center">
-                Loading...
+                @SharedLoc["State_Loading"]
             </div>
         }
     </div>
@@ -119,7 +121,7 @@
         }
         else
         {
-            await ShowModalMessage(title: "Opps!", message: "Some problem was occured!");
+            await ShowModalMessage(title: Loc["Oops"], message: Loc["ProblemOccurred"]);
         }
 
         areWordsLoading = false;
@@ -154,7 +156,7 @@
         
         if (csvParseResult.IsSuccess)
         {
-            fieldMappings = WordModelProperties.GetMappingFields();
+            fieldMappings = WordModelProperties.GetMappingFields(SharedLoc);
             showMappingUI = true;
         }
     }
@@ -185,7 +187,6 @@
                 if (string.IsNullOrEmpty(mapping.CsvColumnName))
                     continue;
 
-                // Skip meaning properties if includeMeanings is false
                 if (mapping.IsMeaningProperty && !includeMeanings)
                     continue;
 
@@ -264,7 +265,7 @@
     {
         if (string.IsNullOrEmpty(vocabularyName))
         {
-            await ShowModalMessage("Warning", "Please set the vocabulary's name");
+            await ShowModalMessage(Loc["Warning"], Loc["PleaseSetVocabularyName"]);
             return;
         }
 
@@ -275,7 +276,7 @@
         
         if (!vocabularyCreationResponse.IsSuccessStatusCode)
         {
-            await ShowModalMessage("Opps!", await vocabularyCreationResponse.Content.ReadAsStringAsync());
+            await ShowModalMessage(Loc["Oops"], await vocabularyCreationResponse.Content.ReadAsStringAsync());
             return;
         }
 
@@ -287,12 +288,12 @@
     {
         if (vocabularyId == 0)
         {
-            await ShowModalMessage("Warning", "Please select a vocabulary");
+            await ShowModalMessage(Loc["Warning"], Loc["PleaseSelectVocabulary"]);
             return;
         }
 
         VocabularyView? selectedVocab = existingVocabularies.FirstOrDefault(v => v.Id == vocabularyId);
-        string vocabName = selectedVocab?.Name ?? "Selected vocabulary";
+        string vocabName = selectedVocab?.Name ?? Loc["SelectedVocabulary"];
         await SaveWordsToVocabulary(vocabularyId, vocabName);
     }
 
@@ -305,11 +306,11 @@
         
         if (wordsSavingResponse.IsSuccessStatusCode)
         {
-            await ShowModalMessage("Good job!", $"The vocabulary: {vocabularyName} is saved with {WordList.Count} words");
+            await ShowModalMessage(Loc["GoodJob"], string.Format(Loc["VocabularySavedWithWords"], vocabularyName, WordList.Count));
         }
         else
         {
-            await ShowModalMessage("Opps!", "Sorry, operation failed.");
+            await ShowModalMessage(Loc["Oops"], Loc["OperationFailed"]);
         }
     }
 
@@ -329,12 +330,12 @@
             }
             else
             {
-                await ShowModalMessage("Error", "Failed to load existing vocabularies");
+                await ShowModalMessage(Loc["Error"], Loc["FailedToLoadVocabularies"]);
             }
         }
         catch (Exception ex)
         {
-            await ShowModalMessage("Error", $"Failed to load vocabularies: {ex.Message}");
+            await ShowModalMessage(Loc["Error"], string.Format(Loc["FailedToLoadVocabulariesMessage"], ex.Message));
         }
         finally
         {
