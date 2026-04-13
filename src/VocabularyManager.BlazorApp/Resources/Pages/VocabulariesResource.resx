@@ -41,4 +41,6 @@
   <data name="NoVocabularyFound" xml:space="preserve"><value>Sorry, no vocabulary found!</value></data>
   <data name="AddNew" xml:space="preserve"><value>Add new</value></data>
   <data name="AddWord" xml:space="preserve"><value>Add word</value></data>
+  <data name="Btn_Unload" xml:space="preserve"><value>Unload</value></data>
+  <data name="NoVocabulariesFound" xml:space="preserve"><value>No vocabularies found</value></data>
 </root>

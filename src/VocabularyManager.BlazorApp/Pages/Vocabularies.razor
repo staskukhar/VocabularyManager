@@ -2,6 +2,7 @@
 
 @using VocabularyManager.BlazorApp.Models.Views
 @using VocabularyManager.BlazorApp.Pages.Modals
+@using VocabularyManager.BlazorApp.Pages.Components
 @using VocabularyManager.BlazorApp.Services
 @using VocabularyManager.BlazorApp.Interfaces
 
@@ -9,6 +10,7 @@
 @inject HttpService HttpService
 @inject IVocabularyStateManager<VocabularyView> VocabularyStateManager
 @inject IRecentlyOpenedService RecentlyOpenedService
+@inject NavigationManager NavigationManager
 @inject IStringLocalizer<SharedResource> SharedLoc
 @inject IStringLocalizer<VocabulariesResource> Loc
 
@@ -40,6 +42,14 @@
     </div>
     @if(VocabularyStateManager.Vocabulary is not null)
     {
+        <div class="me-1">
+            <Button
+                    Type="ButtonType.Button"
+                    Color="ButtonColor.Secondary"
+                    @onclick="UnloadVocabulary">
+                @Loc["Btn_Unload"]
+            </Button>
+        </div>
         <div>
             <Button
                     Type="ButtonType.Button"
@@ -52,7 +62,7 @@
 </div>
 @if (vocabularyLoading)
 {
-<div class="text-info">@SharedLoc["State_Loading"]</div>
+    <div class="text-info">@SharedLoc["State_Loading"]</div>
 }
 else
 {
@@ -73,7 +83,30 @@ else
     }
     else
     {
-        <div class="text-info">@Loc["NoListLoaded"]</div>
+        @if (_vocabularyListLoading)
+        {
+            <div class="text-info">@SharedLoc["State_Loading"]</div>
+        }
+        else if (_filteredVocabularies.Count == 0 && listOfVocabularies is not null)
+        {
+            <div class="text-info">@Loc["NoVocabulariesFound"]</div>
+        }
+        else if (listOfVocabularies is not null)
+        {
+            <div class="m-2">
+                <FirstLetterFilter
+                    Letters="_allVocabularyLetters"
+                    OnChange="OnFilterChanged"
+                    OnFilterCleared="OnFilterCleared" />
+            </div>
+            @for (int i = StartOfPage(_currentPage); i < EndOfPage(_currentPage); i++)
+            {
+                <VocabularyPlate Vocabulary="@_filteredVocabularies[i]" />
+            }
+            <Pagination ActivePageNumber="@_currentPage"
+                        TotalPages="@((int)Math.Ceiling(_filteredVocabularies.Count * 1m / VocabulariesPerPage))"
+                        PageChanged="OnPageChangedAsync" />
+        }
     }
 }
 <ConfirmDialog @ref="dialog"></ConfirmDialog>
@@ -88,8 +121,15 @@ else
     private string? vocabularyName;
     private IEnumerable<VocabularyView>? listOfVocabularies;
     private bool vocabularyLoading = false;
+    private bool _vocabularyListLoading = false;
     private Modal createVocabularyModal = default!;
     private ConfirmDialog dialog = default!;
+
+    private IList<VocabularyView> _filteredVocabularies = [];
+    private IEnumerable<char> _allVocabularyLetters = [];
+    private char? _activeFilter;
+    private int _currentPage = 1;
+    private const int VocabulariesPerPage = 20;
 
     protected override void OnInitialized()
     {
@@ -101,12 +141,43 @@ else
         await TryToLoadVocabulary();
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        await EnsureVocabulariesLoaded();
+    }
+
+    private async Task EnsureVocabulariesLoaded()
+    {
+        if (listOfVocabularies is null)
+        {
+            _vocabularyListLoading = true;
+            listOfVocabularies = await GetVocabulariesAsync();
+            _vocabularyListLoading = false;
+            RefreshFilteredList();
+        }
+    }
+
+    private void RefreshFilteredList()
+    {
+        var ordered = (listOfVocabularies ?? []).OrderBy(v => v.Name).ToList();
+
+        _allVocabularyLetters = ordered
+            .Select(v => v.Name.ToLower().FirstOrDefault())
+            .Where(c => c != default)
+            .Distinct();
+
+        _filteredVocabularies = _activeFilter.HasValue
+            ? ordered.Where(v => v.Name.ToLower().FirstOrDefault() == _activeFilter.Value).ToList()
+            : ordered;
+    }
+
     private async Task<AutoCompleteDataProviderResult<VocabularyView>> VocabulariesDataProvider(
     AutoCompleteDataProviderRequest<VocabularyView> request)
     {
         if(listOfVocabularies is null)
         {
             listOfVocabularies = await GetVocabulariesAsync();
+            RefreshFilteredList();
         }
 
         return await Task.FromResult(request.ApplyTo(listOfVocabularies.OrderBy(wl => wl.Name)));
@@ -158,6 +229,7 @@ else
         }
         return null;
     }
+
     private async Task TryToLoadVocabulary()
     {
         if(VocabularyId is not null)
@@ -170,6 +242,45 @@ else
                     VocabularyStateManager.Vocabulary.Name);
             }
         }
+    }
+
+    private void UnloadVocabulary()
+    {
+        VocabularyStateManager.Pop();
+        VocabularyId = null;
+        NavigationManager.NavigateTo("/vocabulary");
+    }
+
+    private void OnFilterChanged(char letter)
+    {
+        _activeFilter = letter;
+        _filteredVocabularies = (listOfVocabularies ?? [])
+            .Where(v => v.Name.ToLower().FirstOrDefault() == letter)
+            .OrderBy(v => v.Name)
+            .ToList();
+        _currentPage = 1;
+        StateHasChanged();
+    }
+
+    private void OnFilterCleared()
+    {
+        _activeFilter = null;
+        _filteredVocabularies = (listOfVocabularies ?? []).OrderBy(v => v.Name).ToList();
+        _currentPage = 1;
+        StateHasChanged();
+    }
+
+    private async Task OnPageChangedAsync(int newPageNumber)
+    {
+        await Task.Run(() => { _currentPage = newPageNumber; });
+    }
+
+    private int StartOfPage(int currentPage) => (currentPage - 1) * VocabulariesPerPage;
+
+    private int EndOfPage(int currentPage)
+    {
+        int end = currentPage * VocabulariesPerPage;
+        return end > _filteredVocabularies.Count ? _filteredVocabularies.Count : end;
     }
 
     private async Task CreateVocabularyModal()
@@ -186,6 +297,7 @@ else
     {
         await createVocabularyModal.HideAsync();
         listOfVocabularies = await GetVocabulariesAsync();
+        RefreshFilteredList();
     }
 
     private async Task DeleteVocabularyDialog()
@@ -212,6 +324,8 @@ else
             {
                 ToastService.Notify(new ToastMessage(ToastType.Success, SharedLoc["Toast_VocabularyDeleted"]));
                 VocabularyStateManager.Pop();
+                listOfVocabularies = await GetVocabulariesAsync();
+                RefreshFilteredList();
             }
             else
             {
