@@ -6,6 +6,8 @@ namespace VocabularyManager.UseCases.Interfaces
     {
         Task<Word> GetWordById(int wordId);
 
+        Task<Word> GetGlobalWord(int wordId);
+
         Task<int> DeleteWordById(int wordId);
 
         Task UpdateWord(Word word);

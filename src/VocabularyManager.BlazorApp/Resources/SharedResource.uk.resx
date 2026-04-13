@@ -115,6 +115,7 @@
 
   <!-- Інше -->
   <data name="AllVocabularies" xml:space="preserve"><value>Усі словники</value></data>
+  <data name="Global" xml:space="preserve"><value>Глобальний</value></data>
   <data name="Filter_Clear" xml:space="preserve"><value>очистити</value></data>
   <data name="WordNotFound" xml:space="preserve"><value>Слово не знайдено.</value></data>
   <data name="LoadingWord" xml:space="preserve"><value>Завантаження слова...</value></data>

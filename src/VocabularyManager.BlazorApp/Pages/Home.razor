@@ -91,8 +91,12 @@
                         <ul class="list-group list-group-flush">
                             @foreach (RecentItem item in recentWords)
                             {
-                                <li class="list-group-item">
-                                    <a href="/word/@item.Id" class="text-primary text-decoration-none fw-medium">@item.Name</a>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <a href="@GetWordLink(item)" class="text-primary text-decoration-none fw-medium">@item.Name</a>
+                                    @if (item.IsGlobalMode)
+                                    {
+                                        <span class="badge bg-info ms-2">@SharedLoc["Global"]</span>
+                                    }
                                 </li>
                             }
                         </ul>
@@ -177,4 +181,10 @@
         }
     }
 
+    private static string GetWordLink(RecentItem item)
+    {
+        return item.IsGlobalMode
+            ? $"/word/{item.Id}?globalMode=true"
+            : $"/word/{item.Id}";
+    }
 }

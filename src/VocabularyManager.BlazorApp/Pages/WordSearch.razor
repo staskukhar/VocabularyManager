@@ -9,10 +9,11 @@
 @inject HttpPathBuilder HttpPathBuilder
 @inject HttpService HttpService
 @inject NavigationManager NavigationManager
+@inject GlobalModeState GlobalModeState
 @inject IStringLocalizer<SharedResource> SharedLoc
 @inject IStringLocalizer<WordSearchResource> Loc
 
-<div class="d-flex flex-row">
+<div class="d-flex flex-row align-items-center">
     <div class="col-md-5 col-sm-12 me-4">
         <AutoComplete @bind-Value="wordName"
                       TItem="WordSearchItem"
@@ -26,19 +27,28 @@
         OptionText="@(v => v.Text)"
         OptionValue="@(v => v.Value?.Name)"
         OptionSelected="@(v => v.Selected)"
-        @bind-SelectedOption="@selectedVocabulary" />
+        @bind-SelectedOption="@selectedVocabulary"
+        Disabled="@globalMode" />
+
+    <FluentSwitch class="ms-4"
+                  @bind-Value="@globalMode"
+                  @bind-Value:after="OnGlobalModeChanged">
+        @Loc["GlobalMode"]
+    </FluentSwitch>
 </div>
 
 @code {
     [Inject] protected ToastService ToastService { get; set; } = default!;
 
     private string? wordName;
+    private bool globalMode;
     private Option<ShortVocabulary> selectedVocabulary = default!;
     private IEnumerable<VocabularyView> vocabulariesWithWords = [];
     private List<Option<ShortVocabulary>> vocabularyOptions = [];
 
     protected override async Task OnInitializedAsync()
     {
+        globalMode = GlobalModeState.IsEnabled;
         vocabulariesWithWords = await LoadVocabulariesWithWordsAsync();
 
         vocabularyOptions = vocabulariesWithWords
@@ -62,6 +72,11 @@
         vocabularyOptions.Add(defaultOption);
     }
 
+    private void OnGlobalModeChanged()
+    {
+        GlobalModeState.IsEnabled = globalMode;
+    }
+
     private async Task<AutoCompleteDataProviderResult<WordSearchItem>> WordDataProvider(
         AutoCompleteDataProviderRequest<WordSearchItem> request)
     {
@@ -72,6 +87,18 @@
 
     private IEnumerable<WordSearchItem> GetWordSearchItems()
     {
+        if (globalMode)
+        {
+            return vocabulariesWithWords
+                .SelectMany(v => v.Words)
+                .GroupBy(w => w.WordContent, StringComparer.OrdinalIgnoreCase)
+                .Select(g => new WordSearchItem
+                {
+                    Word = g.First(),
+                    VocabularyName = SharedLoc["Global"]
+                });
+        }
+
         IEnumerable<VocabularyView> sources = selectedVocabulary.Value?.Id == VocabularyConstants.AllVocabulariesId
             ? vocabulariesWithWords
             : vocabulariesWithWords.Where(v => v.Id == selectedVocabulary.Value?.Id);
@@ -91,7 +118,12 @@
 
     private void OnWordChosen(WordSearchItem? item)
     {
-        if (item is not null)
-            NavigationManager.NavigateTo($"/word/{item.Word.Id}");
+        if (item is null) return;
+
+        string url = globalMode
+            ? $"/word/{item.Word.Id}?globalMode=true"
+            : $"/word/{item.Word.Id}";
+
+        NavigationManager.NavigateTo(url);
     }
 }

@@ -43,6 +43,8 @@ namespace VocabularyManager.BlazorApp.Models.Configurations
 
         public string GetById { get; set; } = string.Empty;
 
+        public string GetGlobal { get; set; } = string.Empty;
+
         public string Get { get; set; } = string.Empty;
 
         public string Add { get; set; } = string.Empty;

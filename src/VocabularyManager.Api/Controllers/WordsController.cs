@@ -32,6 +32,13 @@ namespace VocabularyManager.Api.Controllers
             return Ok(word);
         }
 
+        [HttpGet("{id:int}/global")]
+        public async Task<ActionResult<Word>> GetGlobalWord([FromRoute] int id)
+        {
+            Word word = await _wordStoreManager.GetGlobalWord(id);
+            return Ok(word);
+        }
+
         [HttpPost]
         [ServiceFilter(typeof(WordsValidationFilter))]
         public async Task<IActionResult> AddWords(

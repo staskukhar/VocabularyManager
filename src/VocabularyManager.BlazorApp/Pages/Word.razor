@@ -16,6 +16,7 @@
 @inject IValidator<WordView> WordValidator
 @inject IValidator<MeaningView> MeaningValidator
 @inject IRecentlyOpenedService RecentlyOpenedService
+@inject NavigationManager NavigationManager
 @inject IStringLocalizer<SharedResource> SharedLoc
 @inject IStringLocalizer<WordResource> Loc
 
@@ -35,25 +36,46 @@ else
 {
     <FluentCard class="word-page-card">
         <div class="card-header">
-            <h2 class="fluent-typography-title-2">@wordData.WordContent</h2>
+            <div class="d-flex align-items-center gap-2">
+                <h2 class="fluent-typography-title-2 mb-0">@wordData.WordContent</h2>
+                @if (isGlobalMode)
+                {
+                    <FluentBadge Appearance="Appearance.Accent">@Loc["GlobalView"]</FluentBadge>
+                }
+            </div>
             <div class="card-actions">
                 <FluentButton Appearance="Appearance.Outline" AppearanceVariant="AppearanceVariant.Neutral" @onclick="GoBack">@SharedLoc["Btn_Cancel"]</FluentButton>
-                <FluentButton Appearance="Appearance.Accent" @onclick="UpdateWord">@SharedLoc["Btn_Update"]</FluentButton>
-                <FluentButton Appearance="Appearance.Outline" AppearanceVariant="AppearanceVariant.Danger" @onclick="ConfirmDelete">@SharedLoc["Btn_Delete"]</FluentButton>
+                @if (!isGlobalMode)
+                {
+                    <FluentButton Appearance="Appearance.Accent" @onclick="UpdateWord">@SharedLoc["Btn_Update"]</FluentButton>
+                    <FluentButton Appearance="Appearance.Outline" AppearanceVariant="AppearanceVariant.Danger" @onclick="ConfirmDelete">@SharedLoc["Btn_Delete"]</FluentButton>
+                }
             </div>
         </div>
 
         <div class="card-body">
+            @if (isGlobalMode)
+            {
+                <FluentMessageBar Intent="MessageIntent.Info" class="mb-3">
+                    @Loc["GlobalViewDescription"]
+                </FluentMessageBar>
+            }
+
             <WordForm Word="wordData" />
 
             <h3 class="fluent-typography-subtitle-1 mt-4">@SharedLoc["Label_Meanings"]</h3>
             @foreach (var meaning in wordData.Meanings)
             {
-                <MeaningForm Meaning="meaning" OnDelete="@(() => RemoveMeaning(meaning))" />
+                <MeaningForm Meaning="meaning"
+                             ShowDeleteButton="@(!isGlobalMode)"
+                             OnDelete="@(() => RemoveMeaning(meaning))" />
             }
-            <FluentButton Appearance="Appearance.Outline" AppearanceVariant="AppearanceVariant.Neutral" Size="Size.Small" @onclick="AddMeaning">
-                @SharedLoc["Btn_AddMeaning"]
-            </FluentButton>
+            @if (!isGlobalMode)
+            {
+                <FluentButton Appearance="Appearance.Outline" AppearanceVariant="AppearanceVariant.Neutral" Size="Size.Small" @onclick="AddMeaning">
+                    @SharedLoc["Btn_AddMeaning"]
+                </FluentButton>
+            }
 
             @if (validationErrors.Count > 0)
             {
@@ -77,6 +99,10 @@ else
     [Parameter]
     public int WordId { get; set; }
 
+    [SupplyParameterFromQuery(Name = "globalMode")]
+    public bool? GlobalModeQuery { get; set; }
+
+    private bool isGlobalMode;
     private bool loading = true;
     private WordView? wordData;
     private List<ValidationFailure> validationErrors = [];
@@ -84,6 +110,7 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
+        isGlobalMode = GlobalModeQuery == true;
         await LoadWord();
     }
 
@@ -93,14 +120,18 @@ else
         validationErrors.Clear();
         try
         {
-            HttpResponseMessage response = await HttpService.GetAsync(HttpPathBuilder.GetWordByIdEndpoint(WordId));
+            string endpoint = isGlobalMode
+                ? HttpPathBuilder.GetGlobalWordEndpoint(WordId)
+                : HttpPathBuilder.GetWordByIdEndpoint(WordId);
+
+            HttpResponseMessage response = await HttpService.GetAsync(endpoint);
             if (response.IsSuccessStatusCode)
             {
                 wordData = await response.Content.ReadFromJsonAsync<WordView>();
                 if (wordData is not null)
                 {
                     wordData = WordCloner.CloneWord(wordData);
-                    await RecentlyOpenedService.RecordWord(wordData.Id, wordData.WordContent);
+                    await RecentlyOpenedService.RecordWord(WordId, wordData.WordContent, isGlobalMode);
                 }
             }
             else

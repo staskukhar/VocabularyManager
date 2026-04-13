@@ -24,6 +24,18 @@ namespace VocabularyManager.BlazorApp.Services
             );
         }
 
+        public string GetGlobalWordEndpoint(int wordId)
+        {
+            return string.Format(
+                string.Concat(
+                    _httpOptions.ApiBaseURL,
+                    _httpOptions.WordTree.PathPrefix,
+                    _httpOptions.WordTree.GetGlobal
+                ),
+                wordId
+            );
+        }
+
         public string AddWordEndpoint(int vocabularyId)
         {
             return string.Format(

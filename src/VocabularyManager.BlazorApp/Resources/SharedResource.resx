@@ -115,6 +115,7 @@
 
   <!-- Misc -->
   <data name="AllVocabularies" xml:space="preserve"><value>All Vocabularies</value></data>
+  <data name="Global" xml:space="preserve"><value>Global</value></data>
   <data name="Filter_Clear" xml:space="preserve"><value>clear</value></data>
   <data name="WordNotFound" xml:space="preserve"><value>Word not found.</value></data>
   <data name="LoadingWord" xml:space="preserve"><value>Loading word...</value></data>

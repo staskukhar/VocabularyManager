@@ -18,9 +18,9 @@ namespace VocabularyManager.BlazorApp.Services
             _jsRuntime = jsRuntime;
         }
 
-        public async Task RecordWord(int id, string name)
+        public async Task RecordWord(int id, string name, bool isGlobalMode = false)
         {
-            await RecordItem(RecentWordsKey, id, name);
+            await RecordItem(RecentWordsKey, id, name, isGlobalMode);
         }
 
         public async Task RecordVocabulary(int id, string name)
@@ -38,16 +38,17 @@ namespace VocabularyManager.BlazorApp.Services
             return await GetItems(RecentVocabulariesKey);
         }
 
-        private async Task RecordItem(string key, int id, string name)
+        private async Task RecordItem(string key, int id, string name, bool isGlobalMode = false)
         {
             List<RecentItem> items = await GetItems(key);
 
-            items.RemoveAll(i => i.Id == id);
+            items.RemoveAll(i => i.Id == id && i.IsGlobalMode == isGlobalMode);
 
             items.Insert(0, new RecentItem
             {
                 Id = id,
-                Name = name
+                Name = name,
+                IsGlobalMode = isGlobalMode
             });
 
             if (items.Count > MaxItems)

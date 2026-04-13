@@ -30,4 +30,6 @@
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
 
   <data name="PageTitle" xml:space="preserve"><value>Слово</value></data>
+  <data name="GlobalView" xml:space="preserve"><value>Глобальний перегляд</value></data>
+  <data name="GlobalViewDescription" xml:space="preserve"><value>Показані всі значення з усіх словників.</value></data>
 </root>
