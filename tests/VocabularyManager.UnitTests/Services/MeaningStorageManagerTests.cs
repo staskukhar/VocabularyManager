@@ -4,6 +4,7 @@ using FluentAssertions;
 using NSubstitute;
 using VocabularyManager.Core.Entities;
 using VocabularyManager.UseCases.Exceptions;
+using VocabularyManager.UseCases.Interfaces;
 using VocabularyManager.UseCases.Services.StoreManagers;
 
 namespace VocabularyManager.UnitTests.Services
@@ -12,14 +13,14 @@ namespace VocabularyManager.UnitTests.Services
     {
         private readonly Fixture _fixture;
         private readonly IRepositoryBase<Meaning> _meaningRepository;
-        private readonly IRepositoryBase<Word> _wordRepository;
+        private readonly IWordRepository _wordRepository;
         private readonly MeaningStorageManager _meaningStorageManager;
 
         public MeaningStorageManagerTests()
         {
             _fixture = new Fixture();
             _meaningRepository = Substitute.For<IRepositoryBase<Meaning>>();
-            _wordRepository = Substitute.For<IRepositoryBase<Word>>();
+            _wordRepository = Substitute.For<IWordRepository>();
             _meaningStorageManager = new MeaningStorageManager(_meaningRepository, _wordRepository);
         }
 

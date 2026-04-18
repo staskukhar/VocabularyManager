@@ -1,4 +1,3 @@
-using Ardalis.Specification;
 using AutoFixture;
 using FluentAssertions;
 using NSubstitute;
@@ -20,7 +19,7 @@ namespace VocabularyManager.UnitTests.Services
         public async Task Delete_Word_By_Id_Test1()
         {
             //Arrange
-            IRepositoryBase<Word> repository = Substitute.For<IRepositoryBase<Word>>();
+            IWordRepository repository = Substitute.For<IWordRepository>();
             int wordId = _fixture.Create<int>();
             var word = new Word(_fixture.Create<string>()) { Id = wordId };
             repository
@@ -45,7 +44,7 @@ namespace VocabularyManager.UnitTests.Services
         public async Task Update_Word_Test1()
         {
             //Arrange
-            IRepositoryBase<Word> repository = Substitute.For<IRepositoryBase<Word>>();
+            IWordRepository repository = Substitute.For<IWordRepository>();
             int wordId = _fixture.Create<int>();
             var word = new Word(_fixture.Create<string>()) { Id = wordId };
             repository

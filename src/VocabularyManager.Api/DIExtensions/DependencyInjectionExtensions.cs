@@ -1,9 +1,5 @@
-using Ardalis.Specification;
 using VocabularyManager.Api.ActionFilters;
-using VocabularyManager.Core.Entities;
-using VocabularyManager.Infrastructure.Data;
-using VocabularyManager.Infrastructure.Data.Repositories;
-using VocabularyManager.UseCases.Interfaces;
+using VocabularyManager.Infrastructure;
 using VocabularyManager.UseCases.Services.DIExtensions;
 using VocabularyManager.UseCases.Validators.DIExtensions;
 
@@ -13,19 +9,10 @@ namespace VocabularyManager.Api.DIExtensions
     {
         public static IServiceCollection InjectDependencies(this IServiceCollection services)
         {
-            services.AddRepositories();
+            services.AddInfrastructure();
             services.AddValidators();
             services.AddStorageManagers();
             services.AddSecondaryServices();
-            return services;
-        }
-
-        public static IServiceCollection AddRepositories(this IServiceCollection services)
-        {
-            services.AddScoped<IRepositoryBase<Vocabulary>, GenericRepository<Vocabulary>>();
-            services.AddScoped<IRepositoryBase<Word>, WordRepository>();
-            services.AddScoped<IRepositoryBase<Meaning>, GenericRepository<Meaning>>();
-            services.AddScoped<IDashboardMetricsProvider, DashboardMetricsProvider>();
             return services;
         }
 

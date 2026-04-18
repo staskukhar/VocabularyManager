@@ -55,23 +55,14 @@ builder.Services.InjectDependencies();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
 using (IServiceScope scope = app.Services.CreateScope())
 {
     VocabularyContext context = scope.ServiceProvider.GetRequiredService<VocabularyContext>();
-    bool schemaExists = context.Database
-        .SqlQueryRaw<int>(
-            @"SELECT COUNT(*)::int AS ""Value"" FROM information_schema.tables
-              WHERE table_schema = 'public' AND table_name = 'Vocabularies'")
-        .AsEnumerable()
-        .First() > 0;
-
-    if (!schemaExists)
-    {
-        await context.Database.MigrateAsync();
-    }
+    await context.Database.MigrateAsync();
 }
 
 // Configure the HTTP request pipeline.
@@ -88,6 +79,7 @@ app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapHealthChecks("/health");
 app.MapControllers().RequireAuthorization();
 
 await app.RunAsync();

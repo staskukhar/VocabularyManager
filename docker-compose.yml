@@ -11,7 +11,6 @@ services:
       KEYCLOAK_DB: ${KEYCLOAK_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./db/init-keycloak-db.sh:/docker-entrypoint-initdb.d/init-keycloak-db.sh:ro
     ports:
       - "${DB_PORT}:5432"
     healthcheck:
@@ -90,6 +89,12 @@ services:
         condition: service_healthy
       keycloak:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 45s
     networks:
       - vocabulary_network
 
@@ -101,7 +106,13 @@ services:
     ports:
       - "${CLIENT_PORT}:80"
     depends_on:
-      - api
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:80/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
       - vocabulary_network
 

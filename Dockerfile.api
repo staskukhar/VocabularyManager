@@ -10,19 +10,13 @@ RUN dotnet restore src/VocabularyManager.Api/VocabularyManager.Api.csproj
 
 COPY src/ src/
 
-RUN dotnet tool install --global dotnet-ef
-ENV PATH="$PATH:/root/.dotnet/tools"
-
-RUN dotnet ef migrations add InitialCreate \
-    --project src/VocabularyManager.Infrastructure \
-    --startup-project src/VocabularyManager.Api
-
 RUN dotnet publish src/VocabularyManager.Api/VocabularyManager.Api.csproj \
     -c Release \
     -o /app/publish \
     --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build /app/publish .
 EXPOSE 8080

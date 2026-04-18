@@ -12,12 +12,12 @@ namespace VocabularyManager.UnitTests.Services
     public class VocabularyStoreManagerTest
     {
         private readonly Fixture _fixture;
-        private readonly IRepositoryBase<Word> _wordRepository;
+        private readonly IWordRepository _wordRepository;
 
         public VocabularyStoreManagerTest()
         {
             _fixture = new Fixture();
-            _wordRepository = Substitute.For<IRepositoryBase<Word>>();
+            _wordRepository = Substitute.For<IWordRepository>();
         }
 
         [Fact]

@@ -4,7 +4,6 @@
 **/.cursor
 **/obj
 **/bin
-**/Migrations
 **/node_modules
 **/.env
 **/*.user

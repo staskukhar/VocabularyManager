@@ -1,11 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using VocabularyManager.Core.Entities;
 using VocabularyManager.UseCases.Exceptions;
+using VocabularyManager.UseCases.Interfaces;
 
 namespace VocabularyManager.Infrastructure.Data.Repositories;
 
 public class WordRepository(VocabularyContext context)
-    : GenericRepository<Word>(context)
+    : GenericRepository<Word>(context), IWordRepository
 {
     public override async Task UpdateAsync(Word entity, CancellationToken cancellationToken = default)
     {

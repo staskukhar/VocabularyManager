@@ -9,11 +9,11 @@ namespace VocabularyManager.UseCases.Services.StoreManagers
     public class MeaningStorageManager : IMeaningStorageManager
     {
         private readonly IRepositoryBase<Meaning> _meaningRepository;
-        private readonly IRepositoryBase<Word> _wordRepository;
+        private readonly IWordRepository _wordRepository;
 
         public MeaningStorageManager(
             IRepositoryBase<Meaning> meaningRepository,
-            IRepositoryBase<Word> wordRepository)
+            IWordRepository wordRepository)
         {
             _meaningRepository = meaningRepository;
             _wordRepository = wordRepository;

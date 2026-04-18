@@ -13,12 +13,12 @@ namespace VocabularyManager.UseCases.Services.StoreManagers
 
         private readonly IRepositoryBase<Vocabulary> _vocabularyRepository;
 
-        private readonly IRepositoryBase<Word> _wordRepository;
+        private readonly IWordRepository _wordRepository;
 
         public VocabularyStorageManager(
             IMeaningStorageManager meaningStorageManager,
             IRepositoryBase<Vocabulary> vocabularyRepository,
-            IRepositoryBase<Word> wordRepository)
+            IWordRepository wordRepository)
         {
             _meaningStorageManager = meaningStorageManager;
             _vocabularyRepository = vocabularyRepository;

@@ -1,4 +1,3 @@
-using Ardalis.Specification;
 using VocabularyManager.Core.Entities;
 using VocabularyManager.Core.Specifications;
 using VocabularyManager.UseCases.Exceptions;
@@ -8,8 +7,8 @@ namespace VocabularyManager.UseCases.Services.StoreManagers
 {
     public class WordStorageManager : IWordStorageManager
     {
-        private readonly IRepositoryBase<Word> _wordRepository;
-        public WordStorageManager(IRepositoryBase<Word> wordRepository)
+        private readonly IWordRepository _wordRepository;
+        public WordStorageManager(IWordRepository wordRepository)
         {
             _wordRepository = wordRepository;
         }
