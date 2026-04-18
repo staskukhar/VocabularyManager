@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Immutable;
 using VocabularyManager.Api.ActionFilters;
@@ -40,6 +41,7 @@ namespace VocabularyManager.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrator")]
         [ServiceFilter(typeof(WordsValidationFilter))]
         public async Task<IActionResult> AddWords(
             [FromQuery] int vocabularyId,
@@ -50,6 +52,7 @@ namespace VocabularyManager.Api.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteWord([FromRoute] int id)
         {
             await _wordStoreManager.DeleteWordById(id);
@@ -57,6 +60,7 @@ namespace VocabularyManager.Api.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Administrator")]
         [ServiceFilter(typeof(WordValidationFilter))]
         public async Task<IActionResult> UpdateWord([FromBody] Word word)
         {

@@ -32,14 +32,18 @@
     <Button Color="ButtonColor.Primary" Disabled=@vocabularyLoading @onclick=TryToLoadVocabulary>@SharedLoc["Btn_Load"]</Button>
 </div>
 <div class="d-flex flex-row mb-1">
-    <div class="me-1">
-        <Button
-                Type="ButtonType.Button"
-                Color="ButtonColor.Success"
-                @onclick="CreateVocabularyModal">
-            @SharedLoc["Btn_Create"]
-        </Button>
-    </div>
+    <AuthorizeView Roles="Administrator">
+        <Authorized>
+            <div class="me-1">
+                <Button
+                        Type="ButtonType.Button"
+                        Color="ButtonColor.Success"
+                        @onclick="CreateVocabularyModal">
+                    @SharedLoc["Btn_Create"]
+                </Button>
+            </div>
+        </Authorized>
+    </AuthorizeView>
     @if(VocabularyStateManager.Vocabulary is not null)
     {
         <div class="me-1">
@@ -50,14 +54,18 @@
                 @Loc["Btn_Unload"]
             </Button>
         </div>
-        <div>
-            <Button
-                    Type="ButtonType.Button"
-                    Color="ButtonColor.Danger"
-                    @onclick="DeleteVocabularyDialog">
-                @SharedLoc["Btn_Delete"]
-            </Button>
-        </div>
+        <AuthorizeView Roles="Administrator">
+            <Authorized>
+                <div>
+                    <Button
+                            Type="ButtonType.Button"
+                            Color="ButtonColor.Danger"
+                            @onclick="DeleteVocabularyDialog">
+                        @SharedLoc["Btn_Delete"]
+                    </Button>
+                </div>
+            </Authorized>
+        </AuthorizeView>
     }
 </div>
 @if (vocabularyLoading)
@@ -93,12 +101,15 @@ else
         }
         else if (listOfVocabularies is not null)
         {
-            <div class="m-2">
-                <FirstLetterFilter
-                    Letters="_allVocabularyLetters"
-                    OnChange="OnFilterChanged"
-                    OnFilterCleared="OnFilterCleared" />
-            </div>
+            @if (_allVocabularyLetters.Any())
+            {
+                <div class="m-2">
+                    <FirstLetterFilter
+                        Letters="_allVocabularyLetters"
+                        OnChange="OnFilterChanged"
+                        OnFilterCleared="OnFilterCleared" />
+                </div>
+            }
             @for (int i = StartOfPage(_currentPage); i < EndOfPage(_currentPage); i++)
             {
                 <VocabularyPlate Vocabulary="@_filteredVocabularies[i]" />

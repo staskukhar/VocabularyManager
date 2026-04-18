@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using VocabularyManager.Core.Entities;
 using VocabularyManager.UseCases.Interfaces;
 using VocabularyManager.Api.ActionFilters;
@@ -17,6 +18,7 @@ namespace VocabularyManager.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrator")]
         [ServiceFilter(typeof(VocabularyValidationFilter))]
         public async Task<IActionResult> CreateVocabulary(
             [FromBody] Vocabulary vocabulary)
@@ -39,6 +41,7 @@ namespace VocabularyManager.Api.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Administrator")]
         [ServiceFilter(typeof(VocabularyValidationFilter))]
         public async Task<IActionResult> UpdateVocabularyWithRelations(
             [FromBody] Vocabulary vocabulary)
@@ -48,6 +51,7 @@ namespace VocabularyManager.Api.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteVocabularyById(int id)
         {
             return Ok(await _vocabularyStoreManager.Delete(id));

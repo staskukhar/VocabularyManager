@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VocabularyManager.Api.ActionFilters;
 using VocabularyManager.Core.Entities;
@@ -17,6 +18,7 @@ namespace VocabularyManager.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrator")]
         [ServiceFilter(typeof(MeaningValidationFilter))]
         public async Task<IActionResult> AddMeaning(
             [FromQuery] int wordId,
@@ -27,6 +29,7 @@ namespace VocabularyManager.Api.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Administrator")]
         [ServiceFilter(typeof(MeaningValidationFilter))]
         public async Task<IActionResult> UpdateMeaning([FromBody] Meaning meaning)
         {
@@ -35,6 +38,7 @@ namespace VocabularyManager.Api.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteMeaning([FromRoute] int id)
         {
             await _meaningStorageManager.DeleteMeaningById(id);

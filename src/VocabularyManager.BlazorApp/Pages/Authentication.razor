@@ -1,8 +1,13 @@
 @page "/authentication/{action}"
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @attribute [AllowAnonymous]
+@inject IStringLocalizer<SharedResource> Loc
 
-<RemoteAuthenticatorView Action="@Action" />
+<RemoteAuthenticatorView Action="@Action">
+    <LogOutSucceeded>
+        <p role="status">@Loc["Auth_LoggedOutMessage"]</p>
+    </LogOutSucceeded>
+</RemoteAuthenticatorView>
 
 @code {
     [Parameter]

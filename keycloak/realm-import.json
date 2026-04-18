@@ -2,12 +2,25 @@
   "realm": "vocabulary-manager",
   "enabled": true,
   "sslRequired": "external",
-  "registrationAllowed": false,
+  "registrationAllowed": true,
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,
   "resetPasswordAllowed": false,
   "editUsernameAllowed": false,
   "bruteForceProtected": true,
+  "roles": {
+    "realm": [
+      {
+        "name": "Administrator",
+        "description": "Full access to all features. Account must be created via Keycloak Admin Console."
+      },
+      {
+        "name": "User",
+        "description": "Read-only access. Assigned automatically on self-registration."
+      }
+    ]
+  },
+  "defaultRoles": ["User"],
   "clients": [
     {
       "clientId": "vocabulary-app",
@@ -26,7 +39,23 @@
       "protocol": "openid-connect",
       "attributes": {
         "pkce.code.challenge.method": "S256"
-      }
+      },
+      "protocolMappers": [
+        {
+          "name": "realm roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "claim.name": "realm_access.roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true"
+          }
+        }
+      ]
     }
   ]
 }

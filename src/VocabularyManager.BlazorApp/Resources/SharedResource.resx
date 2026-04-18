@@ -40,6 +40,7 @@
   <!-- Auth -->
   <data name="Auth_LogIn" xml:space="preserve"><value>Log in</value></data>
   <data name="Auth_LogOut" xml:space="preserve"><value>Log out</value></data>
+  <data name="Auth_LoggedOutMessage" xml:space="preserve"><value>You are logged out.</value></data>
 
   <!-- Buttons -->
   <data name="Btn_Create" xml:space="preserve"><value>Create</value></data>
@@ -51,6 +52,7 @@
   <data name="Btn_Remove" xml:space="preserve"><value>Remove</value></data>
   <data name="Btn_Refresh" xml:space="preserve"><value>Refresh</value></data>
   <data name="Btn_GoBack" xml:space="preserve"><value>Go back</value></data>
+  <data name="Btn_GoHome" xml:space="preserve"><value>Go to Home</value></data>
   <data name="Btn_AddMeaning" xml:space="preserve"><value>+ Add Meaning</value></data>
 
   <!-- States -->
@@ -99,6 +101,7 @@
 
   <!-- App-level -->
   <data name="App_NotAuthorized" xml:space="preserve"><value>You are not authorized to access this resource.</value></data>
+  <data name="App_NotAuthorizedMessage" xml:space="preserve"><value>You don't have permission to view this page. Please contact an administrator if you believe this is a mistake.</value></data>
   <data name="App_CheckingAuth" xml:space="preserve"><value>Checking authentication...</value></data>
   <data name="App_NotFound" xml:space="preserve"><value>Not found</value></data>
   <data name="App_NothingAtAddress" xml:space="preserve"><value>Sorry, there's nothing at this address.</value></data>

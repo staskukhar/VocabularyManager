@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using VocabularyManager.Api.ExceptionHandlers;
 using VocabularyManager.Api.DIExtensions;
+using System.Security.Claims;
+using System.Text.Json;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +32,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = keycloakValidIssuer ?? keycloakAuthority,
             ValidateAudience = false,
             ValidateLifetime = true
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = ctx =>
+            {
+                var realmAccess = ctx.Principal?.FindFirst("realm_access")?.Value;
+                if (realmAccess is not null)
+                {
+                    using var doc = JsonDocument.Parse(realmAccess);
+                    if (doc.RootElement.TryGetProperty("roles", out var roles))
+                    {
+                        var identity = (ClaimsIdentity)ctx.Principal!.Identity!;
+                        foreach (var role in roles.EnumerateArray())
+                            identity.AddClaim(new Claim(ClaimTypes.Role, role.GetString()!));
+                    }
+                }
+                return Task.CompletedTask;
+            }
         };
     });
 builder.Services.AddAuthorization();

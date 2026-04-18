@@ -11,7 +11,9 @@
                     }
                     else
                     {
-                        <p role="alert">@Loc["App_NotAuthorized"]</p>
+                        <LayoutView Layout="@typeof(MainLayout)">
+                            <AccessDeniedPage />
+                        </LayoutView>
                     }
                 </NotAuthorized>
                 <Authorizing>
@@ -21,9 +23,8 @@
             <FocusOnNavigate RouteData="@routeData" Selector="h1" />
         </Found>
         <NotFound>
-            <PageTitle>@Loc["App_NotFound"]</PageTitle>
             <LayoutView Layout="@typeof(MainLayout)">
-                <p role="alert">@Loc["App_NothingAtAddress"]</p>
+                <NotFoundPage />
             </LayoutView>
         </NotFound>
     </Router>

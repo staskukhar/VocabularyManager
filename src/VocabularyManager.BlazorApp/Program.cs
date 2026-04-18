@@ -28,7 +28,7 @@ builder.Services.AddOidcAuthentication(options =>
     options.ProviderOptions.Authority = builder.Configuration["Keycloak:Authority"];
     options.ProviderOptions.ClientId = builder.Configuration["Keycloak:ClientId"];
     options.ProviderOptions.ResponseType = "code";
-});
+}).AddAccountClaimsPrincipalFactory<KeycloakAccountClaimsPrincipalFactory>();
 
 builder.Services.AddScoped<ApiAuthorizationMessageHandler>();
 builder.Services.AddHttpClient("API", client =>

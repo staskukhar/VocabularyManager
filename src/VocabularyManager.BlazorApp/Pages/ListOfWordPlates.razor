@@ -16,12 +16,15 @@
         @Loc["AddNew"]
     </Button>
 </div>
-<div class="m-2">
-    <FirstLetterFilter 
-        Letters="Vocabulary?.Words.Select(w => w.WordContent.ToLower().FirstOrDefault()).Distinct() ?? []"
-        OnChange="OnFilterChanged" 
-        OnFilterCleared="OnFilterCleared"/>
-</div>
+@if (Vocabulary?.Words.Count > 0)
+{
+    <div class="m-2">
+        <FirstLetterFilter
+            Letters="Vocabulary.Words.Select(w => w.WordContent.ToLower().FirstOrDefault()).Distinct()"
+            OnChange="OnFilterChanged"
+            OnFilterCleared="OnFilterCleared" />
+    </div>
+}
 @if(Vocabulary is not null)
 {
     @for (int i = StartOfPage(CurrentPage); i < EndOfPage(CurrentPage); i++)
