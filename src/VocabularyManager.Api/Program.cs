@@ -1,11 +1,11 @@
-using VocabularyManager.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using VocabularyManager.Api.ExceptionHandlers;
-using VocabularyManager.Api.DIExtensions;
 using System.Security.Claims;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using VocabularyManager.Api.DIExtensions;
+using VocabularyManager.Api.ExceptionHandlers;
+using VocabularyManager.Infrastructure.Data;
 
 
 var builder = WebApplication.CreateBuilder(args);
