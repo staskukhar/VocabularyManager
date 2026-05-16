@@ -36,6 +36,7 @@ namespace VocabularyManager.Api.DIExtensions
         public static IServiceCollection AddSecondaryServices(this IServiceCollection services)
         {
             services.AddOxfordParser();
+            services.AddAnkiExportService();
             return services;
         }
 

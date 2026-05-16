@@ -134,6 +134,18 @@ namespace VocabularyManager.BlazorApp.Services
             );
         }
 
+        public string ExportAnkiEndpoint(int vocabularyId)
+        {
+            return string.Format(
+                string.Concat(
+                    _httpOptions.ApiBaseURL,
+                    _httpOptions.VocabularyTree.PathPrefix,
+                    _httpOptions.VocabularyTree.ExportAnki
+                ),
+                vocabularyId
+            );
+        }
+
         // Meaning endpoints
         public string AddMeaningEndpoint(int wordId)
         {

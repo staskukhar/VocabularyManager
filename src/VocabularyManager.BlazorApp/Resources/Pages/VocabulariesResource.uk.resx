@@ -42,5 +42,6 @@
   <data name="AddNew" xml:space="preserve"><value>Додати нове</value></data>
   <data name="AddWord" xml:space="preserve"><value>Додати слово</value></data>
   <data name="Btn_Unload" xml:space="preserve"><value>Вивантажити</value></data>
+  <data name="Btn_ExportAnki" xml:space="preserve"><value>Експортувати в Anki</value></data>
   <data name="NoVocabulariesFound" xml:space="preserve"><value>Словників не знайдено</value></data>
 </root>

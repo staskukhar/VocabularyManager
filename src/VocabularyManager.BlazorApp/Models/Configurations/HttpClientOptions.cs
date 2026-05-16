@@ -69,6 +69,8 @@ namespace VocabularyManager.BlazorApp.Models.Configurations
         public string Update { get; set; } = string.Empty;
 
         public string Delete { get; set; } = string.Empty;
+
+        public string ExportAnki { get; set; } = string.Empty;
     }
 
     public class MeaningPathes

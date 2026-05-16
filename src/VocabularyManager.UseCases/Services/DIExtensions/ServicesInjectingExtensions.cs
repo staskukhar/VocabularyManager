@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using VocabularyManager.UseCases.Interfaces;
 using VocabularyManager.UseCases.Services.Parsers;
 using VocabularyManager.UseCases.Services.StoreManagers;
+using VocabularyManager.UseCases.Services;
 
 namespace VocabularyManager.UseCases.Services.DIExtensions
 {
@@ -10,6 +11,11 @@ namespace VocabularyManager.UseCases.Services.DIExtensions
         public static IServiceCollection AddOxfordParser(this IServiceCollection services)
         {
             return services.AddScoped<IWordParser<string>, SimpleOxfordDictionaryParser>();
+        }
+
+        public static IServiceCollection AddAnkiExportService(this IServiceCollection services)
+        {
+            return services.AddScoped<IAnkiExportService, AnkiExportService>();
         }
 
         public static IServiceCollection AddVocabularyStorageManager(this IServiceCollection services)

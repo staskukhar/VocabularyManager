@@ -13,6 +13,7 @@
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<SharedResource> SharedLoc
 @inject IStringLocalizer<VocabulariesResource> Loc
+@inject IJSRuntime JS
 
 @implements IDisposable
 
@@ -52,6 +53,14 @@
                     Color="ButtonColor.Secondary"
                     @onclick="UnloadVocabulary">
                 @Loc["Btn_Unload"]
+            </Button>
+        </div>
+        <div class="me-1">
+            <Button
+                    Type="ButtonType.Button"
+                    Color="ButtonColor.Info"
+                    @onclick="ExportToAnki">
+                @Loc["Btn_ExportAnki"]
             </Button>
         </div>
         <AuthorizeView Roles="Administrator">
@@ -260,6 +269,23 @@ else
         VocabularyStateManager.Pop();
         VocabularyId = null;
         NavigationManager.NavigateTo("/vocabulary");
+    }
+
+    private async Task ExportToAnki()
+    {
+        var url = HttpPathBuilder.ExportAnkiEndpoint(VocabularyStateManager.Vocabulary!.Id);
+        HttpResponseMessage response = await HttpService.GetAsync(url);
+        if (response.IsSuccessStatusCode)
+        {
+            byte[] bytes = await response.Content.ReadAsByteArrayAsync();
+            string base64 = Convert.ToBase64String(bytes);
+            string fileName = $"{VocabularyStateManager.Vocabulary.Name}.txt";
+            await JS.InvokeVoidAsync("downloadFile", fileName, "text/plain", base64);
+        }
+        else
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Danger, SharedLoc["Toast_OperationFailed"]));
+        }
     }
 
     private void OnFilterChanged(char letter)

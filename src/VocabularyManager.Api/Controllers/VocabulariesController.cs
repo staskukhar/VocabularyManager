@@ -11,10 +11,14 @@ namespace VocabularyManager.Api.Controllers
     public class VocabulariesController : ControllerBase
     {
         private readonly IVocabularyStorageManager _vocabularyStoreManager;
+        private readonly IAnkiExportService _ankiExportService;
+
         public VocabulariesController(
-            IVocabularyStorageManager vocabularyStoreManager)
+            IVocabularyStorageManager vocabularyStoreManager,
+            IAnkiExportService ankiExportService)
         {
             _vocabularyStoreManager = vocabularyStoreManager;
+            _ankiExportService = ankiExportService;
         }
 
         [HttpPost]
@@ -55,6 +59,14 @@ namespace VocabularyManager.Api.Controllers
         public async Task<IActionResult> DeleteVocabularyById(int id)
         {
             return Ok(await _vocabularyStoreManager.Delete(id));
+        }
+
+        [HttpGet("{id:int}/export/anki")]
+        public async Task<IActionResult> ExportToAnki(int id, CancellationToken ct)
+        {
+            var result = await _ankiExportService.ExportAsync(id, ct);
+            if (result is null) return NotFound();
+            return File(result.Content, "text/plain; charset=utf-8", result.FileName);
         }
     }
 }
