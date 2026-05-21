@@ -18,6 +18,7 @@ namespace VocabularyManager.Api.Controllers
         [HttpGet("top-words")]
         public async Task<IActionResult> GetTopWordsByDefinitionCount([FromQuery] int count = DefaultTopCount, CancellationToken cancellationToken = default)
         {
+            if (count <= 0) count = DefaultTopCount;
             var items = await _dashboardMetricsProvider.GetTopWordsByDefinitionCountAsync(count, cancellationToken);
             return Ok(items);
         }
@@ -25,6 +26,7 @@ namespace VocabularyManager.Api.Controllers
         [HttpGet("top-vocabularies")]
         public async Task<IActionResult> GetTopVocabulariesByWordCount([FromQuery] int count = DefaultTopCount, CancellationToken cancellationToken = default)
         {
+            if (count <= 0) count = DefaultTopCount;
             var items = await _dashboardMetricsProvider.GetTopVocabulariesByWordCountAsync(count, cancellationToken);
             return Ok(items);
         }

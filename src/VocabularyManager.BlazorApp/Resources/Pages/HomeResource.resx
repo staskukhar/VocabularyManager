@@ -34,6 +34,7 @@
   <data name="NoWordsYet" xml:space="preserve"><value>No words yet.</value></data>
   <data name="TopVocabulariesByWordCount" xml:space="preserve"><value>Top vocabularies by word count</value></data>
   <data name="NoVocabulariesYet" xml:space="preserve"><value>No vocabularies yet.</value></data>
+  <data name="LoadError" xml:space="preserve"><value>Failed to load data. Please try again later.</value></data>
   <data name="RecentlyOpenedWords" xml:space="preserve"><value>Recently opened words</value></data>
   <data name="RecentlyOpenedVocabularies" xml:space="preserve"><value>Recently opened vocabularies</value></data>
 </root>

@@ -34,6 +34,7 @@
   <data name="NoWordsYet" xml:space="preserve"><value>Слів ще немає.</value></data>
   <data name="TopVocabulariesByWordCount" xml:space="preserve"><value>Топ словників за кількістю слів</value></data>
   <data name="NoVocabulariesYet" xml:space="preserve"><value>Словників ще немає.</value></data>
+  <data name="LoadError" xml:space="preserve"><value>Не вдалося завантажити дані. Спробуйте пізніше.</value></data>
   <data name="RecentlyOpenedWords" xml:space="preserve"><value>Нещодавно відкриті слова</value></data>
   <data name="RecentlyOpenedVocabularies" xml:space="preserve"><value>Нещодавно відкриті словники</value></data>
 </root>

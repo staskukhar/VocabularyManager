@@ -20,13 +20,17 @@
                 <h2 class="h5 mb-0">@Loc["TopWordsByDefinitions"]</h2>
             </div>
             <div class="card-body">
-                @if (topWords.Count == 0 && !loadingWords)
-                {
-                    <p class="text-muted mb-0">@Loc["NoWordsYet"]</p>
-                }
                 @if (loadingWords)
                 {
                     <p class="text-muted mb-0">@SharedLoc["State_LoadingEllipsis"]</p>
+                }
+                else if (wordsLoadError)
+                {
+                    <p class="text-danger mb-0">@Loc["LoadError"]</p>
+                }
+                else if (topWords.Count == 0)
+                {
+                    <p class="text-muted mb-0">@Loc["NoWordsYet"]</p>
                 }
                 else
                 {
@@ -52,13 +56,17 @@
                 <h2 class="h5 mb-0">@Loc["TopVocabulariesByWordCount"]</h2>
             </div>
             <div class="card-body">
-                @if (topVocabularies.Count == 0 && !loadingVocabularies)
-                {
-                    <p class="text-muted mb-0">@Loc["NoVocabulariesYet"]</p>
-                }
                 @if (loadingVocabularies)
                 {
                     <p class="text-muted mb-0">@SharedLoc["State_LoadingEllipsis"]</p>
+                }
+                else if (vocabulariesLoadError)
+                {
+                    <p class="text-danger mb-0">@Loc["LoadError"]</p>
+                }
+                else if (topVocabularies.Count == 0)
+                {
+                    <p class="text-muted mb-0">@Loc["NoVocabulariesYet"]</p>
                 }
                 else
                 {
@@ -135,6 +143,8 @@
     private List<RecentItem> recentVocabularies = new();
     private bool loadingWords = true;
     private bool loadingVocabularies = true;
+    private bool wordsLoadError = false;
+    private bool vocabulariesLoadError = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -157,8 +167,13 @@
         {
             string path = HttpPathBuilder.GetDashboardTopWordsEndpoint(TopCount);
             HttpResponseMessage response = await HttpService.GetAsync(path);
+            response.EnsureSuccessStatusCode();
             List<TopWordByDefinitionsDto>? list = await response.Content.ReadFromJsonAsync<List<TopWordByDefinitionsDto>>();
             topWords = list ?? new List<TopWordByDefinitionsDto>();
+        }
+        catch
+        {
+            wordsLoadError = true;
         }
         finally
         {
@@ -172,8 +187,13 @@
         {
             string path = HttpPathBuilder.GetDashboardTopVocabulariesEndpoint(TopCount);
             HttpResponseMessage response = await HttpService.GetAsync(path);
+            response.EnsureSuccessStatusCode();
             List<TopVocabularyByWordsDto>? list = await response.Content.ReadFromJsonAsync<List<TopVocabularyByWordsDto>>();
             topVocabularies = list ?? new List<TopVocabularyByWordsDto>();
+        }
+        catch
+        {
+            vocabulariesLoadError = true;
         }
         finally
         {
