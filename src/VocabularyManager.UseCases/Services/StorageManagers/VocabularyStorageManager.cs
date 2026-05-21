@@ -51,6 +51,15 @@ namespace VocabularyManager.UseCases.Services.StoreManagers
             }
 
             await _vocabularyRepository.SaveChangesAsync();
+
+            foreach (Word newWord in newWords)
+            {
+                if (newWord.Meanings.Count > 0)
+                {
+                    await _meaningStorageManager.AddMeanings(newWord.Meanings, newWord.Id);
+                }
+            }
+
             return newWords.Select(w => w.Id).ToImmutableList();
         }
 
