@@ -75,6 +75,7 @@
   <data name="Label_MeaningsOptional" xml:space="preserve"><value>Meanings (optional)</value></data>
   <data name="Label_About" xml:space="preserve"><value>About</value></data>
   <data name="Label_Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Label_Words" xml:space="preserve"><value>Words</value></data>
   <data name="Label_WordContent" xml:space="preserve"><value>Word Content</value></data>
   <data name="Label_Optional" xml:space="preserve"><value>Optional</value></data>
 
@@ -130,4 +131,10 @@
   <data name="Ordinal_2" xml:space="preserve"><value>{0}nd</value></data>
   <data name="Ordinal_3" xml:space="preserve"><value>{0}rd</value></data>
   <data name="Ordinal_Default" xml:space="preserve"><value>{0}th</value></data>
+
+  <!-- Pagination -->
+  <data name="Pagination_First" xml:space="preserve"><value>First</value></data>
+  <data name="Pagination_Previous" xml:space="preserve"><value>Previous</value></data>
+  <data name="Pagination_Next" xml:space="preserve"><value>Next</value></data>
+  <data name="Pagination_Last" xml:space="preserve"><value>Last</value></data>
 </root>

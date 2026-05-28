@@ -75,6 +75,7 @@
   <data name="Label_MeaningsOptional" xml:space="preserve"><value>Значення (необов'язково)</value></data>
   <data name="Label_About" xml:space="preserve"><value>Про словник</value></data>
   <data name="Label_Edit" xml:space="preserve"><value>Редагування</value></data>
+  <data name="Label_Words" xml:space="preserve"><value>Слова</value></data>
   <data name="Label_WordContent" xml:space="preserve"><value>Зміст слова</value></data>
   <data name="Label_Optional" xml:space="preserve"><value>Необов'язково</value></data>
 
@@ -130,4 +131,10 @@
   <data name="Ordinal_2" xml:space="preserve"><value>{0}-й</value></data>
   <data name="Ordinal_3" xml:space="preserve"><value>{0}-й</value></data>
   <data name="Ordinal_Default" xml:space="preserve"><value>{0}-й</value></data>
+
+  <!-- Пагінація -->
+  <data name="Pagination_First" xml:space="preserve"><value>Перша</value></data>
+  <data name="Pagination_Previous" xml:space="preserve"><value>Попередня</value></data>
+  <data name="Pagination_Next" xml:space="preserve"><value>Наступна</value></data>
+  <data name="Pagination_Last" xml:space="preserve"><value>Остання</value></data>
 </root>

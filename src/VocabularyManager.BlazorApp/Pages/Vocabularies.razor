@@ -91,7 +91,7 @@ else
                     <AboutVocabulary Vocabulary="@VocabularyStateManager.Vocabulary"></AboutVocabulary>
                 </Content>
             </Tab>
-            <Tab Title="@SharedLoc["Label_Edit"]">
+            <Tab Title="@SharedLoc["Label_Words"]">
                 <Content>
                     <ListOfWordPlates Vocabulary="@VocabularyStateManager.Vocabulary"></ListOfWordPlates>
                 </Content>
@@ -125,7 +125,11 @@ else
             }
             <Pagination ActivePageNumber="@_currentPage"
                         TotalPages="@((int)Math.Ceiling(_filteredVocabularies.Count * 1m / VocabulariesPerPage))"
-                        PageChanged="OnPageChangedAsync" />
+                        PageChanged="OnPageChangedAsync"
+                        FirstLinkText="@SharedLoc["Pagination_First"]"
+                        PreviousLinkText="@SharedLoc["Pagination_Previous"]"
+                        NextLinkText="@SharedLoc["Pagination_Next"]"
+                        LastLinkText="@SharedLoc["Pagination_Last"]" />
         }
     }
 }

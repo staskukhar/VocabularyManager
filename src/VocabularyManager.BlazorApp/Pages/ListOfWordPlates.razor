@@ -6,16 +6,21 @@
 @using VocabularyManager.BlazorApp.Pages.Components
 
 @inject IVocabularyStateManager<VocabularyView> VocabularyStateManager
+@inject IStringLocalizer<SharedResource> SharedLoc
 @inject IStringLocalizer<VocabulariesResource> Loc
 
 @implements IDisposable
 
 <Modal @ref="_addWordModal"></Modal>
-<div class="m-2">
-    <Button @onclick="ShowAddWordModal" Type="ButtonType.Submit" Color="ButtonColor.Success">
-        @Loc["AddNew"]
-    </Button>
-</div>
+<AuthorizeView Roles="Administrator">
+    <Authorized>
+        <div class="m-2">
+            <Button @onclick="ShowAddWordModal" Type="ButtonType.Submit" Color="ButtonColor.Success">
+                @Loc["AddNew"]
+            </Button>
+        </div>
+    </Authorized>
+</AuthorizeView>
 @if (Vocabulary?.Words.Count > 0)
 {
     <div class="m-2">
@@ -33,7 +38,11 @@
     }
     <Pagination ActivePageNumber="@CurrentPage"
                 TotalPages="@((int)Math.Ceiling(_filteredWords.Count * 1m / AmountWordsOnPage))"
-                PageChanged="OnPageChangedAsync" />
+                PageChanged="OnPageChangedAsync"
+                FirstLinkText="@SharedLoc["Pagination_First"]"
+                PreviousLinkText="@SharedLoc["Pagination_Previous"]"
+                NextLinkText="@SharedLoc["Pagination_Next"]"
+                LastLinkText="@SharedLoc["Pagination_Last"]" />
 }
 else
 {

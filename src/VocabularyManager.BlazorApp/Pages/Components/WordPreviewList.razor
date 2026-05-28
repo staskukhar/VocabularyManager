@@ -26,7 +26,11 @@
 </div>
 <Pagination ActivePageNumber="@CurrentPage"
             TotalPages="@TotalPages"
-            PageChanged="OnPageChangedAsync" />
+            PageChanged="OnPageChangedAsync"
+            FirstLinkText="@SharedLoc["Pagination_First"]"
+            PreviousLinkText="@SharedLoc["Pagination_Previous"]"
+            NextLinkText="@SharedLoc["Pagination_Next"]"
+            LastLinkText="@SharedLoc["Pagination_Last"]" />
 
 @code {
     [Parameter]
