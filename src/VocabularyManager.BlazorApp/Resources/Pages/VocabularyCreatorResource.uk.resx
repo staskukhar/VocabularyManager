@@ -61,4 +61,6 @@
   <data name="VocabularyNameRequired" xml:space="preserve"><value>Назва словника обов'язкова</value></data>
   <data name="SelectVocabulary" xml:space="preserve"><value>-- Оберіть словник --</value></data>
   <data name="SelectedVocabulary" xml:space="preserve"><value>Обраний словник</value></data>
+  <data name="FileInput_Browse" xml:space="preserve"><value>Огляд…</value></data>
+  <data name="FileInput_NoFileChosen" xml:space="preserve"><value>Файл не обрано</value></data>
 </root>

@@ -1,29 +1,67 @@
 ﻿using System.Net.Http.Json;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 
 namespace VocabularyManager.BlazorApp.Services
 {
     public class HttpService
     {
-        HttpClient _httpClient;
-        public HttpService(HttpClient httpClient)
+        private const string ClientKey = "API";
+        private readonly IHttpClientFactory _httpClientFactory;
+
+        public HttpService(IHttpClientFactory httpClientFactory)
         {
-            _httpClient = httpClient;
+            _httpClientFactory = httpClientFactory;
         }
+
+        private HttpClient Client => _httpClientFactory.CreateClient(ClientKey);
+
         public virtual async Task<HttpResponseMessage> GetAsync(string requestUrl)
         {
-            return await _httpClient.GetAsync(requestUrl);
+            try
+            {
+                return await Client.GetAsync(requestUrl);
+            }
+            catch (AccessTokenNotAvailableException ex)
+            {
+                ex.Redirect();
+                return default!;
+            }
         }
         public virtual async Task<HttpResponseMessage> PostWithJsonAsync<TRequest>(string requestUrl, TRequest data)
         {
-            return await _httpClient.PostAsJsonAsync(requestUrl, data);
+            try
+            {
+                return await Client.PostAsJsonAsync(requestUrl, data);
+            }
+            catch (AccessTokenNotAvailableException ex)
+            {
+                ex.Redirect();
+                return default!;
+            }
         }
         public virtual async Task<HttpResponseMessage> DeleteAsync(string requestUrl)
         {
-            return await _httpClient.DeleteAsync(requestUrl);
+            try
+            {
+                return await Client.DeleteAsync(requestUrl);
+            }
+            catch (AccessTokenNotAvailableException ex)
+            {
+                ex.Redirect();
+                return default!;
+            }
         }
         public virtual async Task<HttpResponseMessage> PutAsync<TRequest>(string requestUrl, TRequest data)
         {
-            return await _httpClient.PutAsJsonAsync(requestUrl, data);
+            try
+            {
+                return await Client.PutAsJsonAsync(requestUrl, data);
+            }
+            catch (AccessTokenNotAvailableException ex)
+            {
+                ex.Redirect();
+                return default!;
+            }
         }
     }
 }

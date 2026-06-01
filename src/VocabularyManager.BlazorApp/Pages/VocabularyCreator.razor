@@ -21,7 +21,11 @@
                 <Content>
                     <div class="col mb-3 mt-3">
                         <div class="input-group mb-2">
-                            <InputFile OnChange="LoadFiles" class="form-control" accept=".csv" />
+                            <label for="csvFileInput" class="form-control file-input-label">
+                                <span class="file-input-btn">@Loc["FileInput_Browse"]</span>
+                                <span class="file-input-filename">@(selectedFileName ?? Loc["FileInput_NoFileChosen"])</span>
+                            </label>
+                            <InputFile id="csvFileInput" OnChange="LoadFiles" accept=".csv" class="d-none" />
                             <Button Color="ButtonColor.Primary" @onclick="ParseSchema" Disabled="@(csvContent.Count == 0)">
                                 @Loc["ParseSchema"]
                             </Button>
@@ -101,6 +105,7 @@
 
     private List<VocabularyView> existingVocabularies = new();
     private bool isLoadingVocabularies = false;
+    private string? selectedFileName;
 
     private async Task LoadVocabularyFromUrl(string url)
     {
@@ -134,6 +139,7 @@
         csvParseResult = null;
         showMappingUI = false;
         WordList.Clear();
+        selectedFileName = e.File.Name;
 
         using MemoryStream memoryStream = new();
         await e.File.OpenReadStream().CopyToAsync(memoryStream);

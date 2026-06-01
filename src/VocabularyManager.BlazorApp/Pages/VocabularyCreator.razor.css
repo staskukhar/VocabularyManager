@@ -1,0 +1,22 @@
+.file-input-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 0.5rem;
+    overflow: hidden;
+}
+
+.file-input-btn {
+    flex-shrink: 0;
+    padding: 0 0.5rem;
+    background: #e9ecef;
+    border-radius: 0.25rem;
+    white-space: nowrap;
+}
+
+.file-input-filename {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #6c757d;
+}

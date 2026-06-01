@@ -61,4 +61,6 @@
   <data name="VocabularyNameRequired" xml:space="preserve"><value>Vocabulary name is required</value></data>
   <data name="SelectVocabulary" xml:space="preserve"><value>-- Select Vocabulary --</value></data>
   <data name="SelectedVocabulary" xml:space="preserve"><value>Selected vocabulary</value></data>
+  <data name="FileInput_Browse" xml:space="preserve"><value>Browse…</value></data>
+  <data name="FileInput_NoFileChosen" xml:space="preserve"><value>No file chosen</value></data>
 </root>

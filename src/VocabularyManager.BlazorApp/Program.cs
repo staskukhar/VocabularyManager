@@ -36,8 +36,6 @@ builder.Services.AddHttpClient("API", client =>
         client.BaseAddress = new Uri(httpOptions.ApiBaseURL);
     })
     .AddHttpMessageHandler<ApiAuthorizationMessageHandler>();
-builder.Services.AddScoped(serviceProvider =>
-    serviceProvider.GetRequiredService<IHttpClientFactory>().CreateClient("API"));
 
 builder.Services.AddFluentUIComponents();
 
