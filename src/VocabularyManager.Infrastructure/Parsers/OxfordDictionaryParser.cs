@@ -6,7 +6,7 @@ using VocabularyManager.UseCases.Exceptions;
 using VocabularyManager.UseCases.DTOs;
 using VocabularyManager.UseCases.Interfaces;
 
-namespace VocabularyManager.UseCases.Services.Parsers
+namespace VocabularyManager.Infrastructure.Parsers
 {
     public class OxfordDictionaryParser(IValidator<WordDTO> validator)
         : IWordParser<WordDTO>

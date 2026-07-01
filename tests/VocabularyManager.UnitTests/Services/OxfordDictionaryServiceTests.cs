@@ -1,7 +1,7 @@
 using FluentAssertions;
 using VocabularyManager.UseCases.DTOs;
 using VocabularyManager.UseCases.Exceptions;
-using VocabularyManager.UseCases.Services.Parsers;
+using VocabularyManager.Infrastructure.Parsers;
 using VocabularyManager.UseCases.Validators;
 
 namespace VocabularyManager.UnitTests.Services

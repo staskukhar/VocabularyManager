@@ -1,9 +1,9 @@
-﻿using AngleSharp;
+using AngleSharp;
 using AngleSharp.Dom;
 using VocabularyManager.UseCases.Exceptions;
 using VocabularyManager.UseCases.Interfaces;
 
-namespace VocabularyManager.UseCases.Services.Parsers;
+namespace VocabularyManager.Infrastructure.Parsers;
 
 public class SimpleOxfordDictionaryParser
     : IWordParser<string>
